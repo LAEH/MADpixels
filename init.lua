@@ -58,13 +58,13 @@ local functions = {
       'globalShuffle',
       'binedShuffle',
       'localShuffle',
-   }
+   },
    transforms = {
       'invert',
       'boost',
       'apertureBlur',
       'gaussianFlou',
-   }
+   },
    creations = {
       'dagrad',
       'ckograd',
@@ -74,13 +74,11 @@ local functions = {
 }
 
 
--- for _,fun in ipairs(MADpixelsFunctions) do
---    local i = MADpixels[fun](rick)
---    local f = dirout .. fun .. '.jpg'
---    h1(f)
---    pixels.save(f,i)
---    collectgarbage()
--- end
-
--- MADpixels.noise()
--- MADpixels.gradient()
+for _,group in ipairs(MADpixelsFunctions) do
+   for _,fun in ipairs(group) do
+      local i = MADpixels[fun](rick)
+      local f = dirout .. fun .. '.jpg'
+      pixels.save(f,i)
+      collectgarbage()
+   end
+end
