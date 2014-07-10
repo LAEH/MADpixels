@@ -22,7 +22,5 @@ build = {
    type = "builtin",
    modules = {
       ['MADpixels.init'] = 'init.lua',
-      ['MADpixels.gitpush'] = 'gitpush.lua',
-      ['MADpixels.mapixels'] = 'madpixels.lua',
    }
 }
