@@ -23,30 +23,31 @@ local MADpixels = {
 --┃                                                              IMG shuffles ┃
 --┃                                                                           ┃
 --┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-function MADpixels.globalShuffle(opt)
+function MADpixels.globalShuffle(i,o)
+   local i = i or rick
    local o = o or {}
    local h = o.h or s
    local w = o.w or s
-   local i = o.i or rick
    local i1 = image.scale(i,h,w)[{{1,3}}]
    local i2 = i1:reshape(3, h*w):transpose(2,1)
    local idx = torch.randperm((#i2)[1])
    local i3 = i2:clone()
    for x = 1, (#i2)[1] do
       i3[x] = i2[idx[x]]
+      print{i3[x]}
    end
    local i4 = i3:transpose(2,1):reshape(3,h,h)
-   h1(
-      [[
-         _______________________
-         MADpixels.globalShuffle
-         =======================
-      ]]
-   )
-   h2('Dimensions * i ')print(#i)
-   h2('Dimensions * i2')print(#i2)
-   h2('Dimensions * i3')print(#i3)
-   h2('Dimensions * i4')print(#i4)
+   -- h1(
+   --    [[
+   --       _______________________
+   --       MADpixels.globalShuffle
+   --       =======================
+   --    ]]
+   -- )
+   -- h2('Dimensions * i ')print(#i)
+   -- h2('Dimensions * i2')print(#i2)
+   -- h2('Dimensions * i3')print(#i3)
+   -- h2('Dimensions * i4')print(#i4)
    return i4
 end
 
@@ -71,7 +72,8 @@ function MADpixels.binedShuffle(opt)
    h1('Bins tensors Dimensions = ')
    print(imgw..'*'..imgh..'*'.. wBlocksNo..'*'..wBlocksNo..'*'..hBlocksNo)
    for i = 1, (#allBlocks)[2] do
-      xlua.progress(i,(#allBlocks)[2])
+
+
       local rdmPositions = torch.randperm((#allBlocks)[3]) --Randomize Bins
       for j = 1, (#allBlocks)[3] do
          allBlocks[{ 1,i,j }] = allBlocks[{ 1,i,rdmPositions[j] }]

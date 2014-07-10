@@ -23,6 +23,6 @@ build = {
    modules = {
       ['MADpixels.init'] = 'init.lua',
       ['MADpixels.gitpush'] = 'gitpush.lua',
-      ['MADpixels.mapixels'] = 'MADpixels.lua',
+      ['MADpixels.mapixels'] = 'madpixels.lua',
    }
 }

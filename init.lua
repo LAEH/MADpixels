@@ -42,7 +42,7 @@ require('pl.text').format_operator()
 local gm = require 'graphicsmagick'
 local col = require 'async.repl'.colorize
 local pixels = require 'pixels'
-local MADpixels = require 'MADpixels'
+local MADpixels = require 'MADpixels.MADpixels'
 
 --┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 --┃                                                                           ┃
@@ -51,7 +51,7 @@ local MADpixels = require 'MADpixels'
 --┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 local dirout = 'TEMP.test/'
-os.execute('mkdir '..dirout)
+os.execute('mkdir -p '..dirout)
 local functions = {
    shuffles = {
       'binedColorShuffle',
@@ -74,11 +74,32 @@ local functions = {
 }
 
 
-for _,group in ipairs(MADpixelsFunctions) do
-   for _,fun in ipairs(group) do
-      local i = MADpixels[fun](rick)
-      local f = dirout .. fun .. '.jpg'
-      pixels.save(f,i)
-      collectgarbage()
-   end
+-- for _,group in ipairs(functions) do
+--    for _,fun in ipairs(group) do
+--       local i = MADpixels[fun](rick)
+--       local f = dirout .. fun .. '.jpg'
+--       pixels.save(f,i)
+--       collectgarbage()
+--    end
+-- end
+
+--┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+--┃                                                                           ┃
+--┃                                                                      RUNS ┃
+--┃                                                                           ┃
+--┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+local files = dir.getfiles('mosaics/', '*.jpg')
+print(files)
+for i,file in ipairs(files) do
+   local img = pixels.load(file)
+   local name = path.basename(file)
+   local shuffled = MADpixels['globalShuffle'](img)
+   local file = 'mosaicsshuffled/'..name
+   pixels.save(file,shuffled)
+   xlua.progress(i,#files)
+   collectgarbage()
 end
+
+
