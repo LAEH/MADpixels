@@ -74,11 +74,32 @@ local functions = {
 }
 
 
-for _,group in ipairs(functions) do
-   for _,fun in ipairs(group) do
-      local i = MADpixels[fun](rick)
-      local f = dirout .. fun .. '.jpg'
-      pixels.save(f,i)
-      collectgarbage()
-   end
+-- for _,group in ipairs(functions) do
+--    for _,fun in ipairs(group) do
+--       local i = MADpixels[fun](rick)
+--       local f = dirout .. fun .. '.jpg'
+--       pixels.save(f,i)
+--       collectgarbage()
+--    end
+-- end
+
+--┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+--┃                                                                           ┃
+--┃                                                                      RUNS ┃
+--┃                                                                           ┃
+--┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+
+local files = dir.getfiles('mosaics/', '*.jpg')
+print(files)
+for i,file in ipairs(files) do
+   local img = pixels.load(file)
+   local name = path.basename(file)
+   local shuffled = MADpixels['globalShuffle'](img)
+   local file = 'mosaicsshuffled/'..name
+   pixels.save(file,shuffled)
+   xlua.progress(i,#files)
+   collectgarbage()
 end
+
+
