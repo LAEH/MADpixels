@@ -1,0 +1,206 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Madpixels by LAEH</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Madpixels</h1>
+        <p></p>
+
+        <p class="view"><a href="https://github.com/LAEH/MADpixels">View the Project on GitHub <small>LAEH/MADpixels</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/LAEH/MADpixels/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/LAEH/MADpixels/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/LAEH/MADpixels">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h1>
+<a name="madpixels" class="anchor" href="#madpixels"><span class="octicon octicon-link"></span></a>MADpixels</h1>
+
+<p><img src="assets/original.jpg"></p>
+
+<h2>
+<a name="invert" class="anchor" href="#invert"><span class="octicon octicon-link"></span></a>Invert</h2>
+
+<div class="highlight highlight-Lua"><pre>         <span class="k">function</span> <span class="nc">madpixels</span><span class="p">.</span><span class="nf">transform</span><span class="p">.</span><span class="n">invert</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="kd">local</span> <span class="n">args</span> <span class="o">=</span> <span class="n">args</span> <span class="ow">or</span> <span class="p">{}</span>
+            <span class="kd">local</span> <span class="n">img</span>  <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">img</span> <span class="ow">or</span> <span class="n">image</span><span class="p">.</span><span class="n">lena</span><span class="p">()</span>
+            <span class="kd">local</span> <span class="n">imvertedImage</span> <span class="o">=</span> <span class="o">-</span><span class="n">img</span> <span class="o">+</span><span class="mi">1</span>
+            <span class="k">return</span> <span class="n">imvertedImage</span>
+         <span class="k">end</span>
+</pre></div>
+
+<p><img src="assets/invert.jpg"></p>
+
+<h2>
+<a name="image-bins-shuffle" class="anchor" href="#image-bins-shuffle"><span class="octicon octicon-link"></span></a>Image Bins Shuffle</h2>
+
+<div class="highlight highlight-Lua"><pre><span class="k">function</span> <span class="nc">madpixels</span><span class="p">.</span><span class="nf">transform</span><span class="p">.</span><span class="n">binShuffle</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">args</span> <span class="o">=</span> <span class="n">args</span> <span class="ow">or</span> <span class="p">{}</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">img</span> <span class="ow">or</span> <span class="n">image</span><span class="p">.</span><span class="n">lena</span><span class="p">()</span>
+   <span class="kd">local</span> <span class="n">imgh</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgh</span> <span class="ow">or</span> <span class="mi">1024</span>
+   <span class="kd">local</span> <span class="n">imgw</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgw</span> <span class="ow">or</span> <span class="mi">1024</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">scale</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">imgh</span><span class="p">,</span><span class="n">imgw</span><span class="p">)[{</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span> <span class="p">}]</span>
+   <span class="kd">local</span> <span class="n">imgSize</span> <span class="o">=</span> <span class="o">#</span><span class="n">img</span>
+   <span class="kd">local</span> <span class="n">wblocksNo</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">wblocksNo</span> <span class="ow">or</span> <span class="mi">16</span>
+   <span class="kd">local</span> <span class="n">hblocksNo</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">hblocksNo</span> <span class="ow">or</span> <span class="mi">16</span>
+   <span class="kd">local</span> <span class="n">totalBlocksNo</span> <span class="o">=</span> <span class="n">wblocksNo</span> <span class="o">*</span> <span class="n">hblocksNo</span>
+   <span class="kd">local</span> <span class="n">blockw</span> <span class="o">=</span> <span class="n">imgSize</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">wblocksNo</span>
+   <span class="kd">local</span> <span class="n">blockh</span> <span class="o">=</span> <span class="n">imgSize</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">hblocksNo</span>
+   <span class="kd">local</span> <span class="n">blocks</span> <span class="o">=</span> <span class="n">img</span><span class="p">:</span><span class="n">unfold</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">blockw</span><span class="p">,</span><span class="n">blockw</span><span class="p">):</span><span class="n">unfold</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">blockh</span><span class="p">,</span><span class="n">blockh</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">allBlocks</span> <span class="o">=</span> <span class="n">blocks</span><span class="p">:</span><span class="n">reshape</span><span class="p">((</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                                    <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">3</span><span class="p">],</span>
+                                    <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">4</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">5</span><span class="p">])</span>
+   <span class="c1">-- Generate Random posiiton &amp; Randomize Bin Posiiton</span>
+   <span class="kd">local</span> <span class="n">rdmPositions</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">randperm</span><span class="p">((</span><span class="o">#</span><span class="n">allBlocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="o">#</span><span class="n">allBlocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="k">do</span>
+      <span class="n">xlua</span><span class="p">.</span><span class="n">progress</span><span class="p">(</span><span class="n">i</span><span class="p">,(</span><span class="o">#</span><span class="n">allBlocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+      <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">1</span><span class="p">,</span><span class="n">i</span> <span class="p">}]</span> <span class="o">=</span> <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">1</span><span class="p">,</span><span class="n">rdmPositions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">}]</span>
+      <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">2</span><span class="p">,</span><span class="n">i</span> <span class="p">}]</span> <span class="o">=</span> <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">2</span><span class="p">,</span><span class="n">rdmPositions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">}]</span>
+      <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">3</span><span class="p">,</span><span class="n">i</span> <span class="p">}]</span> <span class="o">=</span> <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">3</span><span class="p">,</span><span class="n">rdmPositions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">}]</span>
+   <span class="k">end</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">allBlocks</span><span class="p">:</span><span class="n">reshape</span><span class="p">((</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                                 <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">],</span>
+                                 <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">3</span><span class="p">],</span>
+                                 <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">4</span><span class="p">],</span>
+                                 <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">5</span><span class="p">])</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">:</span><span class="n">transpose</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">):</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">imgh</span><span class="p">,</span><span class="n">imgw</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">img</span>
+<span class="k">end</span>
+</pre></div>
+
+<p><img src="assets/binsShuffle.jpg"></p>
+
+<h2>
+<a name="global-pixels-shuffle" class="anchor" href="#global-pixels-shuffle"><span class="octicon octicon-link"></span></a>Global pixels Shuffle</h2>
+
+<hr><div class="highlight highlight-Lua"><pre><span class="k">function</span> <span class="nc">madpixels</span><span class="p">.</span><span class="nf">transform</span><span class="p">.</span><span class="n">globalShuffle</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">args</span> <span class="o">=</span> <span class="n">args</span> <span class="ow">or</span> <span class="p">{}</span>
+   <span class="kd">local</span> <span class="n">img</span>  <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">img</span> <span class="ow">or</span> <span class="n">image</span><span class="p">.</span><span class="n">lena</span><span class="p">()</span>
+   <span class="kd">local</span> <span class="n">imgh</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgh</span> <span class="ow">or</span> <span class="mi">1024</span>
+   <span class="kd">local</span> <span class="n">imgw</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgw</span> <span class="ow">or</span> <span class="mi">1024</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">scale</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">imgh</span><span class="p">,</span><span class="n">imgw</span><span class="p">)[{</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span> <span class="p">}]</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">:</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">imgh</span><span class="o">*</span><span class="n">imgw</span><span class="p">):</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">rdmi</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">randperm</span><span class="p">((</span><span class="o">#</span><span class="n">img</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+   <span class="kd">local</span> <span class="n">imgdest</span> <span class="o">=</span> <span class="n">img</span><span class="p">:</span><span class="n">clone</span><span class="p">()</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="o">#</span><span class="n">img</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">do</span> <span class="n">imgdest</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">rdmi</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span><span class="k">end</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">imgdest</span><span class="p">:</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">imgh</span><span class="p">,</span><span class="n">imgh</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">img</span>
+<span class="k">end</span>
+</pre></div>
+
+<p><img src="assets/globalShuffle.jpg"></p>
+
+<h2>
+<a name="bined-images-colors-shuffle" class="anchor" href="#bined-images-colors-shuffle"><span class="octicon octicon-link"></span></a>Bined Images Colors Shuffle</h2>
+
+<hr><div class="highlight highlight-Lua"><pre><span class="k">function</span> <span class="nc">madpixels</span><span class="p">.</span><span class="nf">transform</span><span class="p">.</span><span class="n">binedColorShuffle</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">args</span> <span class="o">=</span> <span class="n">args</span> <span class="ow">or</span> <span class="p">{}</span>
+   <span class="kd">local</span> <span class="n">img</span>   <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">img</span> <span class="ow">or</span> <span class="n">image</span><span class="p">.</span><span class="n">lena</span><span class="p">()</span>
+   <span class="kd">local</span> <span class="n">imgh</span>  <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgh</span> <span class="ow">or</span> <span class="mi">1024</span>
+   <span class="kd">local</span> <span class="n">imgw</span>  <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgw</span> <span class="ow">or</span> <span class="mi">1024</span>
+   <span class="kd">local</span> <span class="n">imgc</span>  <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgc</span> <span class="ow">or</span> <span class="mi">3</span>
+   <span class="kd">local</span> <span class="n">imgb</span>  <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgb</span> <span class="ow">or</span> <span class="mi">4</span> <span class="c1">-- == 16 bins</span>
+   <span class="kd">local</span> <span class="n">img</span>   <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">scale</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">imgh</span><span class="p">,</span><span class="n">imgw</span><span class="p">)[{{</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">}}]</span>
+   <span class="kd">local</span> <span class="n">img</span>   <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">rgb2hsl</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">img</span>   <span class="o">=</span> <span class="n">img</span><span class="p">:</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">imgh</span><span class="o">*</span><span class="n">imgw</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">img</span>   <span class="o">=</span> <span class="n">img</span><span class="p">:</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">colors</span>   <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">100</span> <span class="k">do</span>
+      <span class="n">colors</span><span class="p">[{</span><span class="n">i</span><span class="p">}]</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">torch</span><span class="p">.</span><span class="n">random</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">imgh</span><span class="o">*</span><span class="n">imgw</span><span class="p">)]</span>
+   <span class="k">end</span>
+   <span class="kd">local</span> <span class="n">wblocksNo</span>      <span class="o">=</span> <span class="n">imgw</span> <span class="o">/</span> <span class="n">imgb</span>
+   <span class="kd">local</span> <span class="n">hblocksNo</span>      <span class="o">=</span> <span class="n">imgh</span> <span class="o">/</span> <span class="n">imgb</span>
+   <span class="kd">local</span> <span class="n">blockPixelsNo</span>  <span class="o">=</span> <span class="n">imgb</span> <span class="o">*</span> <span class="n">imgb</span>
+   <span class="kd">local</span> <span class="n">totalBlocksNo</span>  <span class="o">=</span> <span class="n">wblocksNo</span> <span class="o">*</span> <span class="n">hblocksNo</span>
+   <span class="kd">local</span> <span class="n">blocksHSL</span>      <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">Tensor</span><span class="p">(</span><span class="n">totalBlocksNo</span><span class="p">,</span><span class="n">blockPixelsNo</span><span class="p">,</span><span class="n">imgc</span><span class="p">)</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,(</span><span class="o">#</span><span class="n">blocksHSL</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">do</span>
+      <span class="n">xlua</span><span class="p">.</span><span class="n">progress</span><span class="p">(</span><span class="n">i</span><span class="p">,(</span><span class="o">#</span><span class="n">blocksHSL</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+      <span class="kd">local</span> <span class="n">inHSL</span>   <span class="o">=</span> <span class="n">colors</span><span class="p">[</span><span class="n">floor</span><span class="p">(</span><span class="n">torch</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">,(</span><span class="o">#</span><span class="n">colors</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">))]</span>
+      <span class="kd">local</span> <span class="n">ssclaor</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+      <span class="kd">local</span> <span class="n">lscalor</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">for</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,(</span><span class="o">#</span><span class="n">blocksHSL</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="k">do</span>
+         <span class="n">blocksHSL</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+         <span class="n">blocksHSL</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mf">1.5</span><span class="p">)</span>
+         <span class="n">blocksHSL</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">1.5</span><span class="p">)</span>
+         <span class="n">blocksHSL</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]:</span><span class="n">cmul</span><span class="p">(</span><span class="n">inHSL</span><span class="p">)</span>
+      <span class="k">end</span>
+   <span class="k">end</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">blocksHSL</span><span class="p">:</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+                        <span class="p">:</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+                        <span class="p">:</span><span class="n">reshape</span><span class="p">(</span><span class="n">imgc</span><span class="p">,</span><span class="n">wblocksNo</span><span class="p">,</span><span class="n">hblocksNo</span><span class="p">,</span><span class="n">imgb</span><span class="p">,</span><span class="n">imgb</span><span class="p">)</span>
+                        <span class="p">:</span><span class="n">transpose</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+                        <span class="p">:</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">imgw</span><span class="p">,</span><span class="n">imgh</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">hsl2rgb</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+   <span class="k">return</span> <span class="n">img</span>
+<span class="k">end</span>
+</pre></div>
+
+<p><img src="assets/binedColorShuffle.jpg"></p>
+
+<h2>
+<a name="bined-images-pixels-shuffle" class="anchor" href="#bined-images-pixels-shuffle"><span class="octicon octicon-link"></span></a>Bined Images Pixels Shuffle</h2>
+
+<h1></h1>
+
+<div class="highlight highlight-Lua"><pre><span class="k">function</span> <span class="nc">madpixels</span><span class="p">.</span><span class="nf">transform</span><span class="p">.</span><span class="n">binedShuffle</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+   <span class="n">args</span> <span class="o">=</span> <span class="n">args</span> <span class="ow">or</span> <span class="p">{}</span>
+   <span class="kd">local</span> <span class="n">img</span>       <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">img</span> <span class="ow">or</span> <span class="n">image</span><span class="p">.</span><span class="n">lena</span><span class="p">()</span>
+   <span class="kd">local</span> <span class="n">imgh</span>      <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgh</span> <span class="ow">or</span> <span class="mi">1024</span>
+   <span class="kd">local</span> <span class="n">imgw</span>      <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">imgw</span> <span class="ow">or</span> <span class="mi">1024</span>
+   <span class="kd">local</span> <span class="n">wblocksNo</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">wblocksNo</span> <span class="ow">or</span> <span class="mi">16</span>
+   <span class="kd">local</span> <span class="n">hblocksNo</span> <span class="o">=</span> <span class="n">args</span><span class="p">.</span><span class="n">hblocksNo</span> <span class="ow">or</span> <span class="mi">16</span>
+   <span class="kd">local</span> <span class="n">img</span>     <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">scale</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">imgh</span><span class="p">,</span><span class="n">imgw</span><span class="p">)[{</span> <span class="p">{</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">}</span> <span class="p">}]</span>
+   <span class="kd">local</span> <span class="n">imgSize</span> <span class="o">=</span> <span class="o">#</span><span class="n">img</span>
+   <span class="kd">local</span> <span class="n">imgHSL</span>  <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">rgb2hsv</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.99</span>
+   <span class="kd">local</span> <span class="n">blockw</span>  <span class="o">=</span> <span class="n">imgSize</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">/</span> <span class="n">wblocksNo</span>
+   <span class="kd">local</span> <span class="n">blockh</span>  <span class="o">=</span> <span class="n">imgSize</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">/</span> <span class="n">hblocksNo</span>
+   <span class="kd">local</span> <span class="n">blocks</span>  <span class="o">=</span> <span class="n">imgHSL</span><span class="p">:</span><span class="n">unfold</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">blockw</span><span class="p">,</span><span class="n">blockw</span><span class="p">):</span><span class="n">unfold</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">blockh</span><span class="p">,</span><span class="n">blockh</span><span class="p">)</span>
+   <span class="kd">local</span> <span class="n">allBlocks</span><span class="o">=</span> <span class="n">blocks</span><span class="p">:</span><span class="n">reshape</span><span class="p">((</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                                   <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">3</span><span class="p">],</span>
+                                   <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">4</span><span class="p">]</span><span class="o">*</span><span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">5</span><span class="p">])</span>
+   <span class="k">for</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="o">#</span><span class="n">allBlocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">]</span> <span class="k">do</span>
+      <span class="n">xlua</span><span class="p">.</span><span class="n">progress</span><span class="p">(</span><span class="n">i</span><span class="p">,(</span><span class="o">#</span><span class="n">allBlocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+      <span class="kd">local</span> <span class="n">rdmPositions</span> <span class="o">=</span> <span class="n">torch</span><span class="p">.</span><span class="n">randperm</span><span class="p">((</span><span class="o">#</span><span class="n">allBlocks</span><span class="p">)[</span><span class="mi">3</span><span class="p">])</span> <span class="c1">--Randomize Bins</span>
+      <span class="k">for</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="o">#</span><span class="n">allBlocks</span><span class="p">)[</span><span class="mi">3</span><span class="p">]</span> <span class="k">do</span>
+         <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="p">}]</span> <span class="o">=</span> <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">1</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">rdmPositions</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="p">}]</span>
+         <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="p">}]</span> <span class="o">=</span> <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">2</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">rdmPositions</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="p">}]</span>
+         <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">3</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="p">}]</span> <span class="o">=</span> <span class="n">allBlocks</span><span class="p">[{</span> <span class="mi">3</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">rdmPositions</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="p">}]</span>
+      <span class="k">end</span>
+   <span class="k">end</span>
+   <span class="c1">-- reshape for output</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">allBlocks</span><span class="p">:</span><span class="n">reshape</span><span class="p">((</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">1</span><span class="p">],</span>
+                                 <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">2</span><span class="p">],</span>
+                                 <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">3</span><span class="p">],</span>
+                                 <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">4</span><span class="p">],</span>
+                                 <span class="p">(</span><span class="o">#</span><span class="n">blocks</span><span class="p">)[</span><span class="mi">5</span><span class="p">])</span>
+   <span class="kd">local</span> <span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">hsv2rgb</span><span class="p">(</span><span class="n">img</span><span class="p">:</span><span class="n">transpose</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">):</span><span class="n">reshape</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="n">imgh</span><span class="p">,</span><span class="n">imgw</span><span class="p">))</span>
+   <span class="k">return</span> <span class="n">img</span>
+<span class="k">end</span>
+</pre></div>
+
+<p><img src="assets/binedShuffle.jpg"></p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/LAEH">LAEH</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>
