@@ -34,7 +34,7 @@ function MADpixels.globalShuffle(i,o)
    local i3 = i2:clone()
    for x = 1, (#i2)[1] do
       i3[x] = i2[idx[x]]
-      print{i3[x]}
+      -- print{i3[x]}
    end
    local i4 = i3:transpose(2,1):reshape(3,h,h)
    -- h1(
@@ -44,10 +44,14 @@ function MADpixels.globalShuffle(i,o)
    --       =======================
    --    ]]
    -- )
-   -- h2('Dimensions * i ')print(#i)
-   -- h2('Dimensions * i2')print(#i2)
-   -- h2('Dimensions * i3')print(#i3)
-   -- h2('Dimensions * i4')print(#i4)
+
+   local by = col.magenta('*')
+   io.write(col.red('i  ')..(#i)[1]..by..(#i)[2]..by..(#i)[3])
+   io.write(col.red('i1 ')..(#i1)[1]..by..(#i1)[2])
+   io.write(col.red('i2 ')..(#i2)[1]..by..(#i2)[2])
+   io.write(col.red('i3 ')..(#i3)[1]..by..(#i3)[2]..by..(#i)[3])
+   io.write(col.red('i4 ')..(#i4)[1]..by..(#i4)[2]..by..(#i)[3])
+
    return i4
 end
 

@@ -1,11 +1,11 @@
 #!/usr/bin/env th
-
-
---┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
---┃                                                                           ┃
---┃                                                                 MADpixels ┃
---┃                                                                           ┃
---┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+require 'sys'
+require 'xlua'
+require('pl.text').format_operator()
+local gm = require 'graphicsmagick'
+local col = require 'async.repl'.colorize
+local pixels = require 'pixels'
+local MADpixels = require './MADpixels' -- load local version
 
 --           _____                    _____                    _____
 --          /\    \                  /\    \                  /\    \
@@ -32,26 +32,10 @@
 
 --┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 --┃                                                                           ┃
---┃                                                  Dependancy & Definitions ┃
---┃                                                                           ┃
---┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
-
-require 'sys'
-require 'xlua'
-require('pl.text').format_operator()
-local gm = require 'graphicsmagick'
-local col = require 'async.repl'.colorize
-local pixels = require 'pixels'
-local MADpixels = require './MADpixels'
-
---┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
---┃                                                                           ┃
 --┃                                                                     TESTS ┃
 --┃                                                                           ┃
 --┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-local dirout = 'TEMP.test/'
-os.execute('mkdir -p '..dirout)
 local functions = {
    shuffles = {
       'binedColorShuffle',
@@ -73,15 +57,18 @@ local functions = {
    }
 }
 
-
--- for _,group in ipairs(functions) do
---    for _,fun in ipairs(group) do
---       local i = MADpixels[fun](rick)
---       local f = dirout .. fun .. '.jpg'
---       pixels.save(f,i)
---       collectgarbage()
---    end
--- end
+function test()
+   local dirout = 'TEMP.test/'
+   os.execute('mkdir -p '..dirout)
+   for _,group in ipairs(functions) do
+      for _,fun in ipairs(group) do
+         local i = MADpixels[fun](rick)
+         local f = dirout .. fun .. '.jpg'
+         pixels.save(f,i)
+         collectgarbage()
+      end
+   end
+end
 
 --┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 --┃                                                                           ┃
@@ -89,17 +76,21 @@ local functions = {
 --┃                                                                           ┃
 --┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-
-local files = dir.getfiles('mosaics/', '*.jpg')
-print(files)
-for i,file in ipairs(files) do
-   local img = pixels.load(file)
-   local name = path.basename(file)
-   local shuffled = MADpixels['globalShuffle'](img)
-   local file = 'mosaicsshuffled/'..name
-   pixels.save(file,shuffled)
-   xlua.progress(i,#files)
-   collectgarbage()
+function ckoiaGrlobalShuffle()
+   local time = os.time()
+   local files = dir.getfiles('digilux/', '*.JPG')
+   local dirout = 'run'..time..'/'
+   os.execute('mkdir -p '..dirout)
+   for i,file in ipairs(files) do
+      local img = pixels.load(file)
+      local name = path.basename(file)
+      print(col.yellow(name))
+      local shuffled = MADpixels['globalShuffle'](img)
+      local file = dirout..name
+      pixels.save(file,shuffled)
+      -- xlua.progress(i,#files)
+      collectgarbage()
+   end
 end
 
-
+ckoiaGrlobalShuffle()
