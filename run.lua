@@ -63,7 +63,7 @@ end
 function run.globalShuffle()
    local time = os.time()
    local files = dir.getfiles(testIMGdirectory, '*.jpg')
-   local dirout = 'resultsrun'..time..'/'
+   local dirout = 'results/resultsrun'..time..'/'
    os.execute('mkdir -p '..dirout)
    for i,file in ipairs(files) do
       local name = path.basename(file)
