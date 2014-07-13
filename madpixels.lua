@@ -15,14 +15,36 @@ function h3(text) print(col._cyan(text)) end
 local s = 512
 local g = 16
 local MADpixels = {
-   test = {}
+   test = {},
+   available = {
+      shuffles = {
+         'binedColorShuffle',
+         'globalShuffle',
+         'binedShuffle',
+         'localShuffle',
+      },
+      transforms = {
+         'invert',
+         'boost',
+         'apertureBlur',
+         'gaussianFlou',
+      },
+      creations = {
+         'dagrad',
+         'ckograd',
+         'uniform',
+         'gradient',
+      }
+   }
 }
+
 
 --┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 --┃                                                                           ┃
 --┃                                                              IMG shuffles ┃
 --┃                                                                           ┃
 --┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
 function MADpixels.globalShuffle(i,o)
    local i = i or rick
    local o = o or {}
@@ -37,14 +59,6 @@ function MADpixels.globalShuffle(i,o)
       -- print{i3[x]}
    end
    local i4 = i3:transpose(2,1):reshape(3,h,h)
-   -- h1(
-   --    [[
-   --       _______________________
-   --       MADpixels.globalShuffle
-   --       =======================
-   --    ]]
-   -- )
-
    local by = col.magenta('*')
    io.write(col.red('i  ')..(#i)[1]..by..(#i)[2]..by..(#i)[3])
    io.write(col.red('i1 ')..(#i1)[1]..by..(#i1)[2])
@@ -98,22 +112,18 @@ end
 
 function MADpixels.localShuffle(opt)
    opt = opt or {}
-   -- Potential Arguments
    local img = opt.img or rick
    img = img:clone()
    local maxSpread = math.max( (#img)[1], (#img)[2], (#img)[3])
    local meanMaxSpread = maxSpread/4
    local spread = opt.spread or meanMaxSpread
-   -- Spread == 0?
    if spread == 0 then
        return img
    end
-   -- Img Geometry
    local width = (#img)[3]
    local height = (#img)[2]
    local channels = (#img)[1]
    local npixels = width*height
-   -- Fast & Furious Computation
    local raw = torch.data(img)
    local offsets_x = torch.data( torch.Tensor(npixels):normal(0, spread) )
    local offsets_y = torch.data( torch.Tensor(npixels):normal(0, spread) )
