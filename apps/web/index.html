@@ -30,43 +30,68 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 16px;
+            padding: 8px 16px;
             flex-shrink: 0;
         }
 
         .logo {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 700;
             letter-spacing: -0.5px;
         }
 
-        .score {
-            font-size: 16px;
-            font-weight: 700;
-            color: #666;
+        .mode-toggle {
+            display: flex;
+            background: #f0f0f0;
+            border-radius: 20px;
+            padding: 3px;
         }
 
-        .header-btns {
+        .mode-btn {
+            padding: 8px 16px;
+            border: none;
+            background: transparent;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            color: #888;
+            border-radius: 17px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .mode-btn.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .header-right {
             display: flex;
-            gap: 8px;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .score {
+            font-size: 15px;
+            font-weight: 700;
+            color: #000;
         }
 
         .icon-btn {
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border: 2px solid #000;
             background: #fff;
             color: #000;
-            border-radius: 22px;
+            border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
         }
         .icon-btn:active { background: #000; color: #fff; }
-        .icon-btn svg { width: 20px; height: 20px; }
+        .icon-btn svg { width: 18px; height: 18px; }
 
-        .grid-wrap {
+        .main-area {
             flex: 1;
             min-height: 0;
             display: flex;
@@ -75,6 +100,7 @@
             padding: 8px 16px;
         }
 
+        /* Game Mode */
         .grid-container {
             position: relative;
             border-radius: 12px;
@@ -84,8 +110,8 @@
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
-            gap: 1px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 2px;
             background: #e0e0e0;
         }
 
@@ -96,7 +122,7 @@
         }
 
         .grid-cell.missing {
-            background: #f5f5f5;
+            background: #f0f0f0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -104,57 +130,81 @@
 
         .grid-cell.missing::after {
             content: '?';
-            font-size: 24px;
+            font-size: 28px;
             font-weight: 700;
             color: #ccc;
         }
 
         .grid-cell.correct {
-            animation: flash-green 0.5s;
+            animation: pop 0.3s;
         }
 
-        @keyframes flash-green {
-            0%, 100% { filter: none; }
-            50% { filter: brightness(1.5) saturate(0.5) sepia(1) hue-rotate(70deg); }
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Edit Mode */
+        .canvas-container {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+        }
+
+        .canvas-container canvas {
+            display: block;
+            max-width: 100%;
+            max-height: 100%;
         }
 
         .controls {
             flex-shrink: 0;
-            padding: 16px;
+            padding: 12px 16px 16px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
         }
 
-        .prompt {
+        /* Game Controls */
+        .game-controls .prompt {
             text-align: center;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #666;
+            min-height: 20px;
         }
+        .game-controls .prompt.correct { color: #22aa22; }
+        .game-controls .prompt.wrong { color: #dd3333; }
 
         .choices {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
+            gap: 10px;
         }
 
         .choice {
             aspect-ratio: 1;
-            border-radius: 12px;
+            border-radius: 10px;
             border: 3px solid #e0e0e0;
             background-size: cover;
             background-position: center;
             cursor: pointer;
-            transition: border-color 0.15s, transform 0.15s;
+            transition: all 0.15s;
         }
         .choice:active { transform: scale(0.95); }
         .choice.wrong {
-            border-color: #ff4444;
+            border-color: #dd3333;
             animation: shake 0.3s;
+            opacity: 0.5;
         }
         .choice.correct {
-            border-color: #44cc44;
+            border-color: #22aa22;
+            transform: scale(1.05);
+        }
+        .choice.disabled {
+            pointer-events: none;
+            opacity: 0.4;
         }
 
         @keyframes shake {
@@ -163,20 +213,71 @@
             75% { transform: translateX(4px); }
         }
 
-        .action-row {
+        /* Edit Controls */
+        .edit-controls .slider-row {
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+        }
+
+        .slider-value {
+            font-size: 12px;
+            font-weight: 700;
+            color: #000;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 44px;
+            background: transparent;
+            margin: 0;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 28px;
+            height: 28px;
+            background: #000;
+            border-radius: 50%;
+            margin-top: -11px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
         }
 
         .action-btn {
             flex: 1;
-            height: 56px;
+            height: 52px;
             border: none;
-            border-radius: 28px;
+            border-radius: 26px;
             background: #000;
             color: #fff;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -199,13 +300,13 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 48px;
+            gap: 40px;
             z-index: 100;
             padding: 32px;
         }
 
         .welcome-title {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             letter-spacing: -1px;
         }
@@ -221,148 +322,322 @@
         .choose-btn {
             width: 100%;
             max-width: 280px;
-            height: 64px;
+            height: 60px;
             border: none;
-            border-radius: 32px;
+            border-radius: 30px;
             background: #000;
             color: #fff;
             font-family: 'Space Grotesk', sans-serif;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
             cursor: pointer;
         }
         .choose-btn:active { opacity: 0.85; }
+
+        canvas.gl { display: none; }
+
+        .streak {
+            font-size: 11px;
+            color: #888;
+            margin-top: -4px;
+        }
+        .streak.hot { color: #ff6600; }
     </style>
 </head>
 <body>
     <div class="app">
         <header>
             <span class="logo">MADpixels</span>
-            <span class="score" id="score">0 / 0</span>
-            <div class="header-btns">
-                <button class="icon-btn" id="newPhotoBtn" title="New Photo">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+            <div class="mode-toggle">
+                <button class="mode-btn active" id="gameModeBtn">Game</button>
+                <button class="mode-btn" id="editModeBtn">Edit</button>
+            </div>
+            <div class="header-right">
+                <div>
+                    <div class="score" id="score">0</div>
+                    <div class="streak" id="streak"></div>
+                </div>
+                <button class="icon-btn" id="newPhotoBtn">
+                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
                 </button>
             </div>
         </header>
 
-        <div class="grid-wrap">
-            <div class="grid-container">
+        <div class="main-area">
+            <!-- Game Mode -->
+            <div class="grid-container" id="gameArea">
                 <div class="grid" id="grid"></div>
+            </div>
+            <!-- Edit Mode -->
+            <div class="canvas-container hidden" id="editArea">
+                <canvas id="canvas"></canvas>
             </div>
         </div>
 
-        <div class="controls">
+        <!-- Game Controls -->
+        <div class="controls game-controls" id="gameControls">
             <div class="prompt" id="prompt">Find the missing piece</div>
             <div class="choices" id="choices"></div>
-            <div class="action-row">
-                <button class="action-btn" id="nextBtn">Next Puzzle</button>
+        </div>
+
+        <!-- Edit Controls -->
+        <div class="controls edit-controls hidden" id="editControls">
+            <div class="slider-row">
+                <div class="slider-header">
+                    <span class="slider-label">Block Size</span>
+                    <span class="slider-value" id="blockValue">32</span>
+                </div>
+                <input type="range" id="blockSlider" min="4" max="64" value="32" step="4">
+            </div>
+            <div class="slider-row">
+                <div class="slider-header">
+                    <span class="slider-label">Dispersion</span>
+                    <span class="slider-value" id="disperseValue">50</span>
+                </div>
+                <input type="range" id="disperseSlider" min="0" max="100" value="50" step="5">
+            </div>
+            <div class="btn-row">
+                <button class="action-btn outline" id="shuffleBtn">Shuffle</button>
+                <button class="action-btn" id="downloadBtn">Save</button>
             </div>
         </div>
     </div>
 
-    <input type="file" id="fileInput" accept="image/*" style="display:none">
+    <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
+    <canvas id="glCanvas" class="gl"></canvas>
 
     <div class="welcome" id="welcome">
         <div class="welcome-title">MADpixels</div>
-        <div class="welcome-sub">Find the missing piece. Test your eye for detail.</div>
-        <button class="choose-btn" id="chooseBtn">Choose Photo</button>
+        <div class="welcome-sub">Select your photos. Find the missing pieces. Beat your streak.</div>
+        <button class="choose-btn" id="chooseBtn">Select Photos</button>
     </div>
 
 <script>
+// WebGL Processor
+class WebGLProcessor {
+    constructor() {
+        this.canvas = document.getElementById('glCanvas');
+        this.gl = this.canvas.getContext('webgl2') || this.canvas.getContext('webgl');
+        this.programs = {};
+        this.available = !!this.gl;
+        if (this.available) this.init();
+    }
+
+    init() {
+        const gl = this.gl;
+        const vert = `attribute vec2 a_position;attribute vec2 a_texCoord;varying vec2 v_texCoord;void main(){gl_Position=vec4(a_position,0,1);v_texCoord=a_texCoord;}`;
+        const shaders = {
+            localShuffle: `precision highp float;varying vec2 v_texCoord;uniform sampler2D u_image;uniform vec2 u_res;uniform float u_spread;uniform float u_seed;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453+u_seed);}void main(){float m=max(u_res.x,u_res.y)*u_spread/4.0;float u1=max(0.0001,hash(v_texCoord*u_res));float u2=hash(v_texCoord*u_res+vec2(1.0,0.0));float r=sqrt(-2.0*log(u1));vec2 n=vec2(r*cos(6.28318*u2),r*sin(6.28318*u2))*m/u_res;gl_FragColor=texture2D(u_image,clamp(v_texCoord+n,0.0,1.0));}`
+        };
+        for (const [name, frag] of Object.entries(shaders)) {
+            const vs = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vs, vert); gl.compileShader(vs);
+            const fs = gl.createShader(gl.FRAGMENT_SHADER); gl.shaderSource(fs, frag); gl.compileShader(fs);
+            const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+            this.programs[name] = prog;
+        }
+        this.posBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
+        this.texBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.texBuf);
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0,1,1,1,0,0,0,0,1,1,1,0]), gl.STATIC_DRAW);
+    }
+
+    createTexture(img) {
+        const gl = this.gl, tex = gl.createTexture();
+        gl.bindTexture(gl.TEXTURE_2D, tex);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+        return tex;
+    }
+
+    render(prog, w, h, setup) {
+        const gl = this.gl;
+        this.canvas.width = w; this.canvas.height = h;
+        gl.viewport(0, 0, w, h); gl.useProgram(prog);
+        const pLoc = gl.getAttribLocation(prog, 'a_position');
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuf); gl.enableVertexAttribArray(pLoc); gl.vertexAttribPointer(pLoc, 2, gl.FLOAT, false, 0, 0);
+        const tLoc = gl.getAttribLocation(prog, 'a_texCoord');
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.texBuf); gl.enableVertexAttribArray(tLoc); gl.vertexAttribPointer(tLoc, 2, gl.FLOAT, false, 0, 0);
+        setup(gl, prog); gl.drawArrays(gl.TRIANGLES, 0, 6);
+    }
+
+    getImageData() {
+        const gl = this.gl, w = this.canvas.width, h = this.canvas.height;
+        const px = new Uint8Array(w * h * 4);
+        gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
+        const flip = new Uint8ClampedArray(px.length);
+        for (let y = 0; y < h; y++) flip.set(px.subarray((h-1-y)*w*4, (h-y)*w*4), y*w*4);
+        return new ImageData(flip, w, h);
+    }
+
+    localShuffle(imgData, spread, seed) {
+        const t = this.createTexture(imgData);
+        this.render(this.programs.localShuffle, imgData.width, imgData.height, (gl, p) => {
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, t);
+            gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0);
+            gl.uniform2f(gl.getUniformLocation(p, 'u_res'), imgData.width, imgData.height);
+            gl.uniform1f(gl.getUniformLocation(p, 'u_spread'), spread);
+            gl.uniform1f(gl.getUniformLocation(p, 'u_seed'), seed);
+        });
+        this.gl.deleteTexture(t);
+        return this.getImageData();
+    }
+}
+
 // State
+let mode = 'game'; // 'game' or 'edit'
+let images = []; // array of loaded image canvases
+let currentImageIdx = 0;
+let puzzlesOnCurrentImage = 0;
 let originalImage = null;
-let blocks = []; // 64 block canvases
-let missingIndex = -1;
-let correctIndex = -1;
-let choices = []; // indices of blocks shown as choices
+let originalImageData = null;
+let blocks = [];
+let shuffleOrder = [];
+let missingGridPos = -1;
+let correctBlockIdx = -1;
+let correctChoiceIdx = -1;
+let choices = [];
 let score = 0;
-let total = 0;
+let streak = 0;
+let bestStreak = 0;
 let answered = false;
 
-const GRID_SIZE = 8;
+// Edit state
+let blockSize = 32;
+let dispersion = 50;
+let seed = Math.random() * 1000;
+
+const GRID_SIZE = 5;
 const TOTAL_BLOCKS = GRID_SIZE * GRID_SIZE;
+const AUTO_NEXT_DELAY = 500;
+const PUZZLES_PER_IMAGE = 3;
 
 const $ = id => document.getElementById(id);
+const gpu = new WebGLProcessor();
+const canvas = $('canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-function loadImage(file) {
-    const reader = new FileReader();
-    reader.onload = e => {
-        const img = new Image();
-        img.onload = () => {
-            // Resize to 512x512 for clean 8x8 grid (64px per block)
-            const size = 512;
-            const c = document.createElement('canvas');
-            c.width = size; c.height = size;
-            const cx = c.getContext('2d');
+function loadImages(files) {
+    images = [];
+    currentImageIdx = 0;
+    puzzlesOnCurrentImage = 0;
+    let loaded = 0;
 
-            // Cover fit
-            const scale = Math.max(size / img.width, size / img.height);
-            const w = img.width * scale;
-            const h = img.height * scale;
-            cx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+    Array.from(files).forEach((file, idx) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                const size = 500;
+                const c = document.createElement('canvas');
+                c.width = size; c.height = size;
+                const cx = c.getContext('2d');
 
-            originalImage = c;
-            extractBlocks();
-            score = 0;
-            total = 0;
-            updateScore();
-            newPuzzle();
+                const scale = Math.max(size / img.width, size / img.height);
+                const w = img.width * scale;
+                const h = img.height * scale;
+                cx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
 
-            $('welcome').classList.add('hidden');
+                images[idx] = { canvas: c, data: cx.getImageData(0, 0, size, size) };
+                loaded++;
+
+                if (loaded === files.length) {
+                    // Shuffle images for variety
+                    for (let i = images.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [images[i], images[j]] = [images[j], images[i]];
+                    }
+                    setCurrentImage(0);
+                    $('welcome').classList.add('hidden');
+                }
+            };
+            img.src = e.target.result;
         };
-        img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+        reader.readAsDataURL(file);
+    });
+}
+
+function setCurrentImage(idx) {
+    if (images.length === 0) return;
+    currentImageIdx = idx % images.length;
+    puzzlesOnCurrentImage = 0;
+
+    originalImage = images[currentImageIdx].canvas;
+    originalImageData = images[currentImageIdx].data;
+
+    if (mode === 'game') {
+        extractBlocks();
+        newPuzzle();
+    } else {
+        applyEditEffect();
+    }
+}
+
+function nextImage() {
+    if (images.length > 1) {
+        setCurrentImage(currentImageIdx + 1);
+    }
 }
 
 function extractBlocks() {
     blocks = [];
-    const blockSize = originalImage.width / GRID_SIZE;
-    const ctx = originalImage.getContext('2d');
+    const blkSize = originalImage.width / GRID_SIZE;
 
     for (let i = 0; i < TOTAL_BLOCKS; i++) {
-        const x = (i % GRID_SIZE) * blockSize;
-        const y = Math.floor(i / GRID_SIZE) * blockSize;
+        const x = (i % GRID_SIZE) * blkSize;
+        const y = Math.floor(i / GRID_SIZE) * blkSize;
 
         const blockCanvas = document.createElement('canvas');
-        blockCanvas.width = blockSize;
-        blockCanvas.height = blockSize;
+        blockCanvas.width = blkSize;
+        blockCanvas.height = blkSize;
         const blockCtx = blockCanvas.getContext('2d');
-        blockCtx.drawImage(originalImage, x, y, blockSize, blockSize, 0, 0, blockSize, blockSize);
+        blockCtx.drawImage(originalImage, x, y, blkSize, blkSize, 0, 0, blkSize, blkSize);
 
         blocks.push(blockCanvas);
     }
 }
 
+function shuffleArray(arr) {
+    const result = [...arr];
+    for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+}
+
 function newPuzzle() {
     answered = false;
     $('prompt').textContent = 'Find the missing piece';
-    $('prompt').style.color = '#666';
+    $('prompt').className = 'prompt';
 
-    // Pick random missing block
-    missingIndex = Math.floor(Math.random() * TOTAL_BLOCKS);
+    // Shuffle grid display
+    const indices = [];
+    for (let i = 0; i < TOTAL_BLOCKS; i++) indices.push(i);
+    shuffleOrder = shuffleArray(indices);
 
-    // Create choices: 1 correct + 3 wrong
+    // Pick missing position
+    missingGridPos = Math.floor(Math.random() * TOTAL_BLOCKS);
+    correctBlockIdx = shuffleOrder[missingGridPos];
+
+    // Create 4 choices
     const wrongChoices = [];
     while (wrongChoices.length < 3) {
         const idx = Math.floor(Math.random() * TOTAL_BLOCKS);
-        if (idx !== missingIndex && !wrongChoices.includes(idx)) {
+        if (idx !== correctBlockIdx && !wrongChoices.includes(idx)) {
             wrongChoices.push(idx);
         }
     }
 
-    choices = [missingIndex, ...wrongChoices];
-    // Shuffle choices
-    for (let i = choices.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [choices[i], choices[j]] = [choices[j], choices[i]];
-    }
-    correctIndex = choices.indexOf(missingIndex);
+    choices = shuffleArray([correctBlockIdx, ...wrongChoices]);
+    correctChoiceIdx = choices.indexOf(correctBlockIdx);
 
     renderGrid();
     renderChoices();
@@ -372,13 +647,12 @@ function renderGrid() {
     const grid = $('grid');
     grid.innerHTML = '';
 
-    // Calculate cell size based on available space
-    const wrap = document.querySelector('.grid-wrap');
+    const wrap = document.querySelector('.main-area');
     const maxSize = Math.min(wrap.clientWidth - 32, wrap.clientHeight - 16);
     const cellSize = Math.floor(maxSize / GRID_SIZE);
 
-    grid.style.width = cellSize * GRID_SIZE + (GRID_SIZE - 1) + 'px';
-    grid.style.height = cellSize * GRID_SIZE + (GRID_SIZE - 1) + 'px';
+    grid.style.width = cellSize * GRID_SIZE + (GRID_SIZE - 1) * 2 + 'px';
+    grid.style.height = cellSize * GRID_SIZE + (GRID_SIZE - 1) * 2 + 'px';
 
     for (let i = 0; i < TOTAL_BLOCKS; i++) {
         const cell = document.createElement('div');
@@ -386,10 +660,12 @@ function renderGrid() {
         cell.style.width = cellSize + 'px';
         cell.style.height = cellSize + 'px';
 
-        if (i === missingIndex && !answered) {
+        const blockIdx = shuffleOrder[i];
+
+        if (i === missingGridPos && !answered) {
             cell.classList.add('missing');
         } else {
-            cell.style.backgroundImage = `url(${blocks[i].toDataURL()})`;
+            cell.style.backgroundImage = `url(${blocks[blockIdx].toDataURL()})`;
         }
 
         grid.appendChild(cell);
@@ -404,11 +680,7 @@ function renderChoices() {
         const choice = document.createElement('div');
         choice.className = 'choice';
         choice.style.backgroundImage = `url(${blocks[blockIdx].toDataURL()})`;
-
-        if (!answered) {
-            choice.onclick = () => selectChoice(i);
-        }
-
+        choice.onclick = () => selectChoice(i);
         container.appendChild(choice);
     });
 }
@@ -416,49 +688,198 @@ function renderChoices() {
 function selectChoice(idx) {
     if (answered) return;
     answered = true;
-    total++;
 
     const choiceEls = $('choices').children;
     const gridCells = $('grid').children;
 
-    if (idx === correctIndex) {
-        // Correct!
+    // Disable all choices
+    Array.from(choiceEls).forEach(c => c.classList.add('disabled'));
+
+    if (idx === correctChoiceIdx) {
         score++;
+        streak++;
+        if (streak > bestStreak) bestStreak = streak;
+
+        choiceEls[idx].classList.remove('disabled');
         choiceEls[idx].classList.add('correct');
-        gridCells[missingIndex].classList.remove('missing');
-        gridCells[missingIndex].style.backgroundImage = `url(${blocks[missingIndex].toDataURL()})`;
-        gridCells[missingIndex].classList.add('correct');
-        $('prompt').textContent = 'Correct!';
-        $('prompt').style.color = '#44cc44';
+        gridCells[missingGridPos].classList.remove('missing');
+        gridCells[missingGridPos].style.backgroundImage = `url(${blocks[correctBlockIdx].toDataURL()})`;
+        gridCells[missingGridPos].classList.add('correct');
+
+        $('prompt').textContent = streak > 2 ? `🔥 ${streak} in a row!` : 'Correct!';
+        $('prompt').className = 'prompt correct';
+
+        puzzlesOnCurrentImage++;
+
+        // Auto-advance - switch image after a few puzzles
+        setTimeout(() => {
+            if (images.length > 1 && puzzlesOnCurrentImage >= PUZZLES_PER_IMAGE) {
+                nextImage();
+            } else {
+                newPuzzle();
+            }
+        }, AUTO_NEXT_DELAY);
     } else {
-        // Wrong
+        streak = 0;
+        choiceEls[idx].classList.remove('disabled');
         choiceEls[idx].classList.add('wrong');
-        choiceEls[correctIndex].classList.add('correct');
-        // Show the correct piece in grid
-        gridCells[missingIndex].classList.remove('missing');
-        gridCells[missingIndex].style.backgroundImage = `url(${blocks[missingIndex].toDataURL()})`;
-        $('prompt').textContent = 'Wrong! The correct piece is highlighted.';
-        $('prompt').style.color = '#ff4444';
+        choiceEls[correctChoiceIdx].classList.remove('disabled');
+        choiceEls[correctChoiceIdx].classList.add('correct');
+
+        gridCells[missingGridPos].classList.remove('missing');
+        gridCells[missingGridPos].style.backgroundImage = `url(${blocks[correctBlockIdx].toDataURL()})`;
+
+        $('prompt').textContent = 'Wrong!';
+        $('prompt').className = 'prompt wrong';
+
+        puzzlesOnCurrentImage++;
+
+        // Auto-advance after wrong
+        setTimeout(() => {
+            if (images.length > 1 && puzzlesOnCurrentImage >= PUZZLES_PER_IMAGE) {
+                nextImage();
+            } else {
+                newPuzzle();
+            }
+        }, AUTO_NEXT_DELAY + 200);
     }
 
     updateScore();
 }
 
 function updateScore() {
-    $('score').textContent = `${score} / ${total}`;
+    $('score').textContent = score;
+    const streakEl = $('streak');
+    if (streak > 2) {
+        streakEl.textContent = `${streak} streak`;
+        streakEl.className = 'streak hot';
+    } else if (bestStreak > 2) {
+        streakEl.textContent = `best: ${bestStreak}`;
+        streakEl.className = 'streak';
+    } else {
+        streakEl.textContent = '';
+    }
+}
+
+// Edit Mode
+function binShuffle(imgData, blkSize, seedVal) {
+    const w = imgData.width, h = imgData.height;
+    const data = new Uint8ClampedArray(imgData.data);
+    const out = new Uint8ClampedArray(data.length);
+
+    const bx = Math.floor(w / blkSize);
+    const by = Math.floor(h / blkSize);
+    const totalBlocks = bx * by;
+
+    const indices = [];
+    for (let i = 0; i < totalBlocks; i++) indices.push(i);
+
+    const rng = (s) => { s = Math.sin(s) * 10000; return s - Math.floor(s); };
+    let s = seedVal;
+    for (let i = indices.length - 1; i > 0; i--) {
+        s = rng(s + i);
+        const j = Math.floor(s * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+
+    for (let i = 0; i < totalBlocks; i++) {
+        const srcIdx = indices[i];
+        const srcX = (srcIdx % bx) * blkSize;
+        const srcY = Math.floor(srcIdx / bx) * blkSize;
+        const dstX = (i % bx) * blkSize;
+        const dstY = Math.floor(i / bx) * blkSize;
+
+        for (let y = 0; y < blkSize; y++) {
+            for (let x = 0; x < blkSize; x++) {
+                const si = ((srcY + y) * w + srcX + x) * 4;
+                const di = ((dstY + y) * w + dstX + x) * 4;
+                out[di] = data[si];
+                out[di+1] = data[si+1];
+                out[di+2] = data[si+2];
+                out[di+3] = data[si+3];
+            }
+        }
+    }
+
+    return new ImageData(out, w, h);
+}
+
+function applyEditEffect() {
+    if (!originalImageData) return;
+
+    let result = binShuffle(originalImageData, blockSize, seed);
+
+    if (dispersion > 0 && gpu.available) {
+        result = gpu.localShuffle(result, dispersion / 100, seed);
+    }
+
+    canvas.width = result.width;
+    canvas.height = result.height;
+    ctx.putImageData(result, 0, 0);
+}
+
+function setMode(newMode) {
+    mode = newMode;
+
+    $('gameModeBtn').classList.toggle('active', mode === 'game');
+    $('editModeBtn').classList.toggle('active', mode === 'edit');
+
+    $('gameArea').classList.toggle('hidden', mode !== 'game');
+    $('editArea').classList.toggle('hidden', mode !== 'edit');
+    $('gameControls').classList.toggle('hidden', mode !== 'game');
+    $('editControls').classList.toggle('hidden', mode !== 'edit');
+
+    if (originalImage) {
+        if (mode === 'game') {
+            extractBlocks();
+            newPuzzle();
+        } else {
+            applyEditEffect();
+        }
+    }
 }
 
 // Events
 $('chooseBtn').onclick = () => $('fileInput').click();
 $('newPhotoBtn').onclick = () => $('fileInput').click();
-$('fileInput').onchange = e => e.target.files[0] && loadImage(e.target.files[0]);
-$('nextBtn').onclick = () => {
-    if (originalImage) newPuzzle();
+$('fileInput').onchange = e => {
+    if (e.target.files.length > 0) {
+        loadImages(e.target.files);
+        score = 0;
+        streak = 0;
+        updateScore();
+    }
 };
 
-// Resize handler
+$('gameModeBtn').onclick = () => setMode('game');
+$('editModeBtn').onclick = () => setMode('edit');
+
+$('blockSlider').oninput = e => {
+    blockSize = parseInt(e.target.value);
+    $('blockValue').textContent = blockSize;
+    applyEditEffect();
+};
+
+$('disperseSlider').oninput = e => {
+    dispersion = parseInt(e.target.value);
+    $('disperseValue').textContent = dispersion;
+    applyEditEffect();
+};
+
+$('shuffleBtn').onclick = () => {
+    seed = Math.random() * 1000;
+    applyEditEffect();
+};
+
+$('downloadBtn').onclick = () => {
+    const a = document.createElement('a');
+    a.download = `madpixels-${Date.now()}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+};
+
 window.addEventListener('resize', () => {
-    if (originalImage) renderGrid();
+    if (originalImage && mode === 'game') renderGrid();
 });
 </script>
 </body>
