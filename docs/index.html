@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MADpixels - Artistic Image Effects</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #d951f9;
+            --primary-dark: #b030d9;
+            --bg: #0a0a0f;
+            --surface: #16161f;
+            --surface-light: #1e1e2a;
+            --text: #ffffff;
+            --text-secondary: #a0a0b0;
+            --border: #2a2a3a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #66ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            gap: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .canvas-container {
+            flex: 1;
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .canvas-container canvas {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .placeholder-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .compare-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 0.5rem;
+        }
+
+        .compare-toggle span {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .compare-toggle span.active {
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background: var(--surface-light);
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background: var(--primary);
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .controls {
+            background: var(--surface);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+        }
+
+        .categories {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+        }
+
+        .category-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            border: none;
+            background: var(--surface-light);
+            color: var(--text);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .category-btn:hover {
+            background: var(--border);
+        }
+
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .effects {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .effect-btn {
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            background: var(--surface-light);
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+
+        .effect-btn:hover {
+            background: var(--border);
+            color: var(--text);
+        }
+
+        .effect-btn.active {
+            background: rgba(217, 81, 249, 0.15);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .settings-section {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: var(--surface-light);
+            border-radius: 8px;
+        }
+
+        .settings-section h3 {
+            font-size: 0.875rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .setting-row label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .setting-row input[type="range"] {
+            width: 120px;
+            accent-color: var(--primary);
+        }
+
+        .setting-row span {
+            font-size: 0.75rem;
+            color: var(--text);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            border: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-primary:disabled {
+            background: var(--border);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--surface-light);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .progress-container {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .progress-container.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--surface-light);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.1s;
+        }
+
+        .progress-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        .hidden-input {
+            display: none;
+        }
+
+        .drop-zone {
+            position: absolute;
+            inset: 0;
+            background: rgba(217, 81, 249, 0.1);
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .drop-zone.active {
+            display: flex;
+        }
+
+        @media (min-width: 768px) {
+            main {
+                flex-direction: row;
+                padding: 1.5rem;
+                gap: 1.5rem;
+            }
+
+            .canvas-container {
+                flex: 2;
+                min-height: 500px;
+            }
+
+            .controls {
+                flex: 1;
+                max-width: 350px;
+            }
+        }
+
+        @media (max-width: 767px) {
+            .canvas-container {
+                min-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">MADpixels</div>
+        <div class="header-actions">
+            <button class="btn btn-secondary" id="uploadBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                    <circle cx="8.5" cy="8.5" r="1.5"/>
+                    <polyline points="21 15 16 10 5 21"/>
+                </svg>
+                Upload
+            </button>
+            <button class="btn btn-secondary" id="downloadBtn" disabled>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                    <polyline points="7 10 12 15 17 10"/>
+                    <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+                Save
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="canvas-container" id="canvasContainer">
+            <canvas id="canvas"></canvas>
+            <div class="placeholder" id="placeholder">
+                <div class="placeholder-icon">🎨</div>
+                <p>Drop an image here or click Upload</p>
+            </div>
+            <div class="drop-zone" id="dropZone">Drop image here</div>
+        </div>
+
+        <div class="controls">
+            <div class="compare-toggle" id="compareToggle" style="display: none;">
+                <span id="originalLabel">Original</span>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="compareSwitch" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span id="processedLabel" class="active">Processed</span>
+            </div>
+
+            <div class="categories">
+                <button class="category-btn active" data-category="shuffles">Shuffles</button>
+                <button class="category-btn" data-category="transforms">Transforms</button>
+                <button class="category-btn" data-category="creations">Creations</button>
+            </div>
+
+            <div class="effects" id="effectsContainer">
+                <!-- Effects will be populated by JS -->
+            </div>
+
+            <div class="settings-section" id="settingsSection">
+                <h3>Settings</h3>
+                <div id="settingsContainer">
+                    <!-- Settings will be populated by JS -->
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="applyBtn" disabled>Apply Effect</button>
+
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">Processing... 0%</div>
+            </div>
+        </div>
+    </main>
+
+    <input type="file" id="fileInput" class="hidden-input" accept="image/*">
+
+    <script>
+        // Effects configuration
+        const effects = {
+            shuffles: [
+                { id: 'globalShuffle', name: 'Global Shuffle' },
+                { id: 'binedShuffle', name: 'Bined Shuffle' },
+                { id: 'localShuffle', name: 'Local Shuffle' },
+                { id: 'binedColorShuffle', name: 'Color Shuffle' }
+            ],
+            transforms: [
+                { id: 'invert', name: 'Invert' },
+                { id: 'boost', name: 'Boost' },
+                { id: 'gaussianBlur', name: 'Gaussian Blur' }
+            ],
+            creations: [
+                { id: 'gradient', name: 'Gradient' }
+            ]
+        };
+
+        // Settings configuration
+        const settingsConfig = {
+            globalShuffle: [
+                { id: 'outputSize', name: 'Output Size', min: 128, max: 1024, default: 512, step: 64 }
+            ],
+            binedShuffle: [
+                { id: 'outputSize', name: 'Output Size', min: 128, max: 1024, default: 512, step: 64 },
+                { id: 'blockSize', name: 'Block Size', min: 4, max: 64, default: 16, step: 4 }
+            ],
+            localShuffle: [
+                { id: 'spread', name: 'Spread', min: 0, max: 100, default: 25, step: 1 }
+            ],
+            binedColorShuffle: [
+                { id: 'outputSize', name: 'Output Size', min: 128, max: 1024, default: 512, step: 64 },
+                { id: 'blockSize', name: 'Block Size', min: 8, max: 64, default: 32, step: 8 }
+            ],
+            boost: [
+                { id: 'boostRed', name: 'Red', min: 0, max: 100, default: 40, step: 5 },
+                { id: 'boostGreen', name: 'Green', min: 0, max: 100, default: 30, step: 5 },
+                { id: 'boostBlue', name: 'Blue', min: 0, max: 100, default: 20, step: 5 }
+            ],
+            gaussianBlur: [
+                { id: 'radius', name: 'Radius', min: 1, max: 50, default: 10, step: 1 }
+            ],
+            gradient: [
+                { id: 'outputSize', name: 'Output Size', min: 128, max: 1024, default: 512, step: 64 }
+            ],
+            invert: []
+        };
+
+        // State
+        let currentCategory = 'shuffles';
+        let currentEffect = 'globalShuffle';
+        let settings = {};
+        let originalImageData = null;
+        let processedImageData = null;
+        let isProcessing = false;
+
+        // DOM elements
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const applyBtn = document.getElementById('applyBtn');
+        const placeholder = document.getElementById('placeholder');
+        const canvasContainer = document.getElementById('canvasContainer');
+        const dropZone = document.getElementById('dropZone');
+        const effectsContainer = document.getElementById('effectsContainer');
+        const settingsContainer = document.getElementById('settingsContainer');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const compareToggle = document.getElementById('compareToggle');
+        const compareSwitch = document.getElementById('compareSwitch');
+        const originalLabel = document.getElementById('originalLabel');
+        const processedLabel = document.getElementById('processedLabel');
+
+        // Initialize
+        function init() {
+            renderEffects();
+            renderSettings();
+            setupEventListeners();
+        }
+
+        function renderEffects() {
+            const categoryEffects = effects[currentCategory];
+            effectsContainer.innerHTML = categoryEffects.map(effect => `
+                <button class="effect-btn ${effect.id === currentEffect ? 'active' : ''}" data-effect="${effect.id}">
+                    ${effect.name}
+                </button>
+            `).join('');
+
+            // Add click handlers
+            effectsContainer.querySelectorAll('.effect-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentEffect = btn.dataset.effect;
+                    renderEffects();
+                    renderSettings();
+                });
+            });
+        }
+
+        function renderSettings() {
+            const effectSettings = settingsConfig[currentEffect] || [];
+
+            if (effectSettings.length === 0) {
+                settingsContainer.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-secondary);">No settings for this effect</p>';
+                return;
+            }
+
+            settingsContainer.innerHTML = effectSettings.map(setting => {
+                const value = settings[setting.id] ?? setting.default;
+                return `
+                    <div class="setting-row">
+                        <label>${setting.name}</label>
+                        <input type="range"
+                               id="setting-${setting.id}"
+                               min="${setting.min}"
+                               max="${setting.max}"
+                               value="${value}"
+                               step="${setting.step}">
+                        <span id="value-${setting.id}">${value}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Add change handlers
+            effectSettings.forEach(setting => {
+                const input = document.getElementById(`setting-${setting.id}`);
+                const valueSpan = document.getElementById(`value-${setting.id}`);
+
+                input.addEventListener('input', () => {
+                    settings[setting.id] = parseInt(input.value);
+                    valueSpan.textContent = input.value;
+                });
+
+                // Initialize setting
+                settings[setting.id] = settings[setting.id] ?? setting.default;
+            });
+        }
+
+        function setupEventListeners() {
+            // Category buttons
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentCategory = btn.dataset.category;
+                    currentEffect = effects[currentCategory][0].id;
+                    renderEffects();
+                    renderSettings();
+                });
+            });
+
+            // File upload
+            uploadBtn.addEventListener('click', () => fileInput.click());
+            fileInput.addEventListener('change', handleFileSelect);
+
+            // Drag and drop
+            canvasContainer.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('active');
+            });
+
+            canvasContainer.addEventListener('dragleave', () => {
+                dropZone.classList.remove('active');
+            });
+
+            canvasContainer.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('active');
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    loadImage(file);
+                }
+            });
+
+            // Apply effect
+            applyBtn.addEventListener('click', applyEffect);
+
+            // Download
+            downloadBtn.addEventListener('click', downloadImage);
+
+            // Compare toggle
+            compareSwitch.addEventListener('change', () => {
+                const showProcessed = compareSwitch.checked;
+                originalLabel.classList.toggle('active', !showProcessed);
+                processedLabel.classList.toggle('active', showProcessed);
+                displayImage(showProcessed ? processedImageData : originalImageData);
+            });
+        }
+
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (file) {
+                loadImage(file);
+            }
+        }
+
+        function loadImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    processedImageData = null;
+                    placeholder.style.display = 'none';
+                    canvas.style.display = 'block';
+                    applyBtn.disabled = false;
+                    downloadBtn.disabled = true;
+                    compareToggle.style.display = 'none';
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayImage(imageData) {
+            if (!imageData) return;
+            canvas.width = imageData.width;
+            canvas.height = imageData.height;
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function updateProgress(percent) {
+            progressFill.style.width = `${percent}%`;
+            progressText.textContent = `Processing... ${Math.round(percent)}%`;
+        }
+
+        async function applyEffect() {
+            if (isProcessing || (!originalImageData && currentEffect !== 'gradient')) return;
+
+            isProcessing = true;
+            applyBtn.disabled = true;
+            progressContainer.classList.add('visible');
+            updateProgress(0);
+
+            // Use setTimeout to allow UI to update
+            await new Promise(resolve => setTimeout(resolve, 10));
+
+            try {
+                let result;
+                switch (currentEffect) {
+                    case 'globalShuffle':
+                        result = await globalShuffle();
+                        break;
+                    case 'binedShuffle':
+                        result = await binedShuffle();
+                        break;
+                    case 'localShuffle':
+                        result = await localShuffle();
+                        break;
+                    case 'binedColorShuffle':
+                        result = await binedColorShuffle();
+                        break;
+                    case 'invert':
+                        result = await invert();
+                        break;
+                    case 'boost':
+                        result = await boost();
+                        break;
+                    case 'gaussianBlur':
+                        result = await gaussianBlur();
+                        break;
+                    case 'gradient':
+                        result = await createGradient();
+                        break;
+                }
+
+                processedImageData = result;
+                displayImage(processedImageData);
+                downloadBtn.disabled = false;
+                compareToggle.style.display = 'flex';
+                compareSwitch.checked = true;
+                originalLabel.classList.remove('active');
+                processedLabel.classList.add('active');
+            } catch (error) {
+                console.error('Error applying effect:', error);
+            }
+
+            isProcessing = false;
+            applyBtn.disabled = false;
+            progressContainer.classList.remove('visible');
+        }
+
+        function downloadImage() {
+            if (!processedImageData) return;
+
+            const link = document.createElement('a');
+            link.download = `madpixels-${currentEffect}-${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Image processing functions
+        async function globalShuffle() {
+            const size = settings.outputSize || 512;
+            const resized = resizeImageData(originalImageData, size, size);
+            const data = new Uint8ClampedArray(resized.data);
+            const pixelCount = size * size;
+
+            // Fisher-Yates shuffle
+            for (let i = pixelCount - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+
+                // Swap pixels
+                for (let c = 0; c < 4; c++) {
+                    const temp = data[i * 4 + c];
+                    data[i * 4 + c] = data[j * 4 + c];
+                    data[j * 4 + c] = temp;
+                }
+
+                if (i % 10000 === 0) {
+                    updateProgress((1 - i / pixelCount) * 100);
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+
+            return new ImageData(data, size, size);
+        }
+
+        async function binedShuffle() {
+            const size = settings.outputSize || 512;
+            const blockSize = settings.blockSize || 16;
+            const resized = resizeImageData(originalImageData, size, size);
+            const data = new Uint8ClampedArray(resized.data);
+
+            const blocksX = Math.floor(size / blockSize);
+            const blocksY = Math.floor(size / blockSize);
+            const totalBlocks = blocksX * blocksY;
+            let processedBlocks = 0;
+
+            for (let by = 0; by < blocksY; by++) {
+                for (let bx = 0; bx < blocksX; bx++) {
+                    // Collect pixels in block
+                    const blockPixels = [];
+                    for (let ly = 0; ly < blockSize; ly++) {
+                        for (let lx = 0; lx < blockSize; lx++) {
+                            const x = bx * blockSize + lx;
+                            const y = by * blockSize + ly;
+                            const idx = (y * size + x) * 4;
+                            blockPixels.push([data[idx], data[idx+1], data[idx+2], data[idx+3]]);
+                        }
+                    }
+
+                    // Shuffle
+                    for (let i = blockPixels.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [blockPixels[i], blockPixels[j]] = [blockPixels[j], blockPixels[i]];
+                    }
+
+                    // Write back
+                    let pi = 0;
+                    for (let ly = 0; ly < blockSize; ly++) {
+                        for (let lx = 0; lx < blockSize; lx++) {
+                            const x = bx * blockSize + lx;
+                            const y = by * blockSize + ly;
+                            const idx = (y * size + x) * 4;
+                            data[idx] = blockPixels[pi][0];
+                            data[idx+1] = blockPixels[pi][1];
+                            data[idx+2] = blockPixels[pi][2];
+                            data[idx+3] = blockPixels[pi][3];
+                            pi++;
+                        }
+                    }
+
+                    processedBlocks++;
+                    if (processedBlocks % 10 === 0) {
+                        updateProgress((processedBlocks / totalBlocks) * 100);
+                        await new Promise(r => setTimeout(r, 0));
+                    }
+                }
+            }
+
+            return new ImageData(data, size, size);
+        }
+
+        async function localShuffle() {
+            const spread = (settings.spread || 25) / 100;
+            const width = originalImageData.width;
+            const height = originalImageData.height;
+            const maxSpread = Math.max(width, height) * spread / 4;
+            const data = new Uint8ClampedArray(originalImageData.data);
+            const pixelCount = width * height;
+
+            for (let i = 0; i < pixelCount; i++) {
+                const x = i % width;
+                const y = Math.floor(i / width);
+
+                // Box-Muller for normal distribution
+                const u1 = Math.random();
+                const u2 = Math.random();
+                const normal = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+
+                const offsetX = Math.round(normal * maxSpread);
+                const offsetY = Math.round(normal * maxSpread);
+
+                const newX = Math.max(0, Math.min(width - 1, x + offsetX));
+                const newY = Math.max(0, Math.min(height - 1, y + offsetY));
+                const newIdx = newY * width + newX;
+
+                // Swap
+                for (let c = 0; c < 4; c++) {
+                    const temp = data[i * 4 + c];
+                    data[i * 4 + c] = data[newIdx * 4 + c];
+                    data[newIdx * 4 + c] = temp;
+                }
+
+                if (i % 10000 === 0) {
+                    updateProgress((i / pixelCount) * 100);
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+
+            return new ImageData(data, width, height);
+        }
+
+        async function binedColorShuffle() {
+            const size = settings.outputSize || 512;
+            const blockSize = settings.blockSize || 32;
+            const resized = resizeImageData(originalImageData, size, size);
+
+            // Sample colors from image
+            const sampledColors = [];
+            for (let i = 0; i < 100; i++) {
+                const idx = Math.floor(Math.random() * size * size) * 4;
+                const r = resized.data[idx] / 255;
+                const g = resized.data[idx + 1] / 255;
+                const b = resized.data[idx + 2] / 255;
+                sampledColors.push(rgbToHsl(r, g, b));
+            }
+
+            const data = new Uint8ClampedArray(size * size * 4);
+            const blocksX = Math.floor(size / blockSize);
+            const blocksY = Math.floor(size / blockSize);
+            const totalBlocks = blocksX * blocksY;
+            let processedBlocks = 0;
+
+            for (let by = 0; by < blocksY; by++) {
+                for (let bx = 0; bx < blocksX; bx++) {
+                    const baseColor = sampledColors[Math.floor(Math.random() * sampledColors.length)];
+
+                    for (let ly = 0; ly < blockSize; ly++) {
+                        for (let lx = 0; lx < blockSize; lx++) {
+                            const x = bx * blockSize + lx;
+                            const y = by * blockSize + ly;
+                            const idx = (y * size + x) * 4;
+
+                            const h = baseColor.h;
+                            const s = Math.min(1, baseColor.s * (1 + Math.random() * 0.5));
+                            const l = Math.min(1, Math.max(0, baseColor.l * Math.random() * 1.5));
+
+                            const rgb = hslToRgb(h, s, l);
+                            data[idx] = Math.round(rgb.r * 255);
+                            data[idx + 1] = Math.round(rgb.g * 255);
+                            data[idx + 2] = Math.round(rgb.b * 255);
+                            data[idx + 3] = 255;
+                        }
+                    }
+
+                    processedBlocks++;
+                    if (processedBlocks % 5 === 0) {
+                        updateProgress((processedBlocks / totalBlocks) * 100);
+                        await new Promise(r => setTimeout(r, 0));
+                    }
+                }
+            }
+
+            return new ImageData(data, size, size);
+        }
+
+        async function invert() {
+            const width = originalImageData.width;
+            const height = originalImageData.height;
+            const data = new Uint8ClampedArray(originalImageData.data);
+
+            for (let i = 0; i < data.length; i += 4) {
+                data[i] = 255 - data[i];
+                data[i + 1] = 255 - data[i + 1];
+                data[i + 2] = 255 - data[i + 2];
+            }
+
+            updateProgress(100);
+            return new ImageData(data, width, height);
+        }
+
+        async function boost() {
+            const width = originalImageData.width;
+            const height = originalImageData.height;
+            const data = new Uint8ClampedArray(originalImageData.data);
+            const pixelCount = width * height;
+
+            const boostR = (settings.boostRed ?? 40) / 100;
+            const boostG = (settings.boostGreen ?? 30) / 100;
+            const boostB = (settings.boostBlue ?? 20) / 100;
+
+            // Calculate mean
+            let sumR = 0, sumG = 0, sumB = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                sumR += data[i];
+                sumG += data[i + 1];
+                sumB += data[i + 2];
+            }
+            const meanR = sumR / pixelCount;
+            const meanG = sumG / pixelCount;
+            const meanB = sumB / pixelCount;
+
+            // Calculate std
+            let varR = 0, varG = 0, varB = 0;
+            for (let i = 0; i < data.length; i += 4) {
+                varR += Math.pow(data[i] - meanR, 2);
+                varG += Math.pow(data[i + 1] - meanG, 2);
+                varB += Math.pow(data[i + 2] - meanB, 2);
+            }
+            const stdR = Math.sqrt(varR / pixelCount) || 1;
+            const stdG = Math.sqrt(varG / pixelCount) || 1;
+            const stdB = Math.sqrt(varB / pixelCount) || 1;
+
+            // Apply boost
+            for (let i = 0; i < data.length; i += 4) {
+                const r = (data[i] - meanR) / stdR * boostR;
+                const g = (data[i + 1] - meanG) / stdG * boostG;
+                const b = (data[i + 2] - meanB) / stdB * boostB;
+
+                data[i] = Math.round((Math.tanh(r * 4) + 1) / 2 * 255);
+                data[i + 1] = Math.round((Math.tanh(g * 4) + 1) / 2 * 255);
+                data[i + 2] = Math.round((Math.tanh(b * 4) + 1) / 2 * 255);
+
+                if (i % 40000 === 0) {
+                    updateProgress((i / data.length) * 100);
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+
+            return new ImageData(data, width, height);
+        }
+
+        async function gaussianBlur() {
+            const radius = settings.radius || 10;
+            const width = originalImageData.width;
+            const height = originalImageData.height;
+            const src = originalImageData.data;
+            const dst = new Uint8ClampedArray(src.length);
+
+            // Create 1D Gaussian kernel
+            const kernel = [];
+            const sigma = radius / 3;
+            let sum = 0;
+            for (let i = -radius; i <= radius; i++) {
+                const val = Math.exp(-(i * i) / (2 * sigma * sigma));
+                kernel.push(val);
+                sum += val;
+            }
+            for (let i = 0; i < kernel.length; i++) kernel[i] /= sum;
+
+            // Horizontal pass
+            const temp = new Uint8ClampedArray(src.length);
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    let r = 0, g = 0, b = 0, a = 0;
+                    for (let k = -radius; k <= radius; k++) {
+                        const px = Math.min(width - 1, Math.max(0, x + k));
+                        const idx = (y * width + px) * 4;
+                        const w = kernel[k + radius];
+                        r += src[idx] * w;
+                        g += src[idx + 1] * w;
+                        b += src[idx + 2] * w;
+                        a += src[idx + 3] * w;
+                    }
+                    const idx = (y * width + x) * 4;
+                    temp[idx] = r;
+                    temp[idx + 1] = g;
+                    temp[idx + 2] = b;
+                    temp[idx + 3] = a;
+                }
+                if (y % 50 === 0) {
+                    updateProgress((y / height) * 50);
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+
+            // Vertical pass
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    let r = 0, g = 0, b = 0, a = 0;
+                    for (let k = -radius; k <= radius; k++) {
+                        const py = Math.min(height - 1, Math.max(0, y + k));
+                        const idx = (py * width + x) * 4;
+                        const w = kernel[k + radius];
+                        r += temp[idx] * w;
+                        g += temp[idx + 1] * w;
+                        b += temp[idx + 2] * w;
+                        a += temp[idx + 3] * w;
+                    }
+                    const idx = (y * width + x) * 4;
+                    dst[idx] = r;
+                    dst[idx + 1] = g;
+                    dst[idx + 2] = b;
+                    dst[idx + 3] = a;
+                }
+                if (y % 50 === 0) {
+                    updateProgress(50 + (y / height) * 50);
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+
+            return new ImageData(dst, width, height);
+        }
+
+        async function createGradient() {
+            const size = settings.outputSize || 512;
+            const data = new Uint8ClampedArray(size * size * 4);
+
+            // Random corner colors
+            const tl = { r: Math.random(), g: Math.random(), b: Math.random() };
+            const tr = { r: Math.random(), g: Math.random(), b: Math.random() };
+            const bl = { r: Math.random(), g: Math.random(), b: Math.random() };
+            const br = { r: Math.random(), g: Math.random(), b: Math.random() };
+
+            for (let y = 0; y < size; y++) {
+                const fy = y / (size - 1);
+                for (let x = 0; x < size; x++) {
+                    const fx = x / (size - 1);
+
+                    // Bilinear interpolation
+                    const top = {
+                        r: tl.r * (1 - fx) + tr.r * fx,
+                        g: tl.g * (1 - fx) + tr.g * fx,
+                        b: tl.b * (1 - fx) + tr.b * fx
+                    };
+                    const bottom = {
+                        r: bl.r * (1 - fx) + br.r * fx,
+                        g: bl.g * (1 - fx) + br.g * fx,
+                        b: bl.b * (1 - fx) + br.b * fx
+                    };
+
+                    const idx = (y * size + x) * 4;
+                    data[idx] = Math.round((top.r * (1 - fy) + bottom.r * fy) * 255);
+                    data[idx + 1] = Math.round((top.g * (1 - fy) + bottom.g * fy) * 255);
+                    data[idx + 2] = Math.round((top.b * (1 - fy) + bottom.b * fy) * 255);
+                    data[idx + 3] = 255;
+                }
+                if (y % 50 === 0) {
+                    updateProgress((y / size) * 100);
+                    await new Promise(r => setTimeout(r, 0));
+                }
+            }
+
+            // For gradient, we don't need an original image
+            if (!originalImageData) {
+                originalImageData = new ImageData(new Uint8ClampedArray(data), size, size);
+                placeholder.style.display = 'none';
+                canvas.style.display = 'block';
+            }
+
+            return new ImageData(data, size, size);
+        }
+
+        // Utility functions
+        function resizeImageData(imageData, newWidth, newHeight) {
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = imageData.width;
+            tempCanvas.height = imageData.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.putImageData(imageData, 0, 0);
+
+            const resizedCanvas = document.createElement('canvas');
+            resizedCanvas.width = newWidth;
+            resizedCanvas.height = newHeight;
+            const resizedCtx = resizedCanvas.getContext('2d');
+            resizedCtx.drawImage(tempCanvas, 0, 0, newWidth, newHeight);
+
+            return resizedCtx.getImageData(0, 0, newWidth, newHeight);
+        }
+
+        function rgbToHsl(r, g, b) {
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            const l = (max + min) / 2;
+
+            if (max === min) {
+                return { h: 0, s: 0, l };
+            }
+
+            const d = max - min;
+            const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+
+            let h;
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                default: h = (r - g) / d + 4;
+            }
+            h /= 6;
+
+            return { h, s, l };
+        }
+
+        function hslToRgb(h, s, l) {
+            if (s === 0) {
+                return { r: l, g: l, b: l };
+            }
+
+            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+            const p = 2 * l - q;
+
+            const hueToRgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+            };
+
+            return {
+                r: hueToRgb(p, q, h + 1/3),
+                g: hueToRgb(p, q, h),
+                b: hueToRgb(p, q, h - 1/3)
+            };
+        }
+
+        // Start
+        init();
+    </script>
+</body>
+</html>
