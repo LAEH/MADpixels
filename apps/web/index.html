@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MADpixels</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         html, body { height: 100%; overflow: hidden; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #000;
-            color: #fff;
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: #fff;
+            color: #000;
         }
 
         .app {
@@ -26,7 +26,6 @@
             padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        /* Header - minimal */
         header {
             display: flex;
             align-items: center;
@@ -35,82 +34,26 @@
             flex-shrink: 0;
         }
 
-        .logo { font-size: 18px; font-weight: 700; }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
 
         .icon-btn {
-            width: 44px;
-            height: 44px;
-            border: none;
-            background: #1a1a1a;
-            color: #fff;
-            border-radius: 22px;
+            width: 48px;
+            height: 48px;
+            border: 2px solid #000;
+            background: #fff;
+            color: #000;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .icon-btn:disabled { opacity: 0.3; }
-        .icon-btn svg { width: 20px; height: 20px; }
-
-        /* Gallery */
-        .gallery-view {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 0 16px 16px;
-            gap: 12px;
-            min-height: 0;
-        }
-
-        .gallery-grid {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            min-height: 0;
-        }
-
-        .gallery-item {
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-        }
-        .gallery-item:active { transform: scale(0.98); }
-        .gallery-item canvas { width: 100%; height: 100%; display: block; }
-
-        .gallery-item-label {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            padding: 4px 8px;
-            background: rgba(0,0,0,0.7);
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .upload-btn {
-            flex-shrink: 0;
-            height: 56px;
-            border: 2px solid #333;
-            border-radius: 12px;
-            background: transparent;
-            color: #fff;
-            font-family: inherit;
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .upload-btn:active { background: #1a1a1a; }
-
-        /* Editor */
-        .editor-view {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            min-height: 0;
-        }
-        .editor-view.active { display: flex; }
-        .gallery-view.hidden { display: none; }
+        .icon-btn:active { background: #000; color: #fff; }
+        .icon-btn:disabled { opacity: 0.2; }
+        .icon-btn svg { width: 22px; height: 22px; }
 
         .canvas-wrap {
             flex: 1;
@@ -118,219 +61,183 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 16px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #0a0a0a;
+            padding: 0 16px;
+            position: relative;
+            cursor: pointer;
         }
 
         .canvas-wrap canvas {
             max-width: 100%;
             max-height: 100%;
             display: block;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         }
 
-        .drop-zone {
+        .tap-hint {
             position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0.1);
-            display: none;
-            align-items: center;
-            justify-content: center;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 16px;
+            background: rgba(0,0,0,0.8);
+            color: #fff;
+            border-radius: 20px;
+            font-size: 13px;
             font-weight: 600;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .drop-zone.active { display: flex; }
+        .canvas-wrap:hover .tap-hint { opacity: 1; }
 
-        /* Controls panel */
         .controls {
             flex-shrink: 0;
             padding: 16px;
             display: flex;
             flex-direction: column;
+            gap: 20px;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
             gap: 16px;
         }
 
-        /* Effect buttons - large, scrollable row */
-        .effects-scroll {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 4px;
-            -webkit-overflow-scrolling: touch;
-        }
-        .effects-scroll::-webkit-scrollbar { display: none; }
-
-        .effect-btn {
-            flex-shrink: 0;
-            height: 44px;
-            padding: 0 20px;
-            border: 2px solid #333;
-            border-radius: 22px;
-            background: transparent;
-            color: #888;
-            font-family: inherit;
-            font-size: 15px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        .effect-btn:active { background: #1a1a1a; }
-        .effect-btn.active {
-            border-color: #fff;
-            color: #fff;
-            background: #1a1a1a;
-        }
-
-        /* Sliders - full width, large touch */
-        .param-row {
+        .slider-row {
             display: flex;
             flex-direction: column;
             gap: 8px;
         }
 
-        .param-header {
+        .slider-header {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
+            align-items: center;
         }
 
-        .param-label { color: #888; }
-        .param-value { color: #fff; font-weight: 600; }
+        .slider-label {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+        }
+
+        .slider-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            min-width: 40px;
+            text-align: right;
+        }
 
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
-            height: 44px;
+            height: 48px;
             background: transparent;
             margin: 0;
         }
 
         input[type="range"]::-webkit-slider-runnable-track {
             height: 8px;
-            background: #333;
+            background: #e0e0e0;
             border-radius: 4px;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 28px;
-            height: 28px;
-            background: #fff;
+            width: 32px;
+            height: 32px;
+            background: #000;
             border-radius: 50%;
-            margin-top: -10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            margin-top: -12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Compare toggle */
-        .compare-row {
-            display: none;
-            align-items: center;
-            justify-content: center;
+        .btn-row {
+            display: flex;
             gap: 12px;
         }
-        .compare-row.visible { display: flex; }
 
-        .compare-label { font-size: 14px; color: #666; }
-        .compare-label.active { color: #fff; }
-
-        .toggle {
-            width: 52px;
-            height: 32px;
-            background: #333;
-            border-radius: 16px;
-            position: relative;
-        }
-        .toggle.on { background: #fff; }
-
-        .toggle-knob {
-            position: absolute;
-            width: 28px;
-            height: 28px;
-            background: #888;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.15s;
-        }
-        .toggle.on .toggle-knob {
-            transform: translateX(20px);
-            background: #000;
-        }
-
-        /* Apply button - big and bold */
-        .apply-btn {
+        .reveal-btn {
+            flex: 1;
             height: 56px;
-            border: none;
-            border-radius: 12px;
+            border: 2px solid #000;
+            border-radius: 28px;
             background: #fff;
             color: #000;
-            font-family: inherit;
-            font-size: 17px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .apply-btn:active { opacity: 0.8; }
-        .apply-btn:disabled { background: #333; color: #666; }
+        .reveal-btn:active { background: #f0f0f0; }
+        .reveal-btn.active {
+            background: #000;
+            color: #fff;
+        }
 
-        .progress-row {
-            display: none;
-            height: 4px;
-            background: #333;
-            border-radius: 2px;
-            overflow: hidden;
+        .shuffle-btn {
+            flex: 1;
+            height: 56px;
+            border: none;
+            border-radius: 28px;
+            background: #000;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .progress-row.visible { display: block; }
-
-        .progress-fill {
-            height: 100%;
-            background: #fff;
-            width: 0%;
-            transition: width 0.1s;
-        }
+        .shuffle-btn:active { opacity: 0.85; }
 
         .hidden { display: none !important; }
-        .params-section.hidden { display: none; }
     </style>
 </head>
 <body>
     <div class="app">
         <header>
             <span class="logo">MADpixels</span>
-            <button class="icon-btn" id="downloadBtn" disabled>
+            <button class="icon-btn" id="downloadBtn">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
             </button>
         </header>
 
-        <div class="gallery-view" id="galleryView">
-            <div class="gallery-grid" id="galleryGrid"></div>
-            <button class="upload-btn" id="choosePhotoBtn">Upload Photo</button>
+        <div class="canvas-wrap" id="canvasArea">
+            <canvas id="canvas"></canvas>
+            <canvas id="glCanvas" class="hidden"></canvas>
+            <span class="tap-hint">Tap to change photo</span>
         </div>
 
-        <div class="editor-view" id="editorView">
-            <div class="canvas-wrap" id="canvasArea">
-                <canvas id="canvas"></canvas>
-                <canvas id="glCanvas" class="hidden"></canvas>
-                <div class="drop-zone" id="dropZone">Drop</div>
+        <div class="controls">
+            <div class="slider-group">
+                <div class="slider-row">
+                    <div class="slider-header">
+                        <span class="slider-label">Block Size</span>
+                        <span class="slider-value" id="blockValue">8</span>
+                    </div>
+                    <input type="range" id="blockSlider" min="2" max="64" value="8" step="2">
+                </div>
+
+                <div class="slider-row">
+                    <div class="slider-header">
+                        <span class="slider-label">Dispersion</span>
+                        <span class="slider-value" id="disperseValue">0</span>
+                    </div>
+                    <input type="range" id="disperseSlider" min="0" max="100" value="0" step="5">
+                </div>
             </div>
 
-            <div class="controls">
-                <div class="compare-row" id="compareBar">
-                    <span class="compare-label" id="labelOriginal">Before</span>
-                    <div class="toggle on" id="toggle"><div class="toggle-knob"></div></div>
-                    <span class="compare-label active" id="labelProcessed">After</span>
-                </div>
-
-                <div class="effects-scroll" id="effectsRow"></div>
-
-                <div class="params-section" id="settingsSection">
-                    <div id="settingsContainer"></div>
-                </div>
-
-                <div class="progress-row" id="progressSection">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-
-                <button class="apply-btn" id="applyBtn">Apply</button>
+            <div class="btn-row">
+                <button class="reveal-btn" id="revealBtn">Reveal</button>
+                <button class="shuffle-btn" id="shuffleBtn">Shuffle</button>
             </div>
         </div>
     </div>
@@ -351,11 +258,7 @@ class WebGLProcessor {
         const gl = this.gl;
         const vert = `attribute vec2 a_position;attribute vec2 a_texCoord;varying vec2 v_texCoord;void main(){gl_Position=vec4(a_position,0,1);v_texCoord=a_texCoord;}`;
         const shaders = {
-            invert: `precision mediump float;varying vec2 v_texCoord;uniform sampler2D u_image;void main(){vec4 c=texture2D(u_image,v_texCoord);gl_FragColor=vec4(1.0-c.rgb,c.a);}`,
-            boost: `precision mediump float;varying vec2 v_texCoord;uniform sampler2D u_image;uniform vec3 u_boost;vec3 tanh3(vec3 x){vec3 e=exp(2.0*x);return(e-1.0)/(e+1.0);}void main(){vec4 c=texture2D(u_image,v_texCoord);vec3 n=(c.rgb-0.5)*u_boost*4.0;gl_FragColor=vec4((tanh3(n)+1.0)*0.5,c.a);}`,
-            blur: `precision mediump float;varying vec2 v_texCoord;uniform sampler2D u_image;uniform vec2 u_res;uniform float u_rad;uniform vec2 u_dir;void main(){vec4 s=vec4(0.0);float t=0.0;for(float i=-20.0;i<=20.0;i+=1.0){float w=exp(-i*i/(2.0*u_rad*u_rad));s+=texture2D(u_image,v_texCoord+u_dir*i/u_res)*w;t+=w;}gl_FragColor=s/t;}`,
-            localShuffle: `precision highp float;varying vec2 v_texCoord;uniform sampler2D u_image;uniform vec2 u_res;uniform float u_spread;uniform float u_seed;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453+u_seed);}void main(){float m=max(u_res.x,u_res.y)*u_spread/4.0;float u1=max(0.0001,hash(v_texCoord*u_res));float u2=hash(v_texCoord*u_res+vec2(1.0,0.0));float r=sqrt(-2.0*log(u1));vec2 n=vec2(r*cos(6.28318*u2),r*sin(6.28318*u2))*m/u_res;gl_FragColor=texture2D(u_image,clamp(v_texCoord+n,0.0,1.0));}`,
-            gradient: `precision mediump float;varying vec2 v_texCoord;uniform vec4 u_tl,u_tr,u_bl,u_br;void main(){gl_FragColor=mix(mix(u_tl,u_tr,v_texCoord.x),mix(u_bl,u_br,v_texCoord.x),v_texCoord.y);}`
+            localShuffle: `precision highp float;varying vec2 v_texCoord;uniform sampler2D u_image;uniform vec2 u_res;uniform float u_spread;uniform float u_seed;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453+u_seed);}void main(){float m=max(u_res.x,u_res.y)*u_spread/4.0;float u1=max(0.0001,hash(v_texCoord*u_res));float u2=hash(v_texCoord*u_res+vec2(1.0,0.0));float r=sqrt(-2.0*log(u1));vec2 n=vec2(r*cos(6.28318*u2),r*sin(6.28318*u2))*m/u_res;gl_FragColor=texture2D(u_image,clamp(v_texCoord+n,0.0,1.0));}`
         };
         for (const [name, frag] of Object.entries(shaders)) {
             const vs = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vs, vert); gl.compileShader(vs);
@@ -400,106 +303,132 @@ class WebGLProcessor {
         return new ImageData(flip, w, h);
     }
 
-    gradient(w, h, colors) {
-        this.render(this.programs.gradient, w, h, (gl, p) => {
-            gl.uniform4f(gl.getUniformLocation(p, 'u_tl'), colors.tl[0], colors.tl[1], colors.tl[2], 1);
-            gl.uniform4f(gl.getUniformLocation(p, 'u_tr'), colors.tr[0], colors.tr[1], colors.tr[2], 1);
-            gl.uniform4f(gl.getUniformLocation(p, 'u_bl'), colors.bl[0], colors.bl[1], colors.bl[2], 1);
-            gl.uniform4f(gl.getUniformLocation(p, 'u_br'), colors.br[0], colors.br[1], colors.br[2], 1);
+    localShuffle(img, spread, seed) {
+        const t = this.createTexture(img);
+        this.render(this.programs.localShuffle, img.width, img.height, (gl, p) => {
+            gl.activeTexture(gl.TEXTURE0);
+            gl.bindTexture(gl.TEXTURE_2D, t);
+            gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0);
+            gl.uniform2f(gl.getUniformLocation(p, 'u_res'), img.width, img.height);
+            gl.uniform1f(gl.getUniformLocation(p, 'u_spread'), spread);
+            gl.uniform1f(gl.getUniformLocation(p, 'u_seed'), seed);
         });
+        this.gl.deleteTexture(t);
         return this.getImageData();
     }
-
-    invert(img) { const t = this.createTexture(img); this.render(this.programs.invert, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); }); this.gl.deleteTexture(t); return this.getImageData(); }
-    boost(img, r, g, b) { const t = this.createTexture(img); this.render(this.programs.boost, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); gl.uniform3f(gl.getUniformLocation(p, 'u_boost'), r, g, b); }); this.gl.deleteTexture(t); return this.getImageData(); }
-    blur(img, rad) { const gl = this.gl; let t = this.createTexture(img); this.render(this.programs.blur, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); gl.uniform2f(gl.getUniformLocation(p, 'u_res'), img.width, img.height); gl.uniform1f(gl.getUniformLocation(p, 'u_rad'), rad); gl.uniform2f(gl.getUniformLocation(p, 'u_dir'), 1, 0); }); const mid = this.getImageData(); gl.deleteTexture(t); t = this.createTexture(mid); this.render(this.programs.blur, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); gl.uniform2f(gl.getUniformLocation(p, 'u_res'), img.width, img.height); gl.uniform1f(gl.getUniformLocation(p, 'u_rad'), rad); gl.uniform2f(gl.getUniformLocation(p, 'u_dir'), 0, 1); }); gl.deleteTexture(t); return this.getImageData(); }
-    localShuffle(img, spread) { const t = this.createTexture(img); this.render(this.programs.localShuffle, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); gl.uniform2f(gl.getUniformLocation(p, 'u_res'), img.width, img.height); gl.uniform1f(gl.getUniformLocation(p, 'u_spread'), spread); gl.uniform1f(gl.getUniformLocation(p, 'u_seed'), Math.random() * 1000); }); this.gl.deleteTexture(t); return this.getImageData(); }
 }
 
-const effects = [
-    { id: 'localShuffle', name: 'Disperse', gpu: true },
-    { id: 'globalShuffle', name: 'Shuffle', gpu: false },
-    { id: 'binedShuffle', name: 'Blocks', gpu: false },
-    { id: 'invert', name: 'Invert', gpu: true },
-    { id: 'boost', name: 'Boost', gpu: true },
-    { id: 'gaussianBlur', name: 'Blur', gpu: true }
-];
-
-const settingsConfig = {
-    globalShuffle: [{ id: 'size', name: 'Size', min: 256, max: 1024, default: 512, step: 128 }],
-    binedShuffle: [{ id: 'size', name: 'Size', min: 256, max: 1024, default: 512, step: 128 }, { id: 'block', name: 'Block', min: 8, max: 64, default: 16, step: 8 }],
-    localShuffle: [{ id: 'spread', name: 'Spread', min: 0, max: 100, default: 25, step: 5 }],
-    boost: [{ id: 'red', name: 'Warm', min: 0, max: 100, default: 40, step: 5 }, { id: 'green', name: 'Tint', min: 0, max: 100, default: 30, step: 5 }, { id: 'blue', name: 'Cool', min: 0, max: 100, default: 20, step: 5 }],
-    gaussianBlur: [{ id: 'radius', name: 'Radius', min: 1, max: 30, default: 8, step: 1 }],
-    invert: []
-};
-
-const presets = [
-    { name: 'Neon', colors: { tl: [1, 0.2, 0.5], tr: [0.2, 0.8, 1], bl: [0.5, 0.1, 0.8], br: [0.1, 0.6, 0.6] } },
-    { name: 'Ember', colors: { tl: [1, 0.4, 0.1], tr: [1, 0.7, 0.2], bl: [0.6, 0.1, 0.1], br: [0.8, 0.3, 0.1] } },
-    { name: 'Void', colors: { tl: [0.15, 0.1, 0.2], tr: [0.1, 0.15, 0.25], bl: [0.05, 0.05, 0.1], br: [0.1, 0.08, 0.15] } },
-    { name: 'Acid', colors: { tl: [0.6, 1, 0.2], tr: [0.2, 1, 0.6], bl: [0.3, 0.5, 0.1], br: [0.1, 0.6, 0.3] } }
-];
-
-let state = { effect: 'localShuffle', settings: {}, original: null, processed: null, processing: false };
+// State
+let originalImage = null;
+let shuffledBlocks = null;
+let blockSize = 8;
+let dispersion = 0;
+let seed = Math.random() * 1000;
+let isRevealed = false;
 
 const $ = id => document.getElementById(id);
-const canvas = $('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
+const canvas = $('canvas');
+const ctx = canvas.getContext('2d', { willReadFrequently: true });
 const gpu = new WebGLProcessor();
 
-function generateGallery() {
-    const grid = $('galleryGrid');
-    grid.innerHTML = '';
-    presets.forEach(preset => {
-        const item = document.createElement('div');
-        item.className = 'gallery-item';
-        const c = document.createElement('canvas');
-        c.width = 200; c.height = 200;
-        c.getContext('2d').putImageData(gpu.gradient(200, 200, preset.colors), 0, 0);
-        const label = document.createElement('div');
-        label.className = 'gallery-item-label';
-        label.textContent = preset.name;
-        item.appendChild(c);
-        item.appendChild(label);
-        item.onclick = () => {
-            state.original = gpu.gradient(512, 512, preset.colors);
-            state.processed = null;
-            showEditor();
-        };
-        grid.appendChild(item);
-    });
+// Create sample image - colorful abstract
+function createSampleImage() {
+    const size = 512;
+    const c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    const cx = c.getContext('2d');
+
+    // Create interesting gradient
+    const g1 = cx.createLinearGradient(0, 0, size, size);
+    g1.addColorStop(0, '#FF6B6B');
+    g1.addColorStop(0.5, '#4ECDC4');
+    g1.addColorStop(1, '#45B7D1');
+    cx.fillStyle = g1;
+    cx.fillRect(0, 0, size, size);
+
+    // Add some circles for interest
+    const g2 = cx.createRadialGradient(size*0.3, size*0.3, 0, size*0.3, size*0.3, size*0.4);
+    g2.addColorStop(0, 'rgba(255,255,255,0.8)');
+    g2.addColorStop(1, 'rgba(255,255,255,0)');
+    cx.fillStyle = g2;
+    cx.fillRect(0, 0, size, size);
+
+    const g3 = cx.createRadialGradient(size*0.7, size*0.6, 0, size*0.7, size*0.6, size*0.3);
+    g3.addColorStop(0, 'rgba(147,51,234,0.7)');
+    g3.addColorStop(1, 'rgba(147,51,234,0)');
+    cx.fillStyle = g3;
+    cx.fillRect(0, 0, size, size);
+
+    return cx.getImageData(0, 0, size, size);
 }
 
-function showEditor() {
-    $('galleryView').classList.add('hidden');
-    $('editorView').classList.add('active');
-    display(state.original);
-    $('compareBar').classList.remove('visible');
-    $('downloadBtn').disabled = true;
+// Bin shuffle - scramble blocks
+function binShuffle(img, blockSize, seedVal) {
+    const w = img.width, h = img.height;
+    const data = new Uint8ClampedArray(img.data);
+    const out = new Uint8ClampedArray(data.length);
+
+    const bx = Math.floor(w / blockSize);
+    const by = Math.floor(h / blockSize);
+    const totalBlocks = bx * by;
+
+    // Create shuffled indices
+    const indices = [];
+    for (let i = 0; i < totalBlocks; i++) indices.push(i);
+
+    // Seeded shuffle
+    const rng = (s) => { s = Math.sin(s) * 10000; return s - Math.floor(s); };
+    let s = seedVal;
+    for (let i = indices.length - 1; i > 0; i--) {
+        s = rng(s + i);
+        const j = Math.floor(s * (i + 1));
+        [indices[i], indices[j]] = [indices[j], indices[i]];
+    }
+
+    // Copy blocks to shuffled positions
+    for (let i = 0; i < totalBlocks; i++) {
+        const srcIdx = indices[i];
+        const srcX = (srcIdx % bx) * blockSize;
+        const srcY = Math.floor(srcIdx / bx) * blockSize;
+        const dstX = (i % bx) * blockSize;
+        const dstY = Math.floor(i / bx) * blockSize;
+
+        for (let y = 0; y < blockSize; y++) {
+            for (let x = 0; x < blockSize; x++) {
+                const si = ((srcY + y) * w + srcX + x) * 4;
+                const di = ((dstY + y) * w + dstX + x) * 4;
+                out[di] = data[si];
+                out[di+1] = data[si+1];
+                out[di+2] = data[si+2];
+                out[di+3] = data[si+3];
+            }
+        }
+    }
+
+    return new ImageData(out, w, h);
 }
 
-function renderEffects() {
-    $('effectsRow').innerHTML = effects.map(e =>
-        `<button class="effect-btn ${e.id === state.effect ? 'active' : ''}" data-id="${e.id}">${e.name}</button>`
-    ).join('');
-    $('effectsRow').querySelectorAll('.effect-btn').forEach(btn => {
-        btn.onclick = () => { state.effect = btn.dataset.id; renderEffects(); renderSettings(); };
-    });
+// Apply current effect
+function applyEffect() {
+    if (!originalImage) return;
+
+    // First bin shuffle
+    let result = binShuffle(originalImage, blockSize, seed);
+
+    // Then apply dispersion if any
+    if (dispersion > 0 && gpu.available) {
+        result = gpu.localShuffle(result, dispersion / 100, seed);
+    }
+
+    shuffledBlocks = result;
+    display(result);
 }
 
-function renderSettings() {
-    const cfg = settingsConfig[state.effect] || [];
-    if (!cfg.length) { $('settingsSection').classList.add('hidden'); return; }
-    $('settingsSection').classList.remove('hidden');
-    $('settingsContainer').innerHTML = cfg.map(s => {
-        const val = state.settings[s.id] ?? s.default;
-        return `<div class="param-row"><div class="param-header"><span class="param-label">${s.name}</span><span class="param-value" id="v-${s.id}">${val}</span></div><input type="range" id="r-${s.id}" min="${s.min}" max="${s.max}" value="${val}" step="${s.step}"></div>`;
-    }).join('');
-    cfg.forEach(s => {
-        state.settings[s.id] = state.settings[s.id] ?? s.default;
-        const inp = $(`r-${s.id}`), val = $(`v-${s.id}`);
-        inp.oninput = () => { state.settings[s.id] = +inp.value; val.textContent = inp.value; };
-    });
+function display(data) {
+    if (!data) return;
+    canvas.width = data.width;
+    canvas.height = data.height;
+    ctx.putImageData(data, 0, 0);
 }
 
 function loadImage(file) {
@@ -507,129 +436,71 @@ function loadImage(file) {
     reader.onload = e => {
         const img = new Image();
         img.onload = () => {
-            canvas.width = img.width; canvas.height = img.height;
-            ctx.drawImage(img, 0, 0);
-            state.original = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            state.processed = null;
-            showEditor();
+            // Resize to square for clean blocks
+            const size = 512;
+            const c = document.createElement('canvas');
+            c.width = size; c.height = size;
+            const cx = c.getContext('2d');
+
+            // Cover fit
+            const scale = Math.max(size / img.width, size / img.height);
+            const w = img.width * scale;
+            const h = img.height * scale;
+            cx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+
+            originalImage = cx.getImageData(0, 0, size, size);
+            seed = Math.random() * 1000;
+            isRevealed = false;
+            $('revealBtn').classList.remove('active');
+            applyEffect();
         };
         img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
 
-function display(data) {
-    if (!data) return;
-    canvas.width = data.width; canvas.height = data.height;
-    ctx.putImageData(data, 0, 0);
+function newShuffle() {
+    seed = Math.random() * 1000;
+    isRevealed = false;
+    $('revealBtn').classList.remove('active');
+    applyEffect();
 }
 
-function updateProgress(pct) {
-    $('progressFill').style.width = pct + '%';
+function toggleReveal() {
+    isRevealed = !isRevealed;
+    $('revealBtn').classList.toggle('active', isRevealed);
+    display(isRevealed ? originalImage : shuffledBlocks);
 }
 
-function resize(img, w, h) {
-    const c1 = document.createElement('canvas'); c1.width = img.width; c1.height = img.height; c1.getContext('2d').putImageData(img, 0, 0);
-    const c2 = document.createElement('canvas'); c2.width = w; c2.height = h; c2.getContext('2d').drawImage(c1, 0, 0, w, h);
-    return c2.getContext('2d').getImageData(0, 0, w, h);
-}
-
-async function chunk(total, size, fn) {
-    return new Promise(resolve => {
-        let i = 0;
-        function step() {
-            const end = Math.min(i + size, total);
-            fn(i, end); i = end; updateProgress(Math.round(i / total * 100));
-            i < total ? requestAnimationFrame(step) : resolve();
-        }
-        requestAnimationFrame(step);
-    });
-}
-
-async function globalShuffle() {
-    const s = state.settings.size || 512, img = resize(state.original, s, s), d = new Uint8ClampedArray(img.data), n = s * s;
-    const idx = new Uint32Array(n); for (let i = 0; i < n; i++) idx[i] = i;
-    await chunk(n, 50000, (a, b) => { for (let i = b - 1; i >= a && i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [idx[i], idx[j]] = [idx[j], idx[i]]; } });
-    const out = new Uint8ClampedArray(n * 4);
-    for (let i = 0; i < n; i++) { const src = idx[i] * 4, dst = i * 4; out[dst] = d[src]; out[dst+1] = d[src+1]; out[dst+2] = d[src+2]; out[dst+3] = d[src+3]; }
-    return new ImageData(out, s, s);
-}
-
-async function binedShuffle() {
-    const s = state.settings.size || 512, b = state.settings.block || 16, img = resize(state.original, s, s), d = new Uint8ClampedArray(img.data);
-    const bx = Math.floor(s / b), total = bx * bx;
-    await chunk(total, 50, (start, end) => {
-        for (let bi = start; bi < end; bi++) {
-            const x0 = (bi % bx) * b, y0 = Math.floor(bi / bx) * b, px = [];
-            for (let y = 0; y < b; y++) for (let x = 0; x < b; x++) { const i = ((y0 + y) * s + x0 + x) * 4; px.push([d[i], d[i+1], d[i+2], d[i+3]]); }
-            for (let i = px.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [px[i], px[j]] = [px[j], px[i]]; }
-            let pi = 0;
-            for (let y = 0; y < b; y++) for (let x = 0; x < b; x++) { const i = ((y0 + y) * s + x0 + x) * 4; d[i] = px[pi][0]; d[i+1] = px[pi][1]; d[i+2] = px[pi][2]; d[i+3] = px[pi][3]; pi++; }
-        }
-    });
-    return new ImageData(d, s, s);
-}
-
-async function applyEffect() {
-    if (state.processing || !state.original) return;
-    state.processing = true;
-    $('applyBtn').disabled = true;
-    $('progressSection').classList.add('visible');
-    updateProgress(0);
-
-    let result;
-    const eff = effects.find(e => e.id === state.effect);
-
-    try {
-        if (gpu.available && eff?.gpu) {
-            if (state.effect === 'invert') result = gpu.invert(state.original);
-            else if (state.effect === 'boost') result = gpu.boost(state.original, (state.settings.red ?? 40) / 100, (state.settings.green ?? 30) / 100, (state.settings.blue ?? 20) / 100);
-            else if (state.effect === 'gaussianBlur') result = gpu.blur(state.original, state.settings.radius || 8);
-            else if (state.effect === 'localShuffle') result = gpu.localShuffle(state.original, (state.settings.spread || 25) / 100);
-        }
-        if (!result) {
-            if (state.effect === 'globalShuffle') result = await globalShuffle();
-            else if (state.effect === 'binedShuffle') result = await binedShuffle();
-        }
-
-        state.processed = result;
-        display(result);
-        $('downloadBtn').disabled = false;
-        $('compareBar').classList.add('visible');
-        $('toggle').classList.add('on');
-        $('labelOriginal').classList.remove('active');
-        $('labelProcessed').classList.add('active');
-    } catch (e) { console.error(e); }
-
-    updateProgress(100);
-    setTimeout(() => {
-        $('progressSection').classList.remove('visible');
-        state.processing = false;
-        $('applyBtn').disabled = false;
-    }, 200);
-}
-
-$('choosePhotoBtn').onclick = () => $('fileInput').click();
+// Events
 $('canvasArea').onclick = () => $('fileInput').click();
 $('fileInput').onchange = e => e.target.files[0] && loadImage(e.target.files[0]);
 
-$('canvasArea').ondragover = e => { e.preventDefault(); $('dropZone').classList.add('active'); };
-$('canvasArea').ondragleave = () => $('dropZone').classList.remove('active');
-$('canvasArea').ondrop = e => { e.preventDefault(); $('dropZone').classList.remove('active'); const f = e.dataTransfer.files[0]; if (f?.type.startsWith('image/')) loadImage(f); };
-
-$('applyBtn').onclick = applyEffect;
-$('downloadBtn').onclick = () => { if (!state.processed) return; const a = document.createElement('a'); a.download = `madpixels-${Date.now()}.png`; a.href = canvas.toDataURL('image/png'); a.click(); };
-
-$('toggle').onclick = () => {
-    const on = $('toggle').classList.toggle('on');
-    $('labelOriginal').classList.toggle('active', !on);
-    $('labelProcessed').classList.toggle('active', on);
-    display(on ? state.processed : state.original);
+$('blockSlider').oninput = e => {
+    blockSize = parseInt(e.target.value);
+    $('blockValue').textContent = blockSize;
+    if (!isRevealed) applyEffect();
 };
 
-generateGallery();
-renderEffects();
-renderSettings();
+$('disperseSlider').oninput = e => {
+    dispersion = parseInt(e.target.value);
+    $('disperseValue').textContent = dispersion;
+    if (!isRevealed) applyEffect();
+};
+
+$('revealBtn').onclick = toggleReveal;
+$('shuffleBtn').onclick = newShuffle;
+
+$('downloadBtn').onclick = () => {
+    const a = document.createElement('a');
+    a.download = `madpixels-${Date.now()}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+};
+
+// Init with sample
+originalImage = createSampleImage();
+applyEffect();
 </script>
 </body>
 </html>
