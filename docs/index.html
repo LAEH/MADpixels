@@ -100,7 +100,6 @@
             padding: 8px 16px;
         }
 
-        /* Game Mode */
         .grid-container {
             position: relative;
             border-radius: 12px;
@@ -145,7 +144,6 @@
             100% { transform: scale(1); }
         }
 
-        /* Edit Mode */
         .canvas-container {
             border-radius: 12px;
             overflow: hidden;
@@ -166,7 +164,6 @@
             gap: 12px;
         }
 
-        /* Game Controls */
         .game-controls .prompt {
             text-align: center;
             font-size: 14px;
@@ -213,7 +210,6 @@
             75% { transform: translateX(4px); }
         }
 
-        /* Edit Controls */
         .edit-controls .slider-row {
             display: flex;
             flex-direction: column;
@@ -368,23 +364,19 @@
         </header>
 
         <div class="main-area">
-            <!-- Game Mode -->
             <div class="grid-container" id="gameArea">
                 <div class="grid" id="grid"></div>
             </div>
-            <!-- Edit Mode -->
             <div class="canvas-container hidden" id="editArea">
                 <canvas id="canvas"></canvas>
             </div>
         </div>
 
-        <!-- Game Controls -->
         <div class="controls game-controls" id="gameControls">
             <div class="prompt" id="prompt">Find the missing piece</div>
             <div class="choices" id="choices"></div>
         </div>
 
-        <!-- Edit Controls -->
         <div class="controls edit-controls hidden" id="editControls">
             <div class="slider-row">
                 <div class="slider-header">
@@ -417,7 +409,6 @@
     </div>
 
 <script>
-// WebGL Processor
 class WebGLProcessor {
     constructor() {
         this.canvas = document.getElementById('glCanvas');
@@ -491,9 +482,8 @@ class WebGLProcessor {
     }
 }
 
-// State
-let mode = 'game'; // 'game' or 'edit'
-let images = []; // array of loaded image canvases
+let mode = 'game';
+let images = [];
 let currentImageIdx = 0;
 let puzzlesOnCurrentImage = 0;
 let originalImage = null;
@@ -509,7 +499,6 @@ let streak = 0;
 let bestStreak = 0;
 let answered = false;
 
-// Edit state
 let blockSize = 32;
 let dispersion = 50;
 let seed = Math.random() * 1000;
@@ -549,7 +538,6 @@ function loadImages(files) {
                 loaded++;
 
                 if (loaded === files.length) {
-                    // Shuffle images for variety
                     for (let i = images.length - 1; i > 0; i--) {
                         const j = Math.floor(Math.random() * (i + 1));
                         [images[i], images[j]] = [images[j], images[i]];
@@ -618,16 +606,13 @@ function newPuzzle() {
     $('prompt').textContent = 'Find the missing piece';
     $('prompt').className = 'prompt';
 
-    // Shuffle grid display
     const indices = [];
     for (let i = 0; i < TOTAL_BLOCKS; i++) indices.push(i);
     shuffleOrder = shuffleArray(indices);
 
-    // Pick missing position
     missingGridPos = Math.floor(Math.random() * TOTAL_BLOCKS);
     correctBlockIdx = shuffleOrder[missingGridPos];
 
-    // Create 4 choices
     const wrongChoices = [];
     while (wrongChoices.length < 3) {
         const idx = Math.floor(Math.random() * TOTAL_BLOCKS);
@@ -692,7 +677,6 @@ function selectChoice(idx) {
     const choiceEls = $('choices').children;
     const gridCells = $('grid').children;
 
-    // Disable all choices
     Array.from(choiceEls).forEach(c => c.classList.add('disabled'));
 
     if (idx === correctChoiceIdx) {
@@ -711,7 +695,6 @@ function selectChoice(idx) {
 
         puzzlesOnCurrentImage++;
 
-        // Auto-advance - switch image after a few puzzles
         setTimeout(() => {
             if (images.length > 1 && puzzlesOnCurrentImage >= PUZZLES_PER_IMAGE) {
                 nextImage();
@@ -734,7 +717,6 @@ function selectChoice(idx) {
 
         puzzlesOnCurrentImage++;
 
-        // Auto-advance after wrong
         setTimeout(() => {
             if (images.length > 1 && puzzlesOnCurrentImage >= PUZZLES_PER_IMAGE) {
                 nextImage();
@@ -761,7 +743,6 @@ function updateScore() {
     }
 }
 
-// Edit Mode
 function binShuffle(imgData, blkSize, seedVal) {
     const w = imgData.width, h = imgData.height;
     const data = new Uint8ClampedArray(imgData.data);
@@ -839,7 +820,6 @@ function setMode(newMode) {
     }
 }
 
-// Events
 $('chooseBtn').onclick = () => $('fileInput').click();
 $('newPhotoBtn').onclick = () => $('fileInput').click();
 $('fileInput').onchange = e => {
