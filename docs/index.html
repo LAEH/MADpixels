@@ -331,35 +331,27 @@ const canvas = $('canvas');
 const ctx = canvas.getContext('2d', { willReadFrequently: true });
 const gpu = new WebGLProcessor();
 
-// Create sample image - colorful abstract
-function createSampleImage() {
-    const size = 512;
-    const c = document.createElement('canvas');
-    c.width = size; c.height = size;
-    const cx = c.getContext('2d');
+// Load sample image from Picsum
+function loadSampleImage() {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+        const size = 512;
+        const c = document.createElement('canvas');
+        c.width = size; c.height = size;
+        const cx = c.getContext('2d');
 
-    // Create interesting gradient
-    const g1 = cx.createLinearGradient(0, 0, size, size);
-    g1.addColorStop(0, '#FF6B6B');
-    g1.addColorStop(0.5, '#4ECDC4');
-    g1.addColorStop(1, '#45B7D1');
-    cx.fillStyle = g1;
-    cx.fillRect(0, 0, size, size);
+        // Cover fit
+        const scale = Math.max(size / img.width, size / img.height);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        cx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
 
-    // Add some circles for interest
-    const g2 = cx.createRadialGradient(size*0.3, size*0.3, 0, size*0.3, size*0.3, size*0.4);
-    g2.addColorStop(0, 'rgba(255,255,255,0.8)');
-    g2.addColorStop(1, 'rgba(255,255,255,0)');
-    cx.fillStyle = g2;
-    cx.fillRect(0, 0, size, size);
-
-    const g3 = cx.createRadialGradient(size*0.7, size*0.6, 0, size*0.7, size*0.6, size*0.3);
-    g3.addColorStop(0, 'rgba(147,51,234,0.7)');
-    g3.addColorStop(1, 'rgba(147,51,234,0)');
-    cx.fillStyle = g3;
-    cx.fillRect(0, 0, size, size);
-
-    return cx.getImageData(0, 0, size, size);
+        originalImage = cx.getImageData(0, 0, size, size);
+        applyEffect();
+    };
+    // Random photo from Picsum
+    img.src = 'https://picsum.photos/512/512?random=' + Date.now();
 }
 
 // Bin shuffle - scramble blocks
@@ -498,9 +490,8 @@ $('downloadBtn').onclick = () => {
     a.click();
 };
 
-// Init with sample
-originalImage = createSampleImage();
-applyEffect();
+// Init with sample photo
+loadSampleImage();
 </script>
 </body>
 </html>
