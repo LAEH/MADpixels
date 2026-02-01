@@ -1,19 +1,19 @@
 {
   "name": "MADpixels",
   "short_name": "MADpixels",
-  "description": "Artistic image effects with GPU acceleration",
+  "description": "Puzzle game meets art. Find the missing piece.",
   "start_url": "./",
-  "display": "standalone",
-  "background_color": "#0a0a0f",
-  "theme_color": "#d951f9",
-  "orientation": "any",
+  "display": "fullscreen",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "orientation": "portrait",
   "icons": [
     {
-      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230a0a0f' width='100' height='100' rx='20'/><text x='50' y='65' text-anchor='middle' font-size='50'>🎨</text></svg>",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23000' width='100' height='100'/><text x='50' y='68' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='24' fill='%23fff'>MAD</text></svg>",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any"
     }
   ],
-  "categories": ["graphics", "photo", "utilities"]
+  "categories": ["games", "photo", "entertainment"]
 }

@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MADpixels</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         html, body { height: 100%; overflow: hidden; }
@@ -35,9 +36,10 @@
         }
 
         .logo {
-            font-size: 18px;
+            font-size: 24px;
             font-weight: 700;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
+            text-transform: uppercase;
         }
 
         .mode-toggle {
@@ -302,9 +304,10 @@
         }
 
         .welcome-title {
-            font-size: 36px;
+            font-size: 48px;
             font-weight: 700;
-            letter-spacing: -1px;
+            letter-spacing: -2px;
+            text-transform: uppercase;
         }
 
         .welcome-sub {
@@ -577,6 +580,7 @@ function nextImage() {
 function extractBlocks() {
     blocks = [];
     const blkSize = originalImage.width / GRID_SIZE;
+    const dispersionAmount = 0.15; // pixel dispersion within blocks
 
     for (let i = 0; i < TOTAL_BLOCKS; i++) {
         const x = (i % GRID_SIZE) * blkSize;
@@ -587,6 +591,13 @@ function extractBlocks() {
         blockCanvas.height = blkSize;
         const blockCtx = blockCanvas.getContext('2d');
         blockCtx.drawImage(originalImage, x, y, blkSize, blkSize, 0, 0, blkSize, blkSize);
+
+        // Apply dispersion effect within each block
+        if (gpu.available && dispersionAmount > 0) {
+            const imgData = blockCtx.getImageData(0, 0, blkSize, blkSize);
+            const dispersed = gpu.localShuffle(imgData, dispersionAmount, seed + i);
+            blockCtx.putImageData(dispersed, 0, 0);
+        }
 
         blocks.push(blockCanvas);
     }
@@ -606,13 +617,11 @@ function newPuzzle() {
     $('prompt').textContent = 'Find the missing piece';
     $('prompt').className = 'prompt';
 
-    const indices = [];
-    for (let i = 0; i < TOTAL_BLOCKS; i++) indices.push(i);
-    shuffleOrder = shuffleArray(indices);
-
+    // Pick random position to be missing (blocks NOT shuffled - stay in place)
     missingGridPos = Math.floor(Math.random() * TOTAL_BLOCKS);
-    correctBlockIdx = shuffleOrder[missingGridPos];
+    correctBlockIdx = missingGridPos; // block index = grid position
 
+    // Create 4 choices: 1 correct + 3 wrong
     const wrongChoices = [];
     while (wrongChoices.length < 3) {
         const idx = Math.floor(Math.random() * TOTAL_BLOCKS);
@@ -645,12 +654,11 @@ function renderGrid() {
         cell.style.width = cellSize + 'px';
         cell.style.height = cellSize + 'px';
 
-        const blockIdx = shuffleOrder[i];
-
+        // Blocks stay in their original positions (not shuffled)
         if (i === missingGridPos && !answered) {
             cell.classList.add('missing');
         } else {
-            cell.style.backgroundImage = `url(${blocks[blockIdx].toDataURL()})`;
+            cell.style.backgroundImage = `url(${blocks[i].toDataURL()})`;
         }
 
         grid.appendChild(cell);
@@ -703,27 +711,23 @@ function selectChoice(idx) {
             }
         }, AUTO_NEXT_DELAY);
     } else {
+        // Wrong - let user try again (don't advance)
         streak = 0;
-        choiceEls[idx].classList.remove('disabled');
+        answered = false; // allow retry
         choiceEls[idx].classList.add('wrong');
-        choiceEls[correctChoiceIdx].classList.remove('disabled');
-        choiceEls[correctChoiceIdx].classList.add('correct');
 
-        gridCells[missingGridPos].classList.remove('missing');
-        gridCells[missingGridPos].style.backgroundImage = `url(${blocks[correctBlockIdx].toDataURL()})`;
-
-        $('prompt').textContent = 'Wrong!';
+        $('prompt').textContent = 'Try again!';
         $('prompt').className = 'prompt wrong';
 
-        puzzlesOnCurrentImage++;
-
+        // Re-enable other choices after shake animation
         setTimeout(() => {
-            if (images.length > 1 && puzzlesOnCurrentImage >= PUZZLES_PER_IMAGE) {
-                nextImage();
-            } else {
-                newPuzzle();
-            }
-        }, AUTO_NEXT_DELAY + 200);
+            choiceEls[idx].classList.add('disabled');
+            Array.from(choiceEls).forEach((c, i) => {
+                if (i !== idx && !c.classList.contains('wrong')) {
+                    c.classList.remove('disabled');
+                }
+            });
+        }, 300);
     }
 
     updateScore();
