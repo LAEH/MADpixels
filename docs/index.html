@@ -91,8 +91,8 @@
         }
 
         .score {
-            font-size: 15px;
-            font-weight: 700;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 22px;
             color: #000;
         }
 
@@ -122,16 +122,17 @@
 
         .grid-container {
             position: relative;
-            border-radius: 12px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            box-shadow: 8px 8px 0 #000;
+            border: 4px solid #000;
         }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 2px;
-            background: #e0e0e0;
+            gap: 3px;
+            background: #000;
         }
 
         .grid-cell {
@@ -141,17 +142,24 @@
         }
 
         .grid-cell.missing {
-            background: #f0f0f0;
+            background: linear-gradient(135deg, #ff3366 0%, #ff6b3d 50%, #ffc107 100%);
             display: flex;
             align-items: center;
             justify-content: center;
+            animation: pulse 1.5s infinite;
         }
 
         .grid-cell.missing::after {
             content: '?';
-            font-size: 28px;
-            font-weight: 700;
-            color: #ccc;
+            font-size: 32px;
+            font-weight: 900;
+            color: #fff;
+            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
         }
 
         .grid-cell.correct {
@@ -194,42 +202,52 @@
 
         .game-controls .prompt {
             text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-            color: #666;
-            min-height: 20px;
+            font-size: 28px;
+            min-height: 36px;
+            line-height: 36px;
         }
-        .game-controls .prompt.correct { color: #22aa22; }
-        .game-controls .prompt.wrong { color: #dd3333; }
+        .game-controls .prompt.correct { animation: bounce 0.4s; }
+        .game-controls .prompt.wrong { animation: shake 0.3s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
 
         .choices {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 12px;
         }
 
         .choice {
             aspect-ratio: 1;
-            border-radius: 10px;
-            border: 3px solid #e0e0e0;
+            border-radius: 16px;
+            border: 4px solid #000;
             background-size: cover;
             background-position: center;
             cursor: pointer;
             transition: all 0.15s;
+            box-shadow: 4px 4px 0 #000;
         }
-        .choice:active { transform: scale(0.95); }
+        .choice:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 #000;
+        }
         .choice.wrong {
-            border-color: #dd3333;
+            border-color: #ff3366;
+            box-shadow: 4px 4px 0 #ff3366;
             animation: shake 0.3s;
-            opacity: 0.5;
+            opacity: 0.4;
         }
         .choice.correct {
-            border-color: #22aa22;
-            transform: scale(1.05);
+            border-color: #00cc66;
+            box-shadow: 0 0 20px #00cc66;
+            transform: scale(1.08);
         }
         .choice.disabled {
             pointer-events: none;
-            opacity: 0.4;
+            opacity: 0.3;
         }
 
         @keyframes shake {
@@ -436,7 +454,7 @@
         </div>
 
         <div class="controls game-controls" id="gameControls">
-            <div class="prompt" id="prompt">Find the missing piece</div>
+            <div class="prompt" id="prompt"></div>
             <div class="choices" id="choices"></div>
         </div>
 
@@ -671,7 +689,8 @@ function extractBlocks() {
 
         if (gpu.available && dispersionAmount > 0) {
             const imgData = blockCtx.getImageData(0, 0, blkSize, blkSize);
-            const dispersed = gpu.localShuffle(imgData, dispersionAmount, seed + i);
+            const uniqueSeed = seed * (i + 1) * 7.31 + Math.sin(i * 13.7) * 1000;
+            const dispersed = gpu.localShuffle(imgData, dispersionAmount, uniqueSeed);
             blockCtx.putImageData(dispersed, 0, 0);
         }
 
@@ -690,7 +709,7 @@ function shuffleArray(arr) {
 
 function newPuzzle() {
     answered = false;
-    $('prompt').textContent = 'Find the missing piece';
+    $('prompt').textContent = '';
     $('prompt').className = 'prompt';
 
     // Pick random position to be missing (blocks NOT shuffled - stay in place)
@@ -775,7 +794,7 @@ function selectChoice(idx) {
         gridCells[missingGridPos].style.backgroundImage = `url(${blocks[correctBlockIdx].toDataURL()})`;
         gridCells[missingGridPos].classList.add('correct');
 
-        $('prompt').textContent = streak > 2 ? `🔥 ${streak} in a row!` : 'Correct!';
+        $('prompt').textContent = streak > 2 ? `🔥🔥🔥 ${streak}` : '✨';
         $('prompt').className = 'prompt correct';
 
         puzzlesOnCurrentImage++;
@@ -793,7 +812,7 @@ function selectChoice(idx) {
         answered = false; // allow retry
         choiceEls[idx].classList.add('wrong');
 
-        $('prompt').textContent = 'Try again!';
+        $('prompt').textContent = '❌';
         $('prompt').className = 'prompt wrong';
 
         // Re-enable other choices after shake animation
