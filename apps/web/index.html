@@ -9,10 +9,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Archivo+Black&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; overflow: hidden; }
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
 
         body {
             font-family: 'Space Grotesk', -apple-system, sans-serif;
@@ -36,10 +41,10 @@
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            text-transform: uppercase;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 26px;
+            letter-spacing: -2px;
+            transform: skewX(-3deg);
         }
 
         .mode-toggle {
@@ -304,10 +309,10 @@
         }
 
         .welcome-title {
-            font-size: 48px;
-            font-weight: 700;
-            letter-spacing: -2px;
-            text-transform: uppercase;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 52px;
+            letter-spacing: -3px;
+            transform: skewX(-5deg);
         }
 
         .welcome-sub {
@@ -491,8 +496,8 @@ let currentImageIdx = 0;
 let puzzlesOnCurrentImage = 0;
 let originalImage = null;
 let originalImageData = null;
-let blocks = [];
-let shuffleOrder = [];
+let blocks = []; // dispersed blocks for grid
+let cleanBlocks = []; // original blocks for choices
 let missingGridPos = -1;
 let correctBlockIdx = -1;
 let correctChoiceIdx = -1;
@@ -579,20 +584,29 @@ function nextImage() {
 
 function extractBlocks() {
     blocks = [];
+    cleanBlocks = [];
     const blkSize = originalImage.width / GRID_SIZE;
-    const dispersionAmount = 0.15; // pixel dispersion within blocks
+    const dispersionAmount = 0.2; // pixel dispersion within blocks
 
     for (let i = 0; i < TOTAL_BLOCKS; i++) {
         const x = (i % GRID_SIZE) * blkSize;
         const y = Math.floor(i / GRID_SIZE) * blkSize;
 
+        // Clean block for choices
+        const cleanCanvas = document.createElement('canvas');
+        cleanCanvas.width = blkSize;
+        cleanCanvas.height = blkSize;
+        const cleanCtx = cleanCanvas.getContext('2d');
+        cleanCtx.drawImage(originalImage, x, y, blkSize, blkSize, 0, 0, blkSize, blkSize);
+        cleanBlocks.push(cleanCanvas);
+
+        // Dispersed block for grid
         const blockCanvas = document.createElement('canvas');
         blockCanvas.width = blkSize;
         blockCanvas.height = blkSize;
         const blockCtx = blockCanvas.getContext('2d');
         blockCtx.drawImage(originalImage, x, y, blkSize, blkSize, 0, 0, blkSize, blkSize);
 
-        // Apply dispersion effect within each block
         if (gpu.available && dispersionAmount > 0) {
             const imgData = blockCtx.getImageData(0, 0, blkSize, blkSize);
             const dispersed = gpu.localShuffle(imgData, dispersionAmount, seed + i);
@@ -669,10 +683,11 @@ function renderChoices() {
     const container = $('choices');
     container.innerHTML = '';
 
+    // Show clean (non-dispersed) blocks as choices
     choices.forEach((blockIdx, i) => {
         const choice = document.createElement('div');
         choice.className = 'choice';
-        choice.style.backgroundImage = `url(${blocks[blockIdx].toDataURL()})`;
+        choice.style.backgroundImage = `url(${cleanBlocks[blockIdx].toDataURL()})`;
         choice.onclick = () => selectChoice(i);
         container.appendChild(choice);
     });
