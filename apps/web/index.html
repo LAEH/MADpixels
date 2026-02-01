@@ -5,586 +5,181 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>MADpixels</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#0a0a0a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Archivo+Black&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Archivo+Black&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
+        :root { --safe-top: env(safe-area-inset-top, 0px); --safe-bottom: env(safe-area-inset-bottom, 0px); --accent: #ff3366; --success: #00ff88; }
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
-        html { background: #000; }
-        body {
-            font-family: 'Space Grotesk', system-ui, sans-serif;
-            background: #0a0a0a;
-            color: #fff;
-            min-height: 100vh;
-            min-height: 100dvh;
-            overflow: hidden;
-            position: fixed;
-            inset: 0;
-        }
-
-        .app {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            padding: var(--safe-top) 0 var(--safe-bottom) 0;
-        }
+        html { background: #0a0a0a; }
+        body { font-family: 'Space Grotesk', system-ui, sans-serif; background: #0a0a0a; color: #fff; min-height: 100vh; min-height: 100dvh; overflow: hidden; position: fixed; inset: 0; }
+        .app { height: 100%; display: flex; flex-direction: column; padding: var(--safe-top) 0 var(--safe-bottom) 0; }
 
         /* Header */
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 16px;
-            flex-shrink: 0;
-        }
-
-        .logo {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            opacity: 0.9;
-        }
-        .logo-box {
-            border: 2px solid #fff;
-            padding: 4px 6px;
-            line-height: 1;
-        }
+        header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; flex-shrink: 0; }
+        .logo { font-family: 'Archivo Black', sans-serif; font-size: 14px; display: flex; align-items: center; gap: 3px; opacity: 0.9; }
+        .logo-box { border: 2px solid #fff; padding: 4px 6px; line-height: 1; }
         .logo-emoji { font-size: 16px; margin-left: 4px; }
 
-        .stats {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            font-size: 13px;
-            font-weight: 500;
-        }
+        .stats { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 500; }
         .stat { display: flex; align-items: center; gap: 4px; opacity: 0.7; }
-        .stat-val { font-weight: 700; color: #fff; opacity: 1; }
-        .stat.hot .stat-val { color: #ff3366; }
+        .stat-val { font-weight: 700; color: #fff; opacity: 1; min-width: 20px; }
+        .stat.hot .stat-val { color: var(--accent); }
+        .stat.combo { background: linear-gradient(135deg, #ff3366, #ff6b3d); padding: 4px 10px; border-radius: 12px; opacity: 1; animation: comboPulse 0.5s; }
+        @keyframes comboPulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
 
-        .icon-btn {
-            width: 36px; height: 36px;
-            border: 2px solid rgba(255,255,255,0.3);
-            background: transparent;
-            color: #fff;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
+        .header-btns { display: flex; gap: 8px; }
+        .icon-btn { width: 36px; height: 36px; border: 2px solid rgba(255,255,255,0.3); background: transparent; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; font-size: 16px; }
         .icon-btn:active { background: #fff; color: #000; }
-        .icon-btn svg { width: 16px; height: 16px; }
 
         /* Main game area */
-        .main-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            gap: 12px;
-            min-height: 0;
-        }
+        .main-area { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 8px 16px; gap: 10px; min-height: 0; }
 
-        /* Progress bar */
-        .progress-wrap {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .progress-bar {
-            flex: 1;
-            height: 4px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ff3366, #ff6b3d);
-            border-radius: 2px;
-            transition: width 0.3s ease;
-        }
-        .progress-text {
-            font-size: 11px;
-            font-weight: 700;
-            color: rgba(255,255,255,0.5);
-            min-width: 32px;
-            text-align: right;
-        }
+        .progress-wrap { width: 100%; max-width: 400px; display: flex; align-items: center; gap: 8px; }
+        .progress-bar { flex: 1; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), #ff6b3d); border-radius: 2px; transition: width 0.3s ease; }
+        .progress-text { font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.5); min-width: 32px; text-align: right; }
 
-        /* Timer */
-        .timer-wrap {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            font-size: 13px;
-            font-weight: 700;
-            color: rgba(255,255,255,0.6);
-        }
-        .timer-wrap.urgent { color: #ff3366; animation: pulse 0.5s infinite; }
+        .timer-wrap { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; font-weight: 700; color: rgba(255,255,255,0.6); }
+        .timer-wrap.urgent { color: var(--accent); animation: pulse 0.5s infinite; }
         @keyframes pulse { 50% { opacity: 0.5; } }
 
-        /* Grid */
-        .grid-wrap {
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        .grid-wrap::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-radius: 12px;
-            pointer-events: none;
-        }
+        .grid-wrap { position: relative; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .grid-wrap::after { content: ''; position: absolute; inset: 0; border: 3px solid rgba(255,255,255,0.1); border-radius: 12px; pointer-events: none; }
+        .grid-wrap.correct { animation: gridCorrect 0.4s; }
+        .grid-wrap.wrong { animation: gridWrong 0.4s; }
+        @keyframes gridCorrect { 0%,100% { box-shadow: 0 20px 60px rgba(0,0,0,0.5); } 50% { box-shadow: 0 0 40px rgba(0,255,136,0.4); } }
+        @keyframes gridWrong { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 2px;
-            background: rgba(255,255,255,0.05);
-        }
-
-        .cell {
-            aspect-ratio: 1;
-            background-size: cover;
-            background-position: center;
-            position: relative;
-            transition: transform 0.2s, filter 0.3s;
-        }
-        .cell.missing {
-            background: linear-gradient(135deg, #ff3366 0%, #ff6b3d 50%, #ffc107 100%);
-            background-size: 200% 200%;
-            animation: gradient 1.5s ease infinite;
-        }
-        .cell.missing::after {
-            content: '?';
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 24px;
-            color: #fff;
-            animation: float 1s ease-in-out infinite;
-        }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; background: rgba(255,255,255,0.05); }
+        .cell { aspect-ratio: 1; background-size: cover; background-position: center; position: relative; }
+        .cell.missing { background: linear-gradient(135deg, #ff3366 0%, #ff6b3d 50%, #ffc107 100%); background-size: 200% 200%; animation: gradient 1.5s ease infinite; }
+        .cell.missing::after { content: '?'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Archivo Black', sans-serif; font-size: 24px; color: #fff; animation: float 1s ease-in-out infinite; }
         @keyframes gradient { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
         @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        .cell.reveal { animation: cellReveal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes cellReveal { 0% { transform: scale(0) rotate(-10deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
 
-        .cell.reveal {
-            animation: cellReveal 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes cellReveal {
-            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
-            100% { transform: scale(1) rotate(0); opacity: 1; }
-        }
-
-        .cell.hint { box-shadow: inset 0 0 0 3px rgba(255,255,255,0.3); }
+        /* Mercy indicator */
+        .mercy { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); padding: 4px 8px; border-radius: 10px; font-size: 11px; display: flex; align-items: center; gap: 4px; z-index: 10; }
+        .mercy.used { opacity: 0.4; text-decoration: line-through; }
 
         /* Choices */
-        .choices-area {
-            flex-shrink: 0;
-            padding: 16px;
-            width: 100%;
-        }
-
-        .choices {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .choice {
-            aspect-ratio: 1;
-            border-radius: 12px;
-            border: 3px solid rgba(255,255,255,0.2);
-            background-size: cover;
-            background-position: center;
-            cursor: pointer;
-            transition: all 0.15s;
-            position: relative;
-            overflow: hidden;
-        }
-        .choice::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent 50%, rgba(0,0,0,0.3));
-            opacity: 0;
-            transition: opacity 0.15s;
-        }
+        .choices-area { flex-shrink: 0; padding: 12px 16px 16px; width: 100%; }
+        .choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 400px; margin: 0 auto; }
+        .choice { aspect-ratio: 1; border-radius: 12px; border: 3px solid rgba(255,255,255,0.2); background-size: cover; background-position: center; cursor: pointer; transition: all 0.15s; position: relative; overflow: hidden; }
         .choice:active { transform: scale(0.95); }
-        .choice:active::before { opacity: 1; }
-
-        .choice.wrong {
-            border-color: #ff3366;
-            animation: shake 0.4s;
-            opacity: 0.3;
-        }
-        .choice.correct {
-            border-color: #00ff88;
-            box-shadow: 0 0 20px rgba(0,255,136,0.5);
-            transform: scale(1.05);
-        }
+        .choice.wrong { border-color: var(--accent); animation: shake 0.4s; opacity: 0.3; }
+        .choice.correct { border-color: var(--success); box-shadow: 0 0 20px rgba(0,255,136,0.5); transform: scale(1.05); }
         .choice.disabled { pointer-events: none; opacity: 0.2; }
-
-        @keyframes shake {
-            0%,100% { transform: translateX(0); }
-            20%,60% { transform: translateX(-6px); }
-            40%,80% { transform: translateX(6px); }
-        }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
 
         /* Feedback overlay */
-        .feedback {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            z-index: 100;
-        }
-        .feedback-text {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 48px;
-            opacity: 0;
-            transform: scale(0.5);
-        }
-        .feedback-text.show {
-            animation: feedbackPop 0.6s ease;
-        }
-        @keyframes feedbackPop {
-            0% { opacity: 0; transform: scale(0.5); }
-            20% { opacity: 1; transform: scale(1.2); }
-            100% { opacity: 0; transform: scale(1) translateY(-20px); }
-        }
+        .feedback { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; pointer-events: none; z-index: 100; }
+        .feedback-text { font-family: 'Archivo Black', sans-serif; font-size: 48px; opacity: 0; transform: scale(0.5); text-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+        .feedback-text.show { animation: feedbackPop 0.6s ease; }
+        @keyframes feedbackPop { 0% { opacity: 0; transform: scale(0.5); } 20% { opacity: 1; transform: scale(1.2); } 100% { opacity: 0; transform: scale(1) translateY(-20px); } }
 
-        /* Image complete overlay */
-        .complete-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.95);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 24px;
-            z-index: 200;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s;
-            padding: 32px;
-        }
+        /* Combo popup */
+        .combo-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: 'Archivo Black', sans-serif; font-size: 72px; pointer-events: none; z-index: 101; opacity: 0; }
+        .combo-popup.show { animation: comboPopup 0.8s ease; }
+        @keyframes comboPopup { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.3); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(1) translateY(-40px); } }
+
+        /* Achievement toast */
+        .achievement { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-100px); background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; padding: 12px 20px; border-radius: 16px; font-weight: 700; font-size: 14px; z-index: 200; display: flex; align-items: center; gap: 8px; box-shadow: 0 10px 40px rgba(255,215,0,0.4); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .achievement.show { transform: translateX(-50%) translateY(0); }
+        .achievement-icon { font-size: 24px; }
+
+        /* Complete overlay */
+        .complete-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.4s; padding: 24px; }
         .complete-overlay.show { opacity: 1; pointer-events: auto; }
+        .complete-image { max-width: 260px; max-height: 260px; border-radius: 16px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); transform: scale(0.9); opacity: 0; transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s; }
+        .complete-overlay.show .complete-image { transform: scale(1); opacity: 1; }
+        .complete-stats { text-align: center; opacity: 0; transform: translateY(20px); transition: all 0.4s ease 0.4s; }
+        .complete-overlay.show .complete-stats { opacity: 1; transform: translateY(0); }
+        .complete-title { font-family: 'Archivo Black', sans-serif; font-size: 24px; margin-bottom: 8px; }
+        .complete-detail { font-size: 14px; opacity: 0.6; line-height: 1.6; }
+        .complete-btns { display: flex; gap: 12px; opacity: 0; transform: translateY(20px); transition: all 0.4s ease 0.6s; }
+        .complete-overlay.show .complete-btns { opacity: 1; transform: translateY(0); }
+        .complete-btn { padding: 14px 28px; border: none; border-radius: 25px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        .complete-btn.primary { background: #fff; color: #000; }
+        .complete-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; }
+        .complete-btn:active { transform: scale(0.95); }
 
-        .complete-image {
-            max-width: 280px;
-            max-height: 280px;
-            border-radius: 16px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            transform: scale(0.9);
-            opacity: 0;
-            transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s;
-        }
-        .complete-overlay.show .complete-image {
-            transform: scale(1);
-            opacity: 1;
-        }
-
-        .complete-stats {
-            text-align: center;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s ease 0.4s;
-        }
-        .complete-overlay.show .complete-stats {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .complete-title {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 24px;
-            margin-bottom: 8px;
-        }
-        .complete-detail {
-            font-size: 14px;
-            opacity: 0.6;
-        }
-
-        .continue-btn {
-            padding: 16px 48px;
-            border: none;
-            border-radius: 30px;
-            background: #fff;
-            color: #000;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.4s ease 0.6s;
-        }
-        .complete-overlay.show .continue-btn {
-            opacity: 1;
-            transform: translateY(0);
-        }
-        .continue-btn:active { transform: scale(0.95); }
+        /* Stats overlay */
+        .stats-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; z-index: 250; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 24px; }
+        .stats-overlay.show { opacity: 1; pointer-events: auto; }
+        .stats-title { font-family: 'Archivo Black', sans-serif; font-size: 28px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; width: 100%; max-width: 300px; }
+        .stats-card { background: rgba(255,255,255,0.05); padding: 16px; border-radius: 12px; text-align: center; }
+        .stats-card-val { font-family: 'Archivo Black', sans-serif; font-size: 32px; color: var(--accent); }
+        .stats-card-label { font-size: 12px; opacity: 0.5; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
+        .achievements-list { width: 100%; max-width: 300px; }
+        .achievements-title { font-size: 12px; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        .achievement-row { display: flex; align-items: center; gap: 12px; padding: 12px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-bottom: 8px; }
+        .achievement-row.locked { opacity: 0.3; }
+        .achievement-row .icon { font-size: 24px; }
+        .achievement-row .info { flex: 1; }
+        .achievement-row .name { font-weight: 700; font-size: 14px; }
+        .achievement-row .desc { font-size: 11px; opacity: 0.5; }
+        .close-btn { position: absolute; top: 20px; right: 20px; width: 40px; height: 40px; border: none; background: rgba(255,255,255,0.1); color: #fff; border-radius: 50%; font-size: 20px; cursor: pointer; }
 
         /* Welcome */
-        .welcome {
-            position: fixed;
-            inset: 0;
-            background: #0a0a0a;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 32px;
-            z-index: 300;
-            padding: 32px;
-        }
+        .welcome { position: fixed; inset: 0; background: #0a0a0a; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; z-index: 300; padding: 32px; }
         .welcome.hidden { display: none; }
-
-        .welcome-logo {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 28px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .welcome-logo .logo-box {
-            border: 3px solid #fff;
-            padding: 10px 14px;
-        }
+        .welcome-logo { font-family: 'Archivo Black', sans-serif; font-size: 28px; display: flex; align-items: center; gap: 4px; }
+        .welcome-logo .logo-box { border: 3px solid #fff; padding: 10px 14px; }
         .welcome-logo .logo-emoji { font-size: 36px; margin-left: 8px; }
-
-        .welcome-text {
-            text-align: center;
-            max-width: 280px;
-        }
-        .welcome-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-        .welcome-sub {
-            font-size: 14px;
-            opacity: 0.5;
-            line-height: 1.5;
-        }
-
-        .start-btn {
-            width: 100%;
-            max-width: 280px;
-            padding: 18px 32px;
-            border: none;
-            border-radius: 30px;
-            background: #fff;
-            color: #000;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: transform 0.15s;
-        }
+        .welcome-text { text-align: center; max-width: 280px; }
+        .welcome-title { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+        .welcome-sub { font-size: 14px; opacity: 0.5; line-height: 1.5; }
+        .start-btn { width: 100%; max-width: 280px; padding: 18px 32px; border: none; border-radius: 30px; background: #fff; color: #000; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; }
         .start-btn:active { transform: scale(0.97); }
-
-        .best-score {
-            font-size: 13px;
-            opacity: 0.4;
-        }
+        .best-score { font-size: 13px; opacity: 0.4; }
+        .sound-toggle { margin-top: 8px; font-size: 13px; opacity: 0.6; cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
         /* Edit mode */
-        .edit-area {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-        }
-        .edit-area canvas {
-            max-width: 100%;
-            max-height: 100%;
-            border-radius: 12px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-
-        .edit-controls {
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .effect-row {
-            display: flex;
-            gap: 8px;
-        }
-        .effect-btn {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid rgba(255,255,255,0.2);
-            background: transparent;
-            font-size: 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .effect-btn.active {
-            border-color: #fff;
-            background: #fff;
-        }
-
-        .slider-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .slider-label {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            min-width: 60px;
-        }
-        input[type="range"] {
-            flex: 1;
-            -webkit-appearance: none;
-            height: 4px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 2px;
-            outline: none;
-        }
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #fff;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .slider-val {
-            font-size: 12px;
-            font-weight: 700;
-            min-width: 28px;
-            text-align: right;
-        }
-
-        .action-row {
-            display: flex;
-            gap: 8px;
-            margin-top: 4px;
-        }
-        .action-btn {
-            flex: 1;
-            padding: 14px;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 25px;
-            background: transparent;
-            color: #fff;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
+        .edit-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; }
+        .edit-area canvas { max-width: 100%; max-height: 100%; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .edit-controls { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .effect-row { display: flex; gap: 8px; }
+        .effect-btn { flex: 1; padding: 12px; border: 2px solid rgba(255,255,255,0.2); background: transparent; font-size: 20px; border-radius: 12px; cursor: pointer; transition: all 0.15s; }
+        .effect-btn.active { border-color: #fff; background: #fff; }
+        .slider-row { display: flex; align-items: center; gap: 12px; }
+        .slider-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; opacity: 0.5; min-width: 50px; }
+        input[type="range"] { flex: 1; -webkit-appearance: none; height: 4px; background: rgba(255,255,255,0.2); border-radius: 2px; outline: none; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; background: #fff; border-radius: 50%; cursor: pointer; }
+        .slider-val { font-size: 12px; font-weight: 700; min-width: 28px; text-align: right; }
+        .action-row { display: flex; gap: 8px; margin-top: 4px; }
+        .action-btn { flex: 1; padding: 14px; border: 2px solid rgba(255,255,255,0.3); border-radius: 25px; background: transparent; color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; cursor: pointer; }
         .action-btn:active { background: #fff; color: #000; }
         .action-btn.primary { background: #fff; color: #000; border-color: #fff; }
 
-        .mode-toggle {
-            position: fixed;
-            bottom: calc(16px + var(--safe-bottom));
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            background: rgba(255,255,255,0.1);
-            border-radius: 25px;
-            padding: 4px;
-            z-index: 50;
-        }
-        .mode-btn {
-            padding: 10px 20px;
-            border: none;
-            background: transparent;
-            color: rgba(255,255,255,0.5);
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+        .mode-toggle { position: fixed; bottom: calc(16px + var(--safe-bottom)); left: 50%; transform: translateX(-50%); display: flex; background: rgba(255,255,255,0.1); border-radius: 25px; padding: 4px; z-index: 50; }
+        .mode-btn { padding: 10px 20px; border: none; background: transparent; color: rgba(255,255,255,0.5); font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
         .mode-btn.active { background: #fff; color: #000; }
 
         .hidden { display: none !important; }
-
-        /* Fullscreen prompt */
-        .fs-prompt {
-            position: fixed;
-            bottom: 80px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255,255,255,0.1);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-size: 12px;
-            opacity: 0.6;
-            z-index: 40;
-            white-space: nowrap;
-        }
-
         canvas.gl { display: none; }
     </style>
 </head>
 <body>
     <div class="app">
         <header>
-            <span class="logo">
-                <span class="logo-box">MAD</span><span class="logo-box">pixels</span>
-                <span class="logo-emoji">🧩</span>
-            </span>
+            <span class="logo"><span class="logo-box">MAD</span><span class="logo-box">pixels</span><span class="logo-emoji">🧩</span></span>
             <div class="stats">
-                <div class="stat" id="streakStat">
-                    <span>🔥</span>
-                    <span class="stat-val" id="streak">0</span>
-                </div>
-                <div class="stat">
-                    <span>⭐</span>
-                    <span class="stat-val" id="score">0</span>
-                </div>
+                <div class="stat combo hidden" id="comboStat">×<span class="stat-val" id="combo">2</span></div>
+                <div class="stat" id="streakStat">🔥<span class="stat-val" id="streak">0</span></div>
+                <div class="stat">⭐<span class="stat-val" id="score">0</span></div>
             </div>
-            <button class="icon-btn" id="addBtn">
-                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
-                </svg>
-            </button>
+            <div class="header-btns">
+                <button class="icon-btn" id="statsBtn">📊</button>
+                <button class="icon-btn" id="addBtn">➕</button>
+            </div>
         </header>
 
         <div class="main-area" id="gameArea">
@@ -592,18 +187,14 @@
                 <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
                 <div class="progress-text" id="progressText">0/0</div>
             </div>
-            <div class="timer-wrap" id="timer">
-                <span>⏱</span>
-                <span id="timerText">0.0s</span>
-            </div>
-            <div class="grid-wrap">
+            <div class="timer-wrap" id="timer">⏱ <span id="timerText">0.0s</span></div>
+            <div class="grid-wrap" id="gridWrap">
+                <div class="mercy" id="mercy">💚 Mercy</div>
                 <div class="grid" id="grid"></div>
             </div>
         </div>
 
-        <div class="edit-area hidden" id="editArea">
-            <canvas id="canvas"></canvas>
-        </div>
+        <div class="edit-area hidden" id="editArea"><canvas id="canvas"></canvas></div>
 
         <div class="choices-area" id="choicesArea">
             <div class="choices" id="choices"></div>
@@ -616,16 +207,8 @@
                 <button class="effect-btn" data-effect="shuffle">🔀</button>
                 <button class="effect-btn active" data-effect="both">🌀</button>
             </div>
-            <div class="slider-row">
-                <span class="slider-label">Size</span>
-                <input type="range" id="sizeSlider" min="8" max="64" value="32" step="4">
-                <span class="slider-val" id="sizeVal">32</span>
-            </div>
-            <div class="slider-row">
-                <span class="slider-label">Chaos</span>
-                <input type="range" id="chaosSlider" min="0" max="100" value="50" step="5">
-                <span class="slider-val" id="chaosVal">50</span>
-            </div>
+            <div class="slider-row"><span class="slider-label">Size</span><input type="range" id="sizeSlider" min="8" max="64" value="32" step="4"><span class="slider-val" id="sizeVal">32</span></div>
+            <div class="slider-row"><span class="slider-label">Chaos</span><input type="range" id="chaosSlider" min="0" max="100" value="50" step="5"><span class="slider-val" id="chaosVal">50</span></div>
             <div class="action-row">
                 <button class="action-btn" id="randomBtn">🎲 Shuffle</button>
                 <button class="action-btn primary" id="saveBtn">💾 Save</button>
@@ -639,6 +222,8 @@
     </div>
 
     <div class="feedback"><div class="feedback-text" id="feedback"></div></div>
+    <div class="combo-popup" id="comboPopup"></div>
+    <div class="achievement" id="achievement"><span class="achievement-icon"></span><span class="achievement-text"></span></div>
 
     <div class="complete-overlay" id="complete">
         <img class="complete-image" id="completeImg">
@@ -646,20 +231,36 @@
             <div class="complete-title" id="completeTitle">Beautiful!</div>
             <div class="complete-detail" id="completeDetail"></div>
         </div>
-        <button class="continue-btn" id="continueBtn">Next Photo →</button>
+        <div class="complete-btns">
+            <button class="complete-btn secondary" id="shareBtn">📤 Share</button>
+            <button class="complete-btn primary" id="continueBtn">Next →</button>
+        </div>
+    </div>
+
+    <div class="stats-overlay" id="statsOverlay">
+        <button class="close-btn" id="closeStats">×</button>
+        <div class="stats-title">Your Stats</div>
+        <div class="stats-grid">
+            <div class="stats-card"><div class="stats-card-val" id="totalScore">0</div><div class="stats-card-label">Total Score</div></div>
+            <div class="stats-card"><div class="stats-card-val" id="gamesPlayed">0</div><div class="stats-card-label">Games</div></div>
+            <div class="stats-card"><div class="stats-card-val" id="bestStreakStat">0</div><div class="stats-card-label">Best Streak</div></div>
+            <div class="stats-card"><div class="stats-card-val" id="accuracy">0%</div><div class="stats-card-label">Accuracy</div></div>
+        </div>
+        <div class="achievements-list">
+            <div class="achievements-title">Achievements</div>
+            <div id="achievementsList"></div>
+        </div>
     </div>
 
     <div class="welcome" id="welcome">
-        <div class="welcome-logo">
-            <span class="logo-box">MAD</span><span class="logo-box">pixels</span>
-            <span class="logo-emoji">🧩</span>
-        </div>
+        <div class="welcome-logo"><span class="logo-box">MAD</span><span class="logo-box">pixels</span><span class="logo-emoji">🧩</span></div>
         <div class="welcome-text">
             <div class="welcome-title">Train Your Eye</div>
-            <div class="welcome-sub">Rediscover your photos piece by piece. How fast can you spot the missing fragment?</div>
+            <div class="welcome-sub">Rediscover your photos piece by piece.<br>Build combos. Beat your streak.</div>
         </div>
         <button class="start-btn" id="startBtn">Choose Photos</button>
         <div class="best-score" id="bestScore"></div>
+        <div class="sound-toggle" id="soundToggle">🔊 Sound ON</div>
     </div>
 
     <input type="file" id="fileInput" accept="image/*" multiple style="display:none">
@@ -667,14 +268,94 @@
 
 <script>
 const $ = id => document.getElementById(id);
-const GRID = 5, TOTAL = 25, ROUNDS_PER_IMG = 5;
+const GRID = 5, TOTAL = 25, ROUNDS = 5;
 
-// Haptic feedback
-const haptic = (style = 'light') => {
-    if (navigator.vibrate) navigator.vibrate(style === 'heavy' ? 20 : 10);
+// Audio Context for sounds
+let audioCtx = null;
+let soundEnabled = true;
+
+function initAudio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+
+function playSound(type) {
+    if (!soundEnabled || !audioCtx) return;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    const now = audioCtx.currentTime;
+    gain.gain.setValueAtTime(0.3, now);
+
+    if (type === 'correct') {
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.setValueAtTime(659.25, now + 0.1); // E5
+        osc.frequency.setValueAtTime(783.99, now + 0.2); // G5
+        gain.gain.exponentialDecayTo(0.01, now + 0.4);
+        osc.start(now);
+        osc.stop(now + 0.4);
+    } else if (type === 'wrong') {
+        osc.frequency.setValueAtTime(200, now);
+        osc.frequency.setValueAtTime(150, now + 0.1);
+        gain.gain.exponentialDecayTo(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+    } else if (type === 'combo') {
+        osc.frequency.setValueAtTime(880, now);
+        osc.frequency.setValueAtTime(1108.73, now + 0.05);
+        osc.frequency.setValueAtTime(1318.51, now + 0.1);
+        gain.gain.exponentialDecayTo(0.01, now + 0.3);
+        osc.start(now);
+        osc.stop(now + 0.3);
+    } else if (type === 'complete') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.frequency.setValueAtTime(freq, now + i * 0.15);
+            g.gain.setValueAtTime(0.2, now + i * 0.15);
+            g.gain.exponentialDecayTo(0.01, now + i * 0.15 + 0.3);
+            o.start(now + i * 0.15);
+            o.stop(now + i * 0.15 + 0.3);
+        });
+    } else if (type === 'achievement') {
+        [783.99, 987.77, 1174.66, 1567.98].forEach((freq, i) => {
+            const o = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            o.connect(g);
+            g.connect(audioCtx.destination);
+            o.frequency.setValueAtTime(freq, now + i * 0.1);
+            g.gain.setValueAtTime(0.25, now + i * 0.1);
+            g.gain.exponentialDecayTo(0.01, now + i * 0.1 + 0.4);
+            o.start(now + i * 0.1);
+            o.stop(now + i * 0.1 + 0.4);
+        });
+    }
+}
+
+// Polyfill for exponentialDecayTo
+AudioParam.prototype.exponentialDecayTo = function(value, endTime) {
+    this.exponentialRampToValueAtTime(Math.max(value, 0.0001), endTime);
 };
 
-// GPU Processor
+const haptic = (style = 'light') => { if (navigator.vibrate) navigator.vibrate(style === 'heavy' ? 20 : 10); };
+
+// Achievements
+const ACHIEVEMENTS = [
+    { id: 'first_win', icon: '🎯', name: 'First Blood', desc: 'Complete your first puzzle', condition: s => s.gamesPlayed >= 1 },
+    { id: 'streak_5', icon: '🔥', name: 'On Fire', desc: 'Get a 5 streak', condition: s => s.bestStreak >= 5 },
+    { id: 'streak_10', icon: '💥', name: 'Unstoppable', desc: 'Get a 10 streak', condition: s => s.bestStreak >= 10 },
+    { id: 'streak_25', icon: '👑', name: 'Legendary', desc: 'Get a 25 streak', condition: s => s.bestStreak >= 25 },
+    { id: 'perfect', icon: '✨', name: 'Perfectionist', desc: 'Complete an image with no mistakes', condition: s => s.perfectRounds >= 1 },
+    { id: 'speed', icon: '⚡', name: 'Speed Demon', desc: 'Answer in under 1 second', condition: s => s.fastestAnswer < 1 },
+    { id: 'combo_5', icon: '🌟', name: 'Combo Master', desc: 'Get a 5x combo', condition: s => s.maxCombo >= 5 },
+    { id: 'score_1000', icon: '🏆', name: 'High Scorer', desc: 'Reach 1000 total points', condition: s => s.totalScore >= 1000 },
+];
+
+// GPU
 class GPU {
     constructor() {
         this.c = $('glCanvas');
@@ -688,14 +369,7 @@ class GPU {
         gl.shaderSource(vs, 'attribute vec2 p,t;varying vec2 v;void main(){gl_Position=vec4(p,0,1);v=t;}');
         gl.compileShader(vs);
         const fs = gl.createShader(gl.FRAGMENT_SHADER);
-        gl.shaderSource(fs, `precision highp float;varying vec2 v;uniform sampler2D i;uniform vec2 r;uniform float s,d;
-            float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453+d);}
-            void main(){
-                float m=max(r.x,r.y)*s/5.;
-                float u1=max(.0001,h(v*r)),u2=h(v*r+vec2(1,0));
-                vec2 n=vec2(sqrt(-2.*log(u1))*cos(6.28318*u2),sqrt(-2.*log(u1))*sin(6.28318*u2))*m/r;
-                gl_FragColor=texture2D(i,clamp(v+n,0.,1.));
-            }`);
+        gl.shaderSource(fs, `precision highp float;varying vec2 v;uniform sampler2D i;uniform vec2 r;uniform float s,d;float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453+d);}void main(){float m=max(r.x,r.y)*s/5.;float u1=max(.0001,h(v*r)),u2=h(v*r+vec2(1,0));vec2 n=vec2(sqrt(-2.*log(u1))*cos(6.28318*u2),sqrt(-2.*log(u1))*sin(6.28318*u2))*m/r;gl_FragColor=texture2D(i,clamp(v+n,0.,1.));}`);
         gl.compileShader(fs);
         this.p = gl.createProgram();
         gl.attachShader(this.p, vs); gl.attachShader(this.p, fs); gl.linkProgram(this.p);
@@ -738,28 +412,51 @@ const gpu = new GPU();
 const canvas = $('canvas'), ctx = canvas.getContext('2d');
 
 // State
-let mode = 'game';
-let images = [], imgIdx = 0, roundNum = 0;
+let mode = 'game', images = [], imgIdx = 0, roundNum = 0;
 let origImg = null, origData = null;
 let blockURLs = [], cleanURLs = [];
 let missing = -1, correctChoice = -1, choices = [];
-let score = 0, streak = 0, bestStreak = 0;
-let roundScore = 0, roundTime = 0, roundPerfect = true;
+let score = 0, streak = 0, combo = 0, lastAnswerTime = 0;
+let roundScore = 0, roundTime = 0, roundPerfect = true, mercyUsed = false;
 let answered = false, timerStart = 0, timerRAF = null;
-
-// Edit state
 let blockSize = 32, chaos = 50, seed = Math.random() * 1000, effect = 'both';
 
-// Load best from storage
-const stored = localStorage.getItem('madpixels');
-if (stored) {
-    const data = JSON.parse(stored);
-    bestStreak = data.bestStreak || 0;
-    $('bestScore').textContent = bestStreak > 0 ? `Best streak: ${bestStreak} 🔥` : '';
+// Persistent stats
+let stats = {
+    totalScore: 0, gamesPlayed: 0, bestStreak: 0, totalCorrect: 0, totalWrong: 0,
+    perfectRounds: 0, fastestAnswer: Infinity, maxCombo: 0, unlockedAchievements: []
+};
+
+// Load stats
+const stored = localStorage.getItem('madpixels_stats');
+if (stored) stats = { ...stats, ...JSON.parse(stored) };
+updateWelcome();
+
+function saveStats() {
+    localStorage.setItem('madpixels_stats', JSON.stringify(stats));
 }
 
-function saveData() {
-    localStorage.setItem('madpixels', JSON.stringify({ bestStreak }));
+function updateWelcome() {
+    $('bestScore').textContent = stats.bestStreak > 0 ? `Best streak: ${stats.bestStreak} 🔥` : '';
+}
+
+function checkAchievements() {
+    ACHIEVEMENTS.forEach(a => {
+        if (!stats.unlockedAchievements.includes(a.id) && a.condition(stats)) {
+            stats.unlockedAchievements.push(a.id);
+            showAchievement(a);
+            saveStats();
+        }
+    });
+}
+
+function showAchievement(a) {
+    playSound('achievement');
+    const el = $('achievement');
+    el.querySelector('.achievement-icon').textContent = a.icon;
+    el.querySelector('.achievement-text').textContent = a.name;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3000);
 }
 
 function loadImages(files) {
@@ -777,13 +474,9 @@ function loadImages(files) {
                 cx.drawImage(img, (500-img.width*s)/2, (500-img.height*s)/2, img.width*s, img.height*s);
                 images[i] = { canvas: c, data: cx.getImageData(0,0,500,500), url: c.toDataURL() };
                 if (++loaded === files.length) {
-                    // Shuffle images
-                    for (let j = images.length-1; j > 0; j--) {
-                        const k = ~~(Math.random()*(j+1));
-                        [images[j],images[k]] = [images[k],images[j]];
-                    }
-                    score = 0; streak = 0;
-                    updateStats();
+                    for (let j = images.length-1; j > 0; j--) { const k = ~~(Math.random()*(j+1)); [images[j],images[k]] = [images[k],images[j]]; }
+                    score = 0; streak = 0; combo = 0;
+                    updateUI();
                     startImage(0);
                     $('welcome').classList.add('hidden');
                     requestFullscreen();
@@ -803,13 +496,11 @@ function requestFullscreen() {
 
 function startImage(idx) {
     imgIdx = idx % images.length;
-    roundNum = 0;
-    roundScore = 0;
-    roundTime = 0;
-    roundPerfect = true;
+    roundNum = 0; roundScore = 0; roundTime = 0; roundPerfect = true; mercyUsed = false;
     origImg = images[imgIdx].canvas;
     origData = images[imgIdx].data;
     seed = Math.random() * 1000;
+    $('mercy').classList.remove('used');
     extractBlocks();
     updateProgress();
     newRound();
@@ -818,19 +509,13 @@ function startImage(idx) {
 function extractBlocks() {
     blockURLs = []; cleanURLs = [];
     const sz = origImg.width / GRID;
-    // Use lower dispersion for more recognizable blocks
-    const dispersion = 0.12 + (roundNum * 0.02); // Increases slightly each round
-
+    const dispersion = 0.12;
     for (let i = 0; i < TOTAL; i++) {
         const x = (i % GRID) * sz, y = ~~(i / GRID) * sz;
-
-        // Clean block
         const clean = document.createElement('canvas');
         clean.width = clean.height = sz;
         clean.getContext('2d').drawImage(origImg, x, y, sz, sz, 0, 0, sz, sz);
         cleanURLs.push(clean.toDataURL());
-
-        // Dispersed block with unique seed per block
         const block = document.createElement('canvas');
         block.width = block.height = sz;
         const bx = block.getContext('2d');
@@ -845,90 +530,58 @@ function extractBlocks() {
 }
 
 function updateProgress() {
-    const pct = (roundNum / ROUNDS_PER_IMG) * 100;
-    $('progress').style.width = pct + '%';
-    $('progressText').textContent = `${roundNum}/${ROUNDS_PER_IMG}`;
+    $('progress').style.width = (roundNum / ROUNDS) * 100 + '%';
+    $('progressText').textContent = `${roundNum}/${ROUNDS}`;
 }
 
 function newRound() {
     answered = false;
-
-    // Pick missing block - prefer blocks with more visual interest (not edges/corners as much)
     const weights = [];
     for (let i = 0; i < TOTAL; i++) {
         const row = ~~(i / GRID), col = i % GRID;
-        const edgeDist = Math.min(row, col, GRID-1-row, GRID-1-col);
-        weights.push(1 + edgeDist); // Center blocks more likely
+        weights.push(1 + Math.min(row, col, GRID-1-row, GRID-1-col));
     }
-    const totalWeight = weights.reduce((a,b) => a+b, 0);
-    let r = Math.random() * totalWeight;
+    let r = Math.random() * weights.reduce((a,b) => a+b, 0);
     missing = 0;
-    for (let i = 0; i < TOTAL; i++) {
-        r -= weights[i];
-        if (r <= 0) { missing = i; break; }
-    }
+    for (let i = 0; i < TOTAL; i++) { r -= weights[i]; if (r <= 0) { missing = i; break; } }
 
-    // Generate choices - ensure they're visually distinct
-    const correct = missing;
-    const wrong = [];
-    const missingRow = ~~(missing / GRID), missingCol = missing % GRID;
-
+    const correct = missing, wrong = [];
+    const mRow = ~~(missing / GRID), mCol = missing % GRID;
     while (wrong.length < 3) {
         const n = ~~(Math.random() * TOTAL);
         if (n === correct || wrong.includes(n)) continue;
-
-        // Avoid blocks that are adjacent (too similar)
         const nRow = ~~(n / GRID), nCol = n % GRID;
-        const dist = Math.abs(nRow - missingRow) + Math.abs(nCol - missingCol);
-        if (dist < 2 && Math.random() > 0.3) continue; // Sometimes allow adjacent for difficulty
-
+        const dist = Math.abs(nRow - mRow) + Math.abs(nCol - mCol);
+        if (dist < 2 && Math.random() > 0.3) continue;
         wrong.push(n);
     }
-
     choices = shuffle([correct, ...wrong]);
     correctChoice = choices.indexOf(correct);
-
     renderGrid();
     renderChoices();
     startTimer();
 }
 
-function shuffle(a) {
-    const r = [...a];
-    for (let i = r.length-1; i > 0; i--) {
-        const j = ~~(Math.random()*(i+1));
-        [r[i],r[j]] = [r[j],r[i]];
-    }
-    return r;
-}
+function shuffle(a) { const r = [...a]; for (let i = r.length-1; i > 0; i--) { const j = ~~(Math.random()*(i+1)); [r[i],r[j]] = [r[j],r[i]]; } return r; }
 
 function renderGrid() {
-    const grid = $('grid');
-    const wrap = document.querySelector('.main-area');
+    const grid = $('grid'), wrap = document.querySelector('.main-area');
     const maxSz = Math.min(wrap.clientWidth - 32, wrap.clientHeight - 100);
     const cellSz = ~~(maxSz / GRID);
-
     grid.style.width = grid.style.height = cellSz * GRID + (GRID-1) * 2 + 'px';
     grid.innerHTML = '';
-
     for (let i = 0; i < TOTAL; i++) {
         const cell = document.createElement('div');
         cell.className = 'cell';
         cell.style.width = cell.style.height = cellSz + 'px';
-
-        if (i === missing && !answered) {
-            cell.classList.add('missing');
-        } else {
-            cell.style.backgroundImage = `url(${blockURLs[i]})`;
-        }
-
+        if (i === missing && !answered) cell.classList.add('missing');
+        else cell.style.backgroundImage = `url(${blockURLs[i]})`;
         grid.appendChild(cell);
     }
 }
 
 function renderChoices() {
-    const c = $('choices');
-    c.innerHTML = '';
+    const c = $('choices'); c.innerHTML = '';
     choices.forEach((idx, i) => {
         const el = document.createElement('div');
         el.className = 'choice';
@@ -950,17 +603,11 @@ function startTimer() {
     update();
 }
 
-function stopTimer() {
-    if (timerRAF) cancelAnimationFrame(timerRAF);
-    return (performance.now() - timerStart) / 1000;
-}
+function stopTimer() { if (timerRAF) cancelAnimationFrame(timerRAF); return (performance.now() - timerStart) / 1000; }
 
 function pick(i) {
     if (answered) return;
-
-    const els = $('choices').children;
-    const cells = $('grid').children;
-
+    const els = $('choices').children, cells = $('grid').children;
     haptic();
 
     if (i === correctChoice) {
@@ -968,82 +615,120 @@ function pick(i) {
         const time = stopTimer();
         roundTime += time;
 
-        // Score based on speed
-        const timeBonus = Math.max(0, 10 - Math.floor(time));
-        const points = 10 + timeBonus + (roundPerfect ? 5 : 0);
-        score += points;
-        streak++;
-        roundScore += points;
-
-        if (streak > bestStreak) {
-            bestStreak = streak;
-            saveData();
+        // Combo check (answer within 2 seconds of last)
+        const now = performance.now();
+        if (lastAnswerTime && now - lastAnswerTime < 2000) {
+            combo++;
+            if (combo > stats.maxCombo) { stats.maxCombo = combo; saveStats(); }
+            if (combo >= 2) {
+                showComboPopup(combo);
+                playSound('combo');
+            }
+        } else {
+            combo = 1;
         }
+        lastAnswerTime = now;
+
+        // Score
+        const timeBonus = Math.max(0, 10 - Math.floor(time));
+        const comboMult = Math.min(combo, 5);
+        const points = (10 + timeBonus) * comboMult + (roundPerfect ? 5 : 0);
+        score += points;
+        roundScore += points;
+        streak++;
+        stats.totalCorrect++;
+        stats.totalScore += points;
+        if (streak > stats.bestStreak) stats.bestStreak = streak;
+        if (time < stats.fastestAnswer) stats.fastestAnswer = time;
+        saveStats();
 
         [...els].forEach(e => e.classList.add('disabled'));
         els[i].classList.remove('disabled');
         els[i].classList.add('correct');
-
         cells[missing].classList.remove('missing');
         cells[missing].style.backgroundImage = `url(${blockURLs[missing]})`;
         cells[missing].classList.add('reveal');
+        $('gridWrap').classList.add('correct');
+        setTimeout(() => $('gridWrap').classList.remove('correct'), 400);
 
-        showFeedback(streak > 2 ? `🔥 ${streak}` : ['Nice!', 'Great!', 'Perfect!'][~~(Math.random()*3)]);
-        haptic('heavy');
+        playSound('correct');
+        showFeedback(combo >= 3 ? `×${combo}` : streak > 2 ? `🔥 ${streak}` : ['+' + points, 'Nice!', 'Great!'][~~(Math.random()*3)]);
 
-        updateStats();
+        updateUI();
+        checkAchievements();
 
         roundNum++;
         updateProgress();
 
         setTimeout(() => {
-            if (roundNum >= ROUNDS_PER_IMG) {
-                showComplete();
-            } else {
-                newRound();
-            }
+            if (roundNum >= ROUNDS) showComplete();
+            else newRound();
         }, 600);
 
     } else {
-        streak = 0;
-        roundPerfect = false;
-        els[i].classList.add('wrong');
-        showFeedback('✗');
-        haptic('heavy');
-        updateStats();
-
-        setTimeout(() => {
-            els[i].classList.add('disabled');
-        }, 300);
+        // Wrong answer
+        if (!mercyUsed) {
+            // Use mercy - don't break streak
+            mercyUsed = true;
+            $('mercy').classList.add('used');
+            els[i].classList.add('wrong');
+            showFeedback('💚 Saved!');
+            playSound('wrong');
+            haptic('heavy');
+            setTimeout(() => els[i].classList.add('disabled'), 300);
+        } else {
+            streak = 0;
+            combo = 0;
+            roundPerfect = false;
+            stats.totalWrong++;
+            saveStats();
+            els[i].classList.add('wrong');
+            $('gridWrap').classList.add('wrong');
+            setTimeout(() => $('gridWrap').classList.remove('wrong'), 400);
+            showFeedback('✗');
+            playSound('wrong');
+            haptic('heavy');
+            updateUI();
+            setTimeout(() => els[i].classList.add('disabled'), 300);
+        }
     }
 }
 
 function showFeedback(text) {
-    const el = $('feedback');
-    el.textContent = text;
-    el.classList.remove('show');
-    void el.offsetWidth; // Reflow
-    el.classList.add('show');
+    const el = $('feedback'); el.textContent = text;
+    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
 
-function updateStats() {
+function showComboPopup(n) {
+    const el = $('comboPopup');
+    el.textContent = `×${n}`;
+    el.style.background = `linear-gradient(135deg, hsl(${340 + n * 10}, 100%, 50%), hsl(${20 + n * 10}, 100%, 50%))`;
+    el.style.webkitBackgroundClip = 'text';
+    el.style.webkitTextFillColor = 'transparent';
+    el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+
+function updateUI() {
     $('score').textContent = score;
     $('streak').textContent = streak;
     $('streakStat').classList.toggle('hot', streak > 2);
+    $('combo').textContent = combo;
+    $('comboStat').classList.toggle('hidden', combo < 2);
 }
 
 function showComplete() {
-    const overlay = $('complete');
-    $('completeImg').src = images[imgIdx].url;
+    stats.gamesPlayed++;
+    if (roundPerfect) stats.perfectRounds++;
+    saveStats();
+    checkAchievements();
 
-    const avgTime = (roundTime / ROUNDS_PER_IMG).toFixed(1);
+    playSound('complete');
+    $('completeImg').src = images[imgIdx].url;
+    const avgTime = (roundTime / ROUNDS).toFixed(1);
     const titles = ['Beautiful!', 'Stunning!', 'Gorgeous!', 'Amazing!', 'Lovely!'];
     $('completeTitle').textContent = titles[~~(Math.random() * titles.length)];
-    $('completeDetail').textContent = `${roundScore} points · ${avgTime}s avg${roundPerfect ? ' · Perfect! 🎯' : ''}`;
-
-    overlay.classList.add('show');
-
-    // Confetti for perfect rounds
+    $('completeDetail').textContent = `${roundScore} points · ${avgTime}s avg${roundPerfect ? '\n🎯 Perfect Round!' : ''}`;
+    $('complete').classList.add('show');
     if (roundPerfect) confetti();
 }
 
@@ -1062,11 +747,39 @@ function confetti() {
 
 function nextImage() {
     $('complete').classList.remove('show');
-    if (images.length > 1) {
-        startImage(imgIdx + 1);
+    startImage(images.length > 1 ? imgIdx + 1 : 0);
+}
+
+async function shareScore() {
+    const text = `🧩 MADpixels\n⭐ ${roundScore} points\n🔥 ${streak} streak${roundPerfect ? '\n🎯 Perfect!' : ''}\n\nTrain your eye at madpixels.app`;
+    if (navigator.share) {
+        try {
+            await navigator.share({ text });
+        } catch (e) {}
     } else {
-        startImage(0);
+        navigator.clipboard.writeText(text);
+        showFeedback('Copied!');
     }
+}
+
+function showStats() {
+    $('totalScore').textContent = stats.totalScore;
+    $('gamesPlayed').textContent = stats.gamesPlayed;
+    $('bestStreakStat').textContent = stats.bestStreak;
+    const total = stats.totalCorrect + stats.totalWrong;
+    $('accuracy').textContent = total > 0 ? Math.round(stats.totalCorrect / total * 100) + '%' : '—';
+
+    const list = $('achievementsList');
+    list.innerHTML = '';
+    ACHIEVEMENTS.forEach(a => {
+        const unlocked = stats.unlockedAchievements.includes(a.id);
+        list.innerHTML += `<div class="achievement-row ${unlocked ? '' : 'locked'}">
+            <span class="icon">${a.icon}</span>
+            <div class="info"><div class="name">${a.name}</div><div class="desc">${a.desc}</div></div>
+        </div>`;
+    });
+
+    $('statsOverlay').classList.add('show');
 }
 
 // Edit mode
@@ -1103,45 +816,29 @@ function setMode(m) {
     $('choicesArea').classList.toggle('hidden', m !== 'game');
     $('editArea').classList.toggle('hidden', m !== 'edit');
     $('editControls').classList.toggle('hidden', m !== 'edit');
-
-    if (origImg) {
-        if (m === 'game') {
-            extractBlocks();
-            newRound();
-        } else {
-            stopTimer();
-            applyEdit();
-        }
-    }
+    if (origImg) { m === 'game' ? (extractBlocks(), newRound()) : (stopTimer(), applyEdit()); }
 }
 
-// Event listeners
-$('startBtn').onclick = $('addBtn').onclick = () => $('fileInput').click();
+// Events
+$('startBtn').onclick = $('addBtn').onclick = () => { initAudio(); $('fileInput').click(); };
 $('fileInput').onchange = e => { if (e.target.files.length) loadImages(e.target.files); };
 $('gameModeBtn').onclick = () => setMode('game');
 $('editModeBtn').onclick = () => setMode('edit');
 $('continueBtn').onclick = nextImage;
+$('shareBtn').onclick = shareScore;
+$('statsBtn').onclick = showStats;
+$('closeStats').onclick = () => $('statsOverlay').classList.remove('show');
+$('soundToggle').onclick = () => {
+    soundEnabled = !soundEnabled;
+    $('soundToggle').textContent = soundEnabled ? '🔊 Sound ON' : '🔇 Sound OFF';
+    if (soundEnabled) initAudio();
+};
 
 let editTimer;
-$('sizeSlider').oninput = e => {
-    blockSize = +e.target.value;
-    $('sizeVal').textContent = blockSize;
-    clearTimeout(editTimer);
-    editTimer = setTimeout(applyEdit, 50);
-};
-$('chaosSlider').oninput = e => {
-    chaos = +e.target.value;
-    $('chaosVal').textContent = chaos;
-    clearTimeout(editTimer);
-    editTimer = setTimeout(applyEdit, 50);
-};
+$('sizeSlider').oninput = e => { blockSize = +e.target.value; $('sizeVal').textContent = blockSize; clearTimeout(editTimer); editTimer = setTimeout(applyEdit, 50); };
+$('chaosSlider').oninput = e => { chaos = +e.target.value; $('chaosVal').textContent = chaos; clearTimeout(editTimer); editTimer = setTimeout(applyEdit, 50); };
 $('randomBtn').onclick = () => { seed = Math.random() * 1000; applyEdit(); };
-$('saveBtn').onclick = () => {
-    const a = document.createElement('a');
-    a.download = `madpixels-${Date.now()}.png`;
-    a.href = canvas.toDataURL();
-    a.click();
-};
+$('saveBtn').onclick = () => { const a = document.createElement('a'); a.download = `madpixels-${Date.now()}.png`; a.href = canvas.toDataURL(); a.click(); };
 
 document.querySelectorAll('.effect-btn').forEach(b => b.onclick = () => {
     document.querySelectorAll('.effect-btn').forEach(x => x.classList.remove('active'));
@@ -1151,8 +848,6 @@ document.querySelectorAll('.effect-btn').forEach(b => b.onclick = () => {
 });
 
 window.onresize = () => { if (origImg && mode === 'game' && !answered) renderGrid(); };
-
-// Prevent scroll/zoom
 document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
 </script>
 </body>
