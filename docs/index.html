@@ -131,8 +131,10 @@
         .welcome-text { text-align: center; max-width: 280px; }
         .welcome-title { font-size: 20px; font-weight: 700; margin-bottom: 8px; }
         .welcome-sub { font-size: 15px; color: #666; line-height: 1.5; }
-        .start-btn { width: 100%; max-width: 280px; padding: 18px 32px; border: none; border-radius: 30px; background: linear-gradient(135deg, #ff3366, #ff6b3d); color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 0 8px 24px rgba(255,51,102,0.3); transition: transform 0.15s; }
+        .welcome-btns { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 280px; }
+        .start-btn { width: 100%; padding: 18px 32px; border: none; border-radius: 30px; background: linear-gradient(135deg, #ff3366, #ff6b3d); color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 24px rgba(255,51,102,0.3); transition: transform 0.15s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .start-btn:active { transform: scale(0.97); }
+        .start-btn.secondary { background: #fff; color: #1a1a2e; box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
         .best-score { font-size: 14px; color: #888; }
         .sound-toggle { font-size: 14px; color: #888; cursor: pointer; }
 
@@ -246,10 +248,13 @@
     <div class="welcome" id="welcome">
         <div class="welcome-logo"><span class="logo-box">MAD</span><span class="logo-box">pixels</span><span class="logo-emoji">🧩</span></div>
         <div class="welcome-text">
-            <div class="welcome-title">Train Your Eye</div>
-            <div class="welcome-sub">Rediscover your photos piece by piece. Build combos. Beat your streak.</div>
+            <div class="welcome-title">Find the Missing Piece</div>
+            <div class="welcome-sub">One piece is missing from the puzzle. Can you spot which one?</div>
         </div>
-        <button class="start-btn" id="startBtn">Choose Photos</button>
+        <div class="welcome-btns">
+            <button class="start-btn" id="quickPlayBtn">▶ Quick Play</button>
+            <button class="start-btn secondary" id="myPhotosBtn">📷 Use My Photos</button>
+        </div>
         <div class="best-score" id="bestScore"></div>
         <div class="sound-toggle" id="soundToggle">🔊 Sound ON</div>
     </div>
@@ -757,7 +762,52 @@ function setMode(m) {
     if (origImg) { m === 'game' ? (extractBlocks(), newRound()) : (stopTimer(), applyEdit()); }
 }
 
-$('startBtn').onclick = $('addBtn').onclick = () => { initAudio(); $('fileInput').click(); };
+const DEMO_IMAGES = [
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop',
+    'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=500&h=500&fit=crop',
+    'https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?w=500&h=500&fit=crop',
+    'https://images.unsplash.com/photo-1433086966358-54859d0ed716?w=500&h=500&fit=crop',
+    'https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=500&h=500&fit=crop',
+    'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=500&h=500&fit=crop'
+];
+
+function loadDemoImages() {
+    images = []; imgIdx = 0; roundNum = 0;
+    let loaded = 0;
+    const shuffled = [...DEMO_IMAGES].sort(() => Math.random() - 0.5);
+    shuffled.forEach((url, i) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => {
+            const c = document.createElement('canvas');
+            c.width = c.height = 500;
+            const cx = c.getContext('2d');
+            const s = Math.max(500/img.width, 500/img.height);
+            cx.drawImage(img, (500-img.width*s)/2, (500-img.height*s)/2, img.width*s, img.height*s);
+            images[i] = { canvas: c, data: cx.getImageData(0,0,500,500), url: c.toDataURL() };
+            if (++loaded === shuffled.length) {
+                score = 0; streak = 0; combo = 0;
+                updateUI();
+                startImage(0);
+                $('welcome').classList.add('hidden');
+                requestFullscreen();
+            }
+        };
+        img.onerror = () => {
+            if (++loaded === shuffled.length && images.filter(Boolean).length > 0) {
+                images = images.filter(Boolean);
+                score = 0; streak = 0; combo = 0;
+                updateUI();
+                startImage(0);
+                $('welcome').classList.add('hidden');
+            }
+        };
+        img.src = url;
+    });
+}
+
+$('quickPlayBtn').onclick = () => { initAudio(); loadDemoImages(); };
+$('myPhotosBtn').onclick = $('addBtn').onclick = () => { initAudio(); $('fileInput').click(); };
 $('fileInput').onchange = e => { if (e.target.files.length) loadImages(e.target.files); };
 $('gameModeBtn').onclick = () => setMode('game');
 $('editModeBtn').onclick = () => setMode('edit');
