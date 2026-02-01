@@ -2,7 +2,7 @@
   "name": "MADpixels",
   "short_name": "MADpixels",
   "description": "Artistic image effects with GPU acceleration",
-  "start_url": "/MADpixels/",
+  "start_url": "/MADpixels/apps/web/",
   "display": "standalone",
   "background_color": "#0a0a0f",
   "theme_color": "#d951f9",
