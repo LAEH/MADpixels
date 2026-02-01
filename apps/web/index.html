@@ -197,6 +197,50 @@
         .shuffle-btn:active { opacity: 0.85; }
 
         .hidden { display: none !important; }
+
+        .welcome {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 48px;
+            z-index: 100;
+            padding: 32px;
+        }
+
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+        }
+
+        .welcome-sub {
+            font-size: 16px;
+            color: #666;
+            text-align: center;
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        .choose-btn {
+            width: 100%;
+            max-width: 280px;
+            height: 64px;
+            border: none;
+            border-radius: 32px;
+            background: #000;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+        .choose-btn:active { opacity: 0.85; }
     </style>
 </head>
 <body>
@@ -243,6 +287,12 @@
     </div>
 
     <input type="file" id="fileInput" accept="image/*" style="display:none">
+
+    <div class="welcome" id="welcome">
+        <div class="welcome-title">MADpixels</div>
+        <div class="welcome-sub">Turn your photos into puzzles. Scramble, solve, share.</div>
+        <button class="choose-btn" id="chooseBtn">Choose Photo</button>
+    </div>
 
 <script>
 class WebGLProcessor {
@@ -330,29 +380,6 @@ const $ = id => document.getElementById(id);
 const canvas = $('canvas');
 const ctx = canvas.getContext('2d', { willReadFrequently: true });
 const gpu = new WebGLProcessor();
-
-// Load sample image from Picsum
-function loadSampleImage() {
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => {
-        const size = 512;
-        const c = document.createElement('canvas');
-        c.width = size; c.height = size;
-        const cx = c.getContext('2d');
-
-        // Cover fit
-        const scale = Math.max(size / img.width, size / img.height);
-        const w = img.width * scale;
-        const h = img.height * scale;
-        cx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
-
-        originalImage = cx.getImageData(0, 0, size, size);
-        applyEffect();
-    };
-    // Random photo from Picsum
-    img.src = 'https://picsum.photos/512/512?random=' + Date.now();
-}
 
 // Bin shuffle - scramble blocks
 function binShuffle(img, blockSize, seedVal) {
@@ -445,6 +472,9 @@ function loadImage(file) {
             isRevealed = false;
             $('revealBtn').classList.remove('active');
             applyEffect();
+
+            // Hide welcome screen
+            $('welcome').classList.add('hidden');
         };
         img.src = e.target.result;
     };
@@ -465,6 +495,7 @@ function toggleReveal() {
 }
 
 // Events
+$('chooseBtn').onclick = () => $('fileInput').click();
 $('canvasArea').onclick = () => $('fileInput').click();
 $('fileInput').onchange = e => e.target.files[0] && loadImage(e.target.files[0]);
 
@@ -490,8 +521,7 @@ $('downloadBtn').onclick = () => {
     a.click();
 };
 
-// Init with sample photo
-loadSampleImage();
+// Welcome screen shows first - user picks their photo
 </script>
 </body>
 </html>
