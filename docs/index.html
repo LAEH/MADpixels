@@ -5,18 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MADpixels</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#000000">
+    <meta name="theme-color" content="#ffffff">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
         html, body { height: 100%; overflow: hidden; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #000;
-            color: #fff;
+            font-family: 'Space Grotesk', -apple-system, sans-serif;
+            background: #fff;
+            color: #000;
         }
 
         .app {
@@ -26,7 +26,6 @@
             padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        /* Header - minimal */
         header {
             display: flex;
             align-items: center;
@@ -35,82 +34,26 @@
             flex-shrink: 0;
         }
 
-        .logo { font-size: 18px; font-weight: 700; }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
 
         .icon-btn {
-            width: 44px;
-            height: 44px;
-            border: none;
-            background: #1a1a1a;
-            color: #fff;
-            border-radius: 22px;
+            width: 48px;
+            height: 48px;
+            border: 2px solid #000;
+            background: #fff;
+            color: #000;
+            border-radius: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .icon-btn:disabled { opacity: 0.3; }
-        .icon-btn svg { width: 20px; height: 20px; }
-
-        /* Gallery */
-        .gallery-view {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 0 16px 16px;
-            gap: 12px;
-            min-height: 0;
-        }
-
-        .gallery-grid {
-            flex: 1;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            min-height: 0;
-        }
-
-        .gallery-item {
-            border-radius: 12px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-        }
-        .gallery-item:active { transform: scale(0.98); }
-        .gallery-item canvas { width: 100%; height: 100%; display: block; }
-
-        .gallery-item-label {
-            position: absolute;
-            bottom: 8px;
-            left: 8px;
-            padding: 4px 8px;
-            background: rgba(0,0,0,0.7);
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .upload-btn {
-            flex-shrink: 0;
-            height: 56px;
-            border: 2px solid #333;
-            border-radius: 12px;
-            background: transparent;
-            color: #fff;
-            font-family: inherit;
-            font-size: 16px;
-            font-weight: 600;
-        }
-        .upload-btn:active { background: #1a1a1a; }
-
-        /* Editor */
-        .editor-view {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            min-height: 0;
-        }
-        .editor-view.active { display: flex; }
-        .gallery-view.hidden { display: none; }
+        .icon-btn:active { background: #000; color: #fff; }
+        .icon-btn:disabled { opacity: 0.2; }
+        .icon-btn svg { width: 22px; height: 22px; }
 
         .canvas-wrap {
             flex: 1;
@@ -118,30 +61,32 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 16px;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #0a0a0a;
+            padding: 0 16px;
+            position: relative;
         }
 
         .canvas-wrap canvas {
             max-width: 100%;
             max-height: 100%;
             display: block;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         }
 
         .drop-zone {
             position: absolute;
-            inset: 0;
-            background: rgba(255,255,255,0.1);
+            inset: 16px;
+            background: rgba(0,0,0,0.05);
+            border: 3px dashed #000;
+            border-radius: 16px;
             display: none;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
+            font-size: 18px;
+            font-weight: 700;
         }
         .drop-zone.active { display: flex; }
 
-        /* Controls panel */
         .controls {
             flex-shrink: 0;
             padding: 16px;
@@ -150,37 +95,79 @@
             gap: 16px;
         }
 
-        /* Effect buttons - large, scrollable row */
+        .compare-row {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+        .compare-row.visible { display: flex; }
+
+        .compare-label {
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaa;
+        }
+        .compare-label.active { color: #000; }
+
+        .toggle {
+            width: 56px;
+            height: 32px;
+            background: #e0e0e0;
+            border-radius: 16px;
+            position: relative;
+            cursor: pointer;
+        }
+        .toggle.on { background: #000; }
+
+        .toggle-knob {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .toggle.on .toggle-knob { transform: translateX(24px); }
+
         .effects-scroll {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             overflow-x: auto;
-            padding-bottom: 4px;
+            padding: 4px 0;
             -webkit-overflow-scrolling: touch;
         }
         .effects-scroll::-webkit-scrollbar { display: none; }
 
         .effect-btn {
             flex-shrink: 0;
-            height: 44px;
-            padding: 0 20px;
-            border: 2px solid #333;
-            border-radius: 22px;
-            background: transparent;
+            height: 48px;
+            padding: 0 24px;
+            border: 2px solid #e0e0e0;
+            border-radius: 24px;
+            background: #fff;
             color: #888;
-            font-family: inherit;
+            font-family: 'Space Grotesk', sans-serif;
             font-size: 15px;
-            font-weight: 600;
-            white-space: nowrap;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-        .effect-btn:active { background: #1a1a1a; }
+        .effect-btn:active { background: #f5f5f5; }
         .effect-btn.active {
-            border-color: #fff;
-            color: #fff;
-            background: #1a1a1a;
+            border-color: #000;
+            color: #000;
+            background: #fff;
         }
 
-        /* Sliders - full width, large touch */
+        .params-section { display: flex; flex-direction: column; gap: 12px; }
+        .params-section.hidden { display: none; }
+
         .param-row {
             display: flex;
             flex-direction: column;
@@ -190,104 +177,92 @@
         .param-header {
             display: flex;
             justify-content: space-between;
-            font-size: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .param-label { color: #888; }
-        .param-value { color: #fff; font-weight: 600; }
+        .param-value { color: #000; }
 
         input[type="range"] {
             -webkit-appearance: none;
             width: 100%;
-            height: 44px;
+            height: 48px;
             background: transparent;
             margin: 0;
         }
 
         input[type="range"]::-webkit-slider-runnable-track {
             height: 8px;
-            background: #333;
+            background: #e0e0e0;
             border-radius: 4px;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 28px;
-            height: 28px;
-            background: #fff;
+            width: 32px;
+            height: 32px;
+            background: #000;
             border-radius: 50%;
-            margin-top: -10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+            margin-top: -12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        /* Compare toggle */
-        .compare-row {
-            display: none;
-            align-items: center;
-            justify-content: center;
+        .btn-row {
+            display: flex;
             gap: 12px;
         }
-        .compare-row.visible { display: flex; }
 
-        .compare-label { font-size: 14px; color: #666; }
-        .compare-label.active { color: #fff; }
-
-        .toggle {
-            width: 52px;
-            height: 32px;
-            background: #333;
-            border-radius: 16px;
-            position: relative;
-        }
-        .toggle.on { background: #fff; }
-
-        .toggle-knob {
-            position: absolute;
-            width: 28px;
-            height: 28px;
-            background: #888;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.15s;
-        }
-        .toggle.on .toggle-knob {
-            transform: translateX(20px);
-            background: #000;
-        }
-
-        /* Apply button - big and bold */
-        .apply-btn {
+        .upload-btn {
+            flex: 1;
             height: 56px;
-            border: none;
-            border-radius: 12px;
+            border: 2px solid #000;
+            border-radius: 28px;
             background: #fff;
             color: #000;
-            font-family: inherit;
-            font-size: 17px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
             font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        .apply-btn:active { opacity: 0.8; }
-        .apply-btn:disabled { background: #333; color: #666; }
+        .upload-btn:active { background: #f5f5f5; }
 
-        .progress-row {
+        .apply-btn {
+            flex: 2;
+            height: 56px;
+            border: none;
+            border-radius: 28px;
+            background: #000;
+            color: #fff;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .apply-btn:active { opacity: 0.85; }
+        .apply-btn:disabled { background: #e0e0e0; color: #aaa; }
+
+        .progress-bar {
             display: none;
             height: 4px;
-            background: #333;
+            background: #e0e0e0;
             border-radius: 2px;
             overflow: hidden;
         }
-        .progress-row.visible { display: block; }
+        .progress-bar.visible { display: block; }
 
         .progress-fill {
             height: 100%;
-            background: #fff;
+            background: #000;
             width: 0%;
             transition: width 0.1s;
         }
 
         .hidden { display: none !important; }
-        .params-section.hidden { display: none; }
     </style>
 </head>
 <body>
@@ -301,35 +276,31 @@
             </button>
         </header>
 
-        <div class="gallery-view" id="galleryView">
-            <div class="gallery-grid" id="galleryGrid"></div>
-            <button class="upload-btn" id="choosePhotoBtn">Upload Photo</button>
+        <div class="canvas-wrap" id="canvasArea">
+            <canvas id="canvas"></canvas>
+            <canvas id="glCanvas" class="hidden"></canvas>
+            <div class="drop-zone" id="dropZone">Drop Image</div>
         </div>
 
-        <div class="editor-view" id="editorView">
-            <div class="canvas-wrap" id="canvasArea">
-                <canvas id="canvas"></canvas>
-                <canvas id="glCanvas" class="hidden"></canvas>
-                <div class="drop-zone" id="dropZone">Drop</div>
+        <div class="controls">
+            <div class="compare-row" id="compareBar">
+                <span class="compare-label" id="labelOriginal">Before</span>
+                <div class="toggle on" id="toggle"><div class="toggle-knob"></div></div>
+                <span class="compare-label active" id="labelProcessed">After</span>
             </div>
 
-            <div class="controls">
-                <div class="compare-row" id="compareBar">
-                    <span class="compare-label" id="labelOriginal">Before</span>
-                    <div class="toggle on" id="toggle"><div class="toggle-knob"></div></div>
-                    <span class="compare-label active" id="labelProcessed">After</span>
-                </div>
+            <div class="effects-scroll" id="effectsRow"></div>
 
-                <div class="effects-scroll" id="effectsRow"></div>
+            <div class="params-section" id="settingsSection">
+                <div id="settingsContainer"></div>
+            </div>
 
-                <div class="params-section" id="settingsSection">
-                    <div id="settingsContainer"></div>
-                </div>
+            <div class="progress-bar" id="progressSection">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
 
-                <div class="progress-row" id="progressSection">
-                    <div class="progress-fill" id="progressFill"></div>
-                </div>
-
+            <div class="btn-row">
+                <button class="upload-btn" id="uploadBtn">Photo</button>
                 <button class="apply-btn" id="applyBtn">Apply</button>
             </div>
         </div>
@@ -428,18 +399,11 @@ const effects = [
 const settingsConfig = {
     globalShuffle: [{ id: 'size', name: 'Size', min: 256, max: 1024, default: 512, step: 128 }],
     binedShuffle: [{ id: 'size', name: 'Size', min: 256, max: 1024, default: 512, step: 128 }, { id: 'block', name: 'Block', min: 8, max: 64, default: 16, step: 8 }],
-    localShuffle: [{ id: 'spread', name: 'Spread', min: 0, max: 100, default: 25, step: 5 }],
+    localShuffle: [{ id: 'spread', name: 'Spread', min: 0, max: 100, default: 30, step: 5 }],
     boost: [{ id: 'red', name: 'Warm', min: 0, max: 100, default: 40, step: 5 }, { id: 'green', name: 'Tint', min: 0, max: 100, default: 30, step: 5 }, { id: 'blue', name: 'Cool', min: 0, max: 100, default: 20, step: 5 }],
     gaussianBlur: [{ id: 'radius', name: 'Radius', min: 1, max: 30, default: 8, step: 1 }],
     invert: []
 };
-
-const presets = [
-    { name: 'Neon', colors: { tl: [1, 0.2, 0.5], tr: [0.2, 0.8, 1], bl: [0.5, 0.1, 0.8], br: [0.1, 0.6, 0.6] } },
-    { name: 'Ember', colors: { tl: [1, 0.4, 0.1], tr: [1, 0.7, 0.2], bl: [0.6, 0.1, 0.1], br: [0.8, 0.3, 0.1] } },
-    { name: 'Void', colors: { tl: [0.15, 0.1, 0.2], tr: [0.1, 0.15, 0.25], bl: [0.05, 0.05, 0.1], br: [0.1, 0.08, 0.15] } },
-    { name: 'Acid', colors: { tl: [0.6, 1, 0.2], tr: [0.2, 1, 0.6], bl: [0.3, 0.5, 0.1], br: [0.1, 0.6, 0.3] } }
-];
 
 let state = { effect: 'localShuffle', settings: {}, original: null, processed: null, processing: false };
 
@@ -447,35 +411,13 @@ const $ = id => document.getElementById(id);
 const canvas = $('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
 const gpu = new WebGLProcessor();
 
-function generateGallery() {
-    const grid = $('galleryGrid');
-    grid.innerHTML = '';
-    presets.forEach(preset => {
-        const item = document.createElement('div');
-        item.className = 'gallery-item';
-        const c = document.createElement('canvas');
-        c.width = 200; c.height = 200;
-        c.getContext('2d').putImageData(gpu.gradient(200, 200, preset.colors), 0, 0);
-        const label = document.createElement('div');
-        label.className = 'gallery-item-label';
-        label.textContent = preset.name;
-        item.appendChild(c);
-        item.appendChild(label);
-        item.onclick = () => {
-            state.original = gpu.gradient(512, 512, preset.colors);
-            state.processed = null;
-            showEditor();
-        };
-        grid.appendChild(item);
-    });
-}
-
-function showEditor() {
-    $('galleryView').classList.add('hidden');
-    $('editorView').classList.add('active');
+// Create initial dispersed gradient
+function initCanvas() {
+    const colors = { tl: [1, 0.25, 0.5], tr: [0.3, 0.7, 1], bl: [0.6, 0.15, 0.9], br: [0.1, 0.8, 0.7] };
+    const gradient = gpu.gradient(512, 512, colors);
+    state.original = gpu.localShuffle(gradient, 0.25);
+    state.processed = null;
     display(state.original);
-    $('compareBar').classList.remove('visible');
-    $('downloadBtn').disabled = true;
 }
 
 function renderEffects() {
@@ -511,7 +453,8 @@ function loadImage(file) {
             ctx.drawImage(img, 0, 0);
             state.original = ctx.getImageData(0, 0, canvas.width, canvas.height);
             state.processed = null;
-            showEditor();
+            $('compareBar').classList.remove('visible');
+            $('downloadBtn').disabled = true;
         };
         img.src = e.target.result;
     };
@@ -585,7 +528,7 @@ async function applyEffect() {
             if (state.effect === 'invert') result = gpu.invert(state.original);
             else if (state.effect === 'boost') result = gpu.boost(state.original, (state.settings.red ?? 40) / 100, (state.settings.green ?? 30) / 100, (state.settings.blue ?? 20) / 100);
             else if (state.effect === 'gaussianBlur') result = gpu.blur(state.original, state.settings.radius || 8);
-            else if (state.effect === 'localShuffle') result = gpu.localShuffle(state.original, (state.settings.spread || 25) / 100);
+            else if (state.effect === 'localShuffle') result = gpu.localShuffle(state.original, (state.settings.spread || 30) / 100);
         }
         if (!result) {
             if (state.effect === 'globalShuffle') result = await globalShuffle();
@@ -609,7 +552,7 @@ async function applyEffect() {
     }, 200);
 }
 
-$('choosePhotoBtn').onclick = () => $('fileInput').click();
+$('uploadBtn').onclick = () => $('fileInput').click();
 $('canvasArea').onclick = () => $('fileInput').click();
 $('fileInput').onchange = e => e.target.files[0] && loadImage(e.target.files[0]);
 
@@ -618,7 +561,15 @@ $('canvasArea').ondragleave = () => $('dropZone').classList.remove('active');
 $('canvasArea').ondrop = e => { e.preventDefault(); $('dropZone').classList.remove('active'); const f = e.dataTransfer.files[0]; if (f?.type.startsWith('image/')) loadImage(f); };
 
 $('applyBtn').onclick = applyEffect;
-$('downloadBtn').onclick = () => { if (!state.processed) return; const a = document.createElement('a'); a.download = `madpixels-${Date.now()}.png`; a.href = canvas.toDataURL('image/png'); a.click(); };
+$('downloadBtn').onclick = () => {
+    const data = state.processed || state.original;
+    if (!data) return;
+    display(data);
+    const a = document.createElement('a');
+    a.download = `madpixels-${Date.now()}.png`;
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+};
 
 $('toggle').onclick = () => {
     const on = $('toggle').classList.toggle('on');
@@ -627,7 +578,7 @@ $('toggle').onclick = () => {
     display(on ? state.processed : state.original);
 };
 
-generateGallery();
+initCanvas();
 renderEffects();
 renderSettings();
 </script>
