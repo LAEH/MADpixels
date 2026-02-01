@@ -2,15 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MADpixels - Artistic Image Effects</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --primary: #d951f9;
             --primary-dark: #b030d9;
@@ -20,51 +19,59 @@
             --text: #ffffff;
             --text-secondary: #a0a0b0;
             --border: #2a2a3a;
+            --success: #4ade80;
         }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
+            overflow-x: hidden;
         }
-
         header {
             background: var(--surface);
             border-bottom: 1px solid var(--border);
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
-
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.25rem;
             font-weight: 700;
             background: linear-gradient(135deg, var(--primary), #66ccff);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
-        .header-actions {
-            display: flex;
-            gap: 0.5rem;
+        .gpu-badge {
+            font-size: 0.6rem;
+            padding: 2px 6px;
+            background: var(--success);
+            color: #000;
+            border-radius: 4px;
+            margin-left: 8px;
+            font-weight: 600;
         }
-
+        .header-actions { display: flex; gap: 0.5rem; }
         main {
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 1rem;
-            gap: 1rem;
-            max-width: 1200px;
+            padding: 0.75rem;
+            gap: 0.75rem;
+            max-width: 1400px;
             margin: 0 auto;
             width: 100%;
         }
-
         .canvas-container {
             flex: 1;
             background: var(--surface);
@@ -73,264 +80,207 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 300px;
+            min-height: 200px;
             position: relative;
             overflow: hidden;
+            touch-action: none;
         }
-
         .canvas-container canvas {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
         }
-
         .placeholder {
             text-align: center;
             color: var(--text-secondary);
+            padding: 2rem;
         }
-
-        .placeholder-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
+        .placeholder-icon { font-size: 3rem; margin-bottom: 0.75rem; opacity: 0.5; }
         .compare-toggle {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 1rem;
+            gap: 0.75rem;
             padding: 0.5rem;
         }
-
-        .compare-toggle span {
-            font-size: 0.875rem;
-            color: var(--text-secondary);
-        }
-
-        .compare-toggle span.active {
-            color: var(--text);
-            font-weight: 500;
-        }
-
-        .toggle-switch {
-            position: relative;
-            width: 50px;
-            height: 26px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-
+        .compare-toggle span { font-size: 0.8rem; color: var(--text-secondary); transition: all 0.2s; }
+        .compare-toggle span.active { color: var(--text); font-weight: 600; }
+        .toggle-switch { position: relative; width: 44px; height: 24px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
         .toggle-slider {
             position: absolute;
             cursor: pointer;
             inset: 0;
             background: var(--surface-light);
-            border-radius: 26px;
-            transition: 0.3s;
+            border-radius: 24px;
+            transition: 0.2s;
         }
-
         .toggle-slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
+            height: 18px;
+            width: 18px;
             left: 3px;
             bottom: 3px;
             background: white;
             border-radius: 50%;
-            transition: 0.3s;
+            transition: 0.2s;
         }
-
-        .toggle-switch input:checked + .toggle-slider {
-            background: var(--primary);
-        }
-
-        .toggle-switch input:checked + .toggle-slider:before {
-            transform: translateX(24px);
-        }
-
+        .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+        .toggle-switch input:checked + .toggle-slider:before { transform: translateX(20px); }
         .controls {
             background: var(--surface);
             border-radius: 12px;
             border: 1px solid var(--border);
-            padding: 1rem;
+            padding: 0.75rem;
         }
-
         .categories {
             display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            gap: 0.4rem;
+            margin-bottom: 0.75rem;
             overflow-x: auto;
-            padding-bottom: 0.5rem;
+            padding-bottom: 0.4rem;
+            -webkit-overflow-scrolling: touch;
         }
-
+        .categories::-webkit-scrollbar { display: none; }
         .category-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
+            padding: 0.4rem 0.8rem;
+            border-radius: 16px;
             border: none;
             background: var(--surface-light);
             color: var(--text);
             cursor: pointer;
-            font-size: 0.875rem;
+            font-size: 0.8rem;
             font-weight: 500;
             white-space: nowrap;
-            transition: all 0.2s;
+            transition: all 0.15s;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        .category-btn:hover {
-            background: var(--border);
-        }
-
-        .category-btn.active {
-            background: var(--primary);
-            color: white;
-        }
-
+        .category-btn:hover { background: var(--border); }
+        .category-btn.active { background: var(--primary); color: white; }
         .effects {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.4rem;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
         }
-
         .effect-btn {
-            padding: 0.4rem 0.8rem;
-            border-radius: 8px;
+            padding: 0.35rem 0.7rem;
+            border-radius: 6px;
             border: 1px solid transparent;
             background: var(--surface-light);
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s;
+            font-size: 0.75rem;
+            transition: all 0.15s;
+            -webkit-tap-highlight-color: transparent;
         }
-
-        .effect-btn:hover {
-            background: var(--border);
-            color: var(--text);
-        }
-
+        .effect-btn:hover { background: var(--border); color: var(--text); }
         .effect-btn.active {
             background: rgba(217, 81, 249, 0.15);
             border-color: var(--primary);
             color: var(--primary);
         }
-
         .settings-section {
-            margin-bottom: 1rem;
-            padding: 1rem;
+            margin-bottom: 0.75rem;
+            padding: 0.75rem;
             background: var(--surface-light);
             border-radius: 8px;
         }
-
         .settings-section h3 {
-            font-size: 0.875rem;
-            margin-bottom: 0.75rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
             color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
-
         .setting-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
         }
-
-        .setting-row label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
+        .setting-row:last-child { margin-bottom: 0; }
+        .setting-row label { font-size: 0.75rem; color: var(--text-secondary); }
         .setting-row input[type="range"] {
-            width: 120px;
+            width: 100px;
+            height: 4px;
             accent-color: var(--primary);
+            cursor: pointer;
         }
-
         .setting-row span {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text);
-            min-width: 40px;
+            min-width: 35px;
             text-align: right;
+            font-variant-numeric: tabular-nums;
         }
-
         .btn {
-            padding: 0.75rem 1.5rem;
+            padding: 0.7rem 1.25rem;
             border-radius: 10px;
             border: none;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.4rem;
+            -webkit-tap-highlight-color: transparent;
         }
-
         .btn-primary {
             background: var(--primary);
             color: white;
             width: 100%;
         }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
+        .btn-primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
         .btn-primary:disabled {
             background: var(--border);
             color: var(--text-secondary);
             cursor: not-allowed;
+            transform: none;
         }
-
         .btn-secondary {
             background: var(--surface-light);
             color: var(--text);
             border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
         }
-
-        .btn-secondary:hover {
-            background: var(--border);
-        }
-
-        .progress-container {
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .progress-container.visible {
-            display: block;
-        }
-
+        .btn-secondary:hover { background: var(--border); }
+        .btn-secondary svg { width: 16px; height: 16px; }
+        .progress-container { margin-top: 0.75rem; display: none; }
+        .progress-container.visible { display: block; }
         .progress-bar {
-            height: 4px;
+            height: 3px;
             background: var(--surface-light);
             border-radius: 2px;
             overflow: hidden;
         }
-
         .progress-fill {
             height: 100%;
-            background: var(--primary);
+            background: linear-gradient(90deg, var(--primary), #66ccff);
             width: 0%;
-            transition: width 0.1s;
+            transition: width 0.05s linear;
         }
-
         .progress-text {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-secondary);
             text-align: center;
-            margin-top: 0.5rem;
+            margin-top: 0.4rem;
+            font-variant-numeric: tabular-nums;
         }
-
-        .hidden-input {
-            display: none;
+        .perf-stats {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-top: 0.25rem;
         }
-
+        .hidden-input { display: none; }
         .drop-zone {
             position: absolute;
             inset: 0;
@@ -340,58 +290,54 @@
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: var(--primary);
+            font-weight: 500;
         }
-
-        .drop-zone.active {
-            display: flex;
-        }
-
+        .drop-zone.active { display: flex; }
         @media (min-width: 768px) {
             main {
                 flex-direction: row;
-                padding: 1.5rem;
-                gap: 1.5rem;
+                padding: 1.25rem;
+                gap: 1.25rem;
             }
-
-            .canvas-container {
-                flex: 2;
-                min-height: 500px;
-            }
-
-            .controls {
-                flex: 1;
-                max-width: 350px;
-            }
+            .canvas-container { flex: 2; min-height: 500px; }
+            .controls { flex: 1; max-width: 320px; }
+            header { padding: 1rem 1.5rem; }
+            .logo { font-size: 1.4rem; }
         }
-
         @media (max-width: 767px) {
-            .canvas-container {
-                min-height: 250px;
-            }
+            .canvas-container { min-height: 220px; max-height: 45vh; }
         }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .processing .btn-primary { animation: pulse 1s infinite; }
     </style>
 </head>
 <body>
     <header>
-        <div class="logo">MADpixels</div>
+        <div style="display: flex; align-items: center;">
+            <div class="logo">MADpixels</div>
+            <span class="gpu-badge" id="gpuBadge" style="display: none;">WebGL</span>
+        </div>
         <div class="header-actions">
             <button class="btn btn-secondary" id="uploadBtn">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
                     <circle cx="8.5" cy="8.5" r="1.5"/>
                     <polyline points="21 15 16 10 5 21"/>
                 </svg>
-                Upload
+                <span class="btn-text">Upload</span>
             </button>
             <button class="btn btn-secondary" id="downloadBtn" disabled>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                     <polyline points="7 10 12 15 17 10"/>
                     <line x1="12" y1="15" x2="12" y2="3"/>
                 </svg>
-                Save
+                <span class="btn-text">Save</span>
             </button>
         </div>
     </header>
@@ -399,9 +345,10 @@
     <main>
         <div class="canvas-container" id="canvasContainer">
             <canvas id="canvas"></canvas>
+            <canvas id="glCanvas" style="display:none;"></canvas>
             <div class="placeholder" id="placeholder">
                 <div class="placeholder-icon">🎨</div>
-                <p>Drop an image here or click Upload</p>
+                <p>Drop an image or tap Upload</p>
             </div>
             <div class="drop-zone" id="dropZone">Drop image here</div>
         </div>
@@ -416,30 +363,24 @@
                 <span id="processedLabel" class="active">Processed</span>
             </div>
 
-            <div class="categories">
-                <button class="category-btn active" data-category="shuffles">Shuffles</button>
-                <button class="category-btn" data-category="transforms">Transforms</button>
-                <button class="category-btn" data-category="creations">Creations</button>
-            </div>
-
-            <div class="effects" id="effectsContainer">
-                <!-- Effects will be populated by JS -->
-            </div>
+            <div class="categories" id="categories"></div>
+            <div class="effects" id="effectsContainer"></div>
 
             <div class="settings-section" id="settingsSection">
                 <h3>Settings</h3>
-                <div id="settingsContainer">
-                    <!-- Settings will be populated by JS -->
-                </div>
+                <div id="settingsContainer"></div>
             </div>
 
-            <button class="btn btn-primary" id="applyBtn" disabled>Apply Effect</button>
+            <button class="btn btn-primary" id="applyBtn" disabled>
+                <span id="applyBtnText">Apply Effect</span>
+            </button>
 
             <div class="progress-container" id="progressContainer">
                 <div class="progress-bar">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
                 <div class="progress-text" id="progressText">Processing... 0%</div>
+                <div class="perf-stats" id="perfStats"></div>
             </div>
         </div>
     </main>
@@ -447,732 +388,937 @@
     <input type="file" id="fileInput" class="hidden-input" accept="image/*">
 
     <script>
-        // Effects configuration
-        const effects = {
-            shuffles: [
-                { id: 'globalShuffle', name: 'Global Shuffle' },
-                { id: 'binedShuffle', name: 'Bined Shuffle' },
-                { id: 'localShuffle', name: 'Local Shuffle' },
-                { id: 'binedColorShuffle', name: 'Color Shuffle' }
-            ],
-            transforms: [
-                { id: 'invert', name: 'Invert' },
-                { id: 'boost', name: 'Boost' },
-                { id: 'gaussianBlur', name: 'Gaussian Blur' }
-            ],
-            creations: [
-                { id: 'gradient', name: 'Gradient' }
-            ]
-        };
+    // ============================================
+    // WebGL GPU Processor
+    // ============================================
+    class WebGLProcessor {
+        constructor() {
+            this.canvas = document.getElementById('glCanvas');
+            this.gl = this.canvas.getContext('webgl2') || this.canvas.getContext('webgl');
+            this.programs = {};
+            this.available = !!this.gl;
 
-        // Settings configuration
-        const settingsConfig = {
-            globalShuffle: [
-                { id: 'outputSize', name: 'Output Size', min: 128, max: 1024, default: 512, step: 64 }
-            ],
-            binedShuffle: [
-                { id: 'outputSize', name: 'Output Size', min: 128, max: 1024, default: 512, step: 64 },
-                { id: 'blockSize', name: 'Block Size', min: 4, max: 64, default: 16, step: 4 }
-            ],
-            localShuffle: [
-                { id: 'spread', name: 'Spread', min: 0, max: 100, default: 25, step: 1 }
-            ],
-            binedColorShuffle: [
-                { id: 'outputSize', name: 'Output Size', min: 128, max: 1024, default: 512, step: 64 },
-                { id: 'blockSize', name: 'Block Size', min: 8, max: 64, default: 32, step: 8 }
-            ],
-            boost: [
-                { id: 'boostRed', name: 'Red', min: 0, max: 100, default: 40, step: 5 },
-                { id: 'boostGreen', name: 'Green', min: 0, max: 100, default: 30, step: 5 },
-                { id: 'boostBlue', name: 'Blue', min: 0, max: 100, default: 20, step: 5 }
-            ],
-            gaussianBlur: [
-                { id: 'radius', name: 'Radius', min: 1, max: 50, default: 10, step: 1 }
-            ],
-            gradient: [
-                { id: 'outputSize', name: 'Output Size', min: 128, max: 1024, default: 512, step: 64 }
-            ],
-            invert: []
-        };
-
-        // State
-        let currentCategory = 'shuffles';
-        let currentEffect = 'globalShuffle';
-        let settings = {};
-        let originalImageData = null;
-        let processedImageData = null;
-        let isProcessing = false;
-
-        // DOM elements
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const fileInput = document.getElementById('fileInput');
-        const uploadBtn = document.getElementById('uploadBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const applyBtn = document.getElementById('applyBtn');
-        const placeholder = document.getElementById('placeholder');
-        const canvasContainer = document.getElementById('canvasContainer');
-        const dropZone = document.getElementById('dropZone');
-        const effectsContainer = document.getElementById('effectsContainer');
-        const settingsContainer = document.getElementById('settingsContainer');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressFill = document.getElementById('progressFill');
-        const progressText = document.getElementById('progressText');
-        const compareToggle = document.getElementById('compareToggle');
-        const compareSwitch = document.getElementById('compareSwitch');
-        const originalLabel = document.getElementById('originalLabel');
-        const processedLabel = document.getElementById('processedLabel');
-
-        // Initialize
-        function init() {
-            renderEffects();
-            renderSettings();
-            setupEventListeners();
-        }
-
-        function renderEffects() {
-            const categoryEffects = effects[currentCategory];
-            effectsContainer.innerHTML = categoryEffects.map(effect => `
-                <button class="effect-btn ${effect.id === currentEffect ? 'active' : ''}" data-effect="${effect.id}">
-                    ${effect.name}
-                </button>
-            `).join('');
-
-            // Add click handlers
-            effectsContainer.querySelectorAll('.effect-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    currentEffect = btn.dataset.effect;
-                    renderEffects();
-                    renderSettings();
-                });
-            });
-        }
-
-        function renderSettings() {
-            const effectSettings = settingsConfig[currentEffect] || [];
-
-            if (effectSettings.length === 0) {
-                settingsContainer.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-secondary);">No settings for this effect</p>';
-                return;
+            if (this.available) {
+                this.init();
+                document.getElementById('gpuBadge').style.display = 'inline';
             }
-
-            settingsContainer.innerHTML = effectSettings.map(setting => {
-                const value = settings[setting.id] ?? setting.default;
-                return `
-                    <div class="setting-row">
-                        <label>${setting.name}</label>
-                        <input type="range"
-                               id="setting-${setting.id}"
-                               min="${setting.min}"
-                               max="${setting.max}"
-                               value="${value}"
-                               step="${setting.step}">
-                        <span id="value-${setting.id}">${value}</span>
-                    </div>
-                `;
-            }).join('');
-
-            // Add change handlers
-            effectSettings.forEach(setting => {
-                const input = document.getElementById(`setting-${setting.id}`);
-                const valueSpan = document.getElementById(`value-${setting.id}`);
-
-                input.addEventListener('input', () => {
-                    settings[setting.id] = parseInt(input.value);
-                    valueSpan.textContent = input.value;
-                });
-
-                // Initialize setting
-                settings[setting.id] = settings[setting.id] ?? setting.default;
-            });
         }
 
-        function setupEventListeners() {
-            // Category buttons
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    currentCategory = btn.dataset.category;
-                    currentEffect = effects[currentCategory][0].id;
-                    renderEffects();
-                    renderSettings();
-                });
-            });
+        init() {
+            const gl = this.gl;
 
-            // File upload
-            uploadBtn.addEventListener('click', () => fileInput.click());
-            fileInput.addEventListener('change', handleFileSelect);
-
-            // Drag and drop
-            canvasContainer.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropZone.classList.add('active');
-            });
-
-            canvasContainer.addEventListener('dragleave', () => {
-                dropZone.classList.remove('active');
-            });
-
-            canvasContainer.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropZone.classList.remove('active');
-                const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
-                    loadImage(file);
+            // Vertex shader (shared)
+            const vertexShaderSrc = `
+                attribute vec2 a_position;
+                attribute vec2 a_texCoord;
+                varying vec2 v_texCoord;
+                void main() {
+                    gl_Position = vec4(a_position, 0, 1);
+                    v_texCoord = a_texCoord;
                 }
-            });
+            `;
 
-            // Apply effect
-            applyBtn.addEventListener('click', applyEffect);
+            // Fragment shaders for each effect
+            const shaders = {
+                invert: `
+                    precision mediump float;
+                    varying vec2 v_texCoord;
+                    uniform sampler2D u_image;
+                    void main() {
+                        vec4 color = texture2D(u_image, v_texCoord);
+                        gl_FragColor = vec4(1.0 - color.rgb, color.a);
+                    }
+                `,
+                boost: `
+                    precision mediump float;
+                    varying vec2 v_texCoord;
+                    uniform sampler2D u_image;
+                    uniform vec3 u_boost;
+                    void main() {
+                        vec4 color = texture2D(u_image, v_texCoord);
+                        vec3 normalized = (color.rgb - 0.5) * u_boost * 4.0;
+                        vec3 clipped = (tanh(normalized) + 1.0) * 0.5;
+                        gl_FragColor = vec4(clipped, color.a);
+                    }
+                    vec3 tanh(vec3 x) {
+                        vec3 e2x = exp(2.0 * x);
+                        return (e2x - 1.0) / (e2x + 1.0);
+                    }
+                `,
+                blur: `
+                    precision mediump float;
+                    varying vec2 v_texCoord;
+                    uniform sampler2D u_image;
+                    uniform vec2 u_resolution;
+                    uniform float u_radius;
+                    uniform vec2 u_direction;
+                    void main() {
+                        vec4 sum = vec4(0.0);
+                        float total = 0.0;
+                        for (float i = -20.0; i <= 20.0; i += 1.0) {
+                            float weight = exp(-i * i / (2.0 * u_radius * u_radius));
+                            vec2 offset = u_direction * i / u_resolution;
+                            sum += texture2D(u_image, v_texCoord + offset) * weight;
+                            total += weight;
+                        }
+                        gl_FragColor = sum / total;
+                    }
+                `,
+                localShuffle: `
+                    precision highp float;
+                    varying vec2 v_texCoord;
+                    uniform sampler2D u_image;
+                    uniform vec2 u_resolution;
+                    uniform float u_spread;
+                    uniform float u_seed;
 
-            // Download
-            downloadBtn.addEventListener('click', downloadImage);
+                    float hash(vec2 p) {
+                        return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453 + u_seed);
+                    }
 
-            // Compare toggle
-            compareSwitch.addEventListener('change', () => {
-                const showProcessed = compareSwitch.checked;
-                originalLabel.classList.toggle('active', !showProcessed);
-                processedLabel.classList.toggle('active', showProcessed);
-                displayImage(showProcessed ? processedImageData : originalImageData);
-            });
-        }
+                    vec2 gaussianNoise(vec2 p) {
+                        float u1 = max(0.0001, hash(p));
+                        float u2 = hash(p + vec2(1.0, 0.0));
+                        float r = sqrt(-2.0 * log(u1));
+                        float theta = 6.28318 * u2;
+                        return vec2(r * cos(theta), r * sin(theta));
+                    }
 
-        function handleFileSelect(e) {
-            const file = e.target.files[0];
-            if (file) {
-                loadImage(file);
-            }
-        }
-
-        function loadImage(file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.drawImage(img, 0, 0);
-                    originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                    processedImageData = null;
-                    placeholder.style.display = 'none';
-                    canvas.style.display = 'block';
-                    applyBtn.disabled = false;
-                    downloadBtn.disabled = true;
-                    compareToggle.style.display = 'none';
-                };
-                img.src = e.target.result;
+                    void main() {
+                        float maxSpread = max(u_resolution.x, u_resolution.y) * u_spread / 4.0;
+                        vec2 noise = gaussianNoise(v_texCoord * u_resolution) * maxSpread / u_resolution;
+                        vec2 srcCoord = clamp(v_texCoord + noise, 0.0, 1.0);
+                        gl_FragColor = texture2D(u_image, srcCoord);
+                    }
+                `,
+                gradient: `
+                    precision mediump float;
+                    varying vec2 v_texCoord;
+                    uniform vec4 u_tl, u_tr, u_bl, u_br;
+                    void main() {
+                        vec4 top = mix(u_tl, u_tr, v_texCoord.x);
+                        vec4 bottom = mix(u_bl, u_br, v_texCoord.x);
+                        gl_FragColor = mix(top, bottom, v_texCoord.y);
+                    }
+                `
             };
-            reader.readAsDataURL(file);
-        }
 
-        function displayImage(imageData) {
-            if (!imageData) return;
-            canvas.width = imageData.width;
-            canvas.height = imageData.height;
-            ctx.putImageData(imageData, 0, 0);
-        }
-
-        function updateProgress(percent) {
-            progressFill.style.width = `${percent}%`;
-            progressText.textContent = `Processing... ${Math.round(percent)}%`;
-        }
-
-        async function applyEffect() {
-            if (isProcessing || (!originalImageData && currentEffect !== 'gradient')) return;
-
-            isProcessing = true;
-            applyBtn.disabled = true;
-            progressContainer.classList.add('visible');
-            updateProgress(0);
-
-            // Use setTimeout to allow UI to update
-            await new Promise(resolve => setTimeout(resolve, 10));
-
-            try {
-                let result;
-                switch (currentEffect) {
-                    case 'globalShuffle':
-                        result = await globalShuffle();
-                        break;
-                    case 'binedShuffle':
-                        result = await binedShuffle();
-                        break;
-                    case 'localShuffle':
-                        result = await localShuffle();
-                        break;
-                    case 'binedColorShuffle':
-                        result = await binedColorShuffle();
-                        break;
-                    case 'invert':
-                        result = await invert();
-                        break;
-                    case 'boost':
-                        result = await boost();
-                        break;
-                    case 'gaussianBlur':
-                        result = await gaussianBlur();
-                        break;
-                    case 'gradient':
-                        result = await createGradient();
-                        break;
-                }
-
-                processedImageData = result;
-                displayImage(processedImageData);
-                downloadBtn.disabled = false;
-                compareToggle.style.display = 'flex';
-                compareSwitch.checked = true;
-                originalLabel.classList.remove('active');
-                processedLabel.classList.add('active');
-            } catch (error) {
-                console.error('Error applying effect:', error);
+            // Compile shaders
+            for (const [name, fragSrc] of Object.entries(shaders)) {
+                this.programs[name] = this.createProgram(vertexShaderSrc, fragSrc);
             }
 
-            isProcessing = false;
-            applyBtn.disabled = false;
-            progressContainer.classList.remove('visible');
+            // Create buffers
+            this.positionBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                -1, -1, 1, -1, -1, 1,
+                -1, 1, 1, -1, 1, 1
+            ]), gl.STATIC_DRAW);
+
+            this.texCoordBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+                0, 1, 1, 1, 0, 0,
+                0, 0, 1, 1, 1, 0
+            ]), gl.STATIC_DRAW);
         }
 
-        function downloadImage() {
-            if (!processedImageData) return;
+        createProgram(vertSrc, fragSrc) {
+            const gl = this.gl;
+            const vert = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(vert, vertSrc);
+            gl.compileShader(vert);
 
-            const link = document.createElement('a');
-            link.download = `madpixels-${currentEffect}-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
+            const frag = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(frag, fragSrc);
+            gl.compileShader(frag);
+
+            const program = gl.createProgram();
+            gl.attachShader(program, vert);
+            gl.attachShader(program, frag);
+            gl.linkProgram(program);
+
+            return program;
         }
 
-        // Image processing functions
-        async function globalShuffle() {
-            const size = settings.outputSize || 512;
-            const resized = resizeImageData(originalImageData, size, size);
-            const data = new Uint8ClampedArray(resized.data);
-            const pixelCount = size * size;
-
-            // Fisher-Yates shuffle
-            for (let i = pixelCount - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-
-                // Swap pixels
-                for (let c = 0; c < 4; c++) {
-                    const temp = data[i * 4 + c];
-                    data[i * 4 + c] = data[j * 4 + c];
-                    data[j * 4 + c] = temp;
-                }
-
-                if (i % 10000 === 0) {
-                    updateProgress((1 - i / pixelCount) * 100);
-                    await new Promise(r => setTimeout(r, 0));
-                }
-            }
-
-            return new ImageData(data, size, size);
+        createTexture(imageData) {
+            const gl = this.gl;
+            const texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, texture);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, imageData);
+            return texture;
         }
 
-        async function binedShuffle() {
-            const size = settings.outputSize || 512;
-            const blockSize = settings.blockSize || 16;
-            const resized = resizeImageData(originalImageData, size, size);
-            const data = new Uint8ClampedArray(resized.data);
+        render(program, width, height, setupUniforms) {
+            const gl = this.gl;
+            this.canvas.width = width;
+            this.canvas.height = height;
+            gl.viewport(0, 0, width, height);
 
-            const blocksX = Math.floor(size / blockSize);
-            const blocksY = Math.floor(size / blockSize);
-            const totalBlocks = blocksX * blocksY;
-            let processedBlocks = 0;
+            gl.useProgram(program);
 
-            for (let by = 0; by < blocksY; by++) {
-                for (let bx = 0; bx < blocksX; bx++) {
-                    // Collect pixels in block
-                    const blockPixels = [];
-                    for (let ly = 0; ly < blockSize; ly++) {
-                        for (let lx = 0; lx < blockSize; lx++) {
-                            const x = bx * blockSize + lx;
-                            const y = by * blockSize + ly;
-                            const idx = (y * size + x) * 4;
-                            blockPixels.push([data[idx], data[idx+1], data[idx+2], data[idx+3]]);
-                        }
-                    }
+            const posLoc = gl.getAttribLocation(program, 'a_position');
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+            gl.enableVertexAttribArray(posLoc);
+            gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
 
-                    // Shuffle
-                    for (let i = blockPixels.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [blockPixels[i], blockPixels[j]] = [blockPixels[j], blockPixels[i]];
-                    }
+            const texLoc = gl.getAttribLocation(program, 'a_texCoord');
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+            gl.enableVertexAttribArray(texLoc);
+            gl.vertexAttribPointer(texLoc, 2, gl.FLOAT, false, 0, 0);
 
-                    // Write back
-                    let pi = 0;
-                    for (let ly = 0; ly < blockSize; ly++) {
-                        for (let lx = 0; lx < blockSize; lx++) {
-                            const x = bx * blockSize + lx;
-                            const y = by * blockSize + ly;
-                            const idx = (y * size + x) * 4;
-                            data[idx] = blockPixels[pi][0];
-                            data[idx+1] = blockPixels[pi][1];
-                            data[idx+2] = blockPixels[pi][2];
-                            data[idx+3] = blockPixels[pi][3];
-                            pi++;
-                        }
-                    }
+            setupUniforms(gl, program);
 
-                    processedBlocks++;
-                    if (processedBlocks % 10 === 0) {
-                        updateProgress((processedBlocks / totalBlocks) * 100);
-                        await new Promise(r => setTimeout(r, 0));
-                    }
-                }
-            }
-
-            return new ImageData(data, size, size);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
         }
 
-        async function localShuffle() {
-            const spread = (settings.spread || 25) / 100;
-            const width = originalImageData.width;
-            const height = originalImageData.height;
-            const maxSpread = Math.max(width, height) * spread / 4;
-            const data = new Uint8ClampedArray(originalImageData.data);
-            const pixelCount = width * height;
+        getImageData() {
+            const gl = this.gl;
+            const pixels = new Uint8Array(this.canvas.width * this.canvas.height * 4);
+            gl.readPixels(0, 0, this.canvas.width, this.canvas.height, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
 
-            for (let i = 0; i < pixelCount; i++) {
-                const x = i % width;
-                const y = Math.floor(i / width);
-
-                // Box-Muller for normal distribution
-                const u1 = Math.random();
-                const u2 = Math.random();
-                const normal = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-
-                const offsetX = Math.round(normal * maxSpread);
-                const offsetY = Math.round(normal * maxSpread);
-
-                const newX = Math.max(0, Math.min(width - 1, x + offsetX));
-                const newY = Math.max(0, Math.min(height - 1, y + offsetY));
-                const newIdx = newY * width + newX;
-
-                // Swap
-                for (let c = 0; c < 4; c++) {
-                    const temp = data[i * 4 + c];
-                    data[i * 4 + c] = data[newIdx * 4 + c];
-                    data[newIdx * 4 + c] = temp;
-                }
-
-                if (i % 10000 === 0) {
-                    updateProgress((i / pixelCount) * 100);
-                    await new Promise(r => setTimeout(r, 0));
-                }
+            // Flip vertically
+            const flipped = new Uint8ClampedArray(pixels.length);
+            const rowSize = this.canvas.width * 4;
+            for (let y = 0; y < this.canvas.height; y++) {
+                const srcRow = (this.canvas.height - 1 - y) * rowSize;
+                const dstRow = y * rowSize;
+                flipped.set(pixels.subarray(srcRow, srcRow + rowSize), dstRow);
             }
 
-            return new ImageData(data, width, height);
+            return new ImageData(flipped, this.canvas.width, this.canvas.height);
         }
 
-        async function binedColorShuffle() {
-            const size = settings.outputSize || 512;
-            const blockSize = settings.blockSize || 32;
-            const resized = resizeImageData(originalImageData, size, size);
-
-            // Sample colors from image
-            const sampledColors = [];
-            for (let i = 0; i < 100; i++) {
-                const idx = Math.floor(Math.random() * size * size) * 4;
-                const r = resized.data[idx] / 255;
-                const g = resized.data[idx + 1] / 255;
-                const b = resized.data[idx + 2] / 255;
-                sampledColors.push(rgbToHsl(r, g, b));
-            }
-
-            const data = new Uint8ClampedArray(size * size * 4);
-            const blocksX = Math.floor(size / blockSize);
-            const blocksY = Math.floor(size / blockSize);
-            const totalBlocks = blocksX * blocksY;
-            let processedBlocks = 0;
-
-            for (let by = 0; by < blocksY; by++) {
-                for (let bx = 0; bx < blocksX; bx++) {
-                    const baseColor = sampledColors[Math.floor(Math.random() * sampledColors.length)];
-
-                    for (let ly = 0; ly < blockSize; ly++) {
-                        for (let lx = 0; lx < blockSize; lx++) {
-                            const x = bx * blockSize + lx;
-                            const y = by * blockSize + ly;
-                            const idx = (y * size + x) * 4;
-
-                            const h = baseColor.h;
-                            const s = Math.min(1, baseColor.s * (1 + Math.random() * 0.5));
-                            const l = Math.min(1, Math.max(0, baseColor.l * Math.random() * 1.5));
-
-                            const rgb = hslToRgb(h, s, l);
-                            data[idx] = Math.round(rgb.r * 255);
-                            data[idx + 1] = Math.round(rgb.g * 255);
-                            data[idx + 2] = Math.round(rgb.b * 255);
-                            data[idx + 3] = 255;
-                        }
-                    }
-
-                    processedBlocks++;
-                    if (processedBlocks % 5 === 0) {
-                        updateProgress((processedBlocks / totalBlocks) * 100);
-                        await new Promise(r => setTimeout(r, 0));
-                    }
-                }
-            }
-
-            return new ImageData(data, size, size);
+        // GPU Effects
+        invert(imageData) {
+            const texture = this.createTexture(imageData);
+            this.render(this.programs.invert, imageData.width, imageData.height, (gl, prog) => {
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(gl.getUniformLocation(prog, 'u_image'), 0);
+            });
+            gl.deleteTexture(texture);
+            return this.getImageData();
         }
 
-        async function invert() {
-            const width = originalImageData.width;
-            const height = originalImageData.height;
-            const data = new Uint8ClampedArray(originalImageData.data);
-
-            for (let i = 0; i < data.length; i += 4) {
-                data[i] = 255 - data[i];
-                data[i + 1] = 255 - data[i + 1];
-                data[i + 2] = 255 - data[i + 2];
-            }
-
-            updateProgress(100);
-            return new ImageData(data, width, height);
+        boost(imageData, r, g, b) {
+            const texture = this.createTexture(imageData);
+            this.render(this.programs.boost, imageData.width, imageData.height, (gl, prog) => {
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(gl.getUniformLocation(prog, 'u_image'), 0);
+                gl.uniform3f(gl.getUniformLocation(prog, 'u_boost'), r, g, b);
+            });
+            this.gl.deleteTexture(texture);
+            return this.getImageData();
         }
 
-        async function boost() {
-            const width = originalImageData.width;
-            const height = originalImageData.height;
-            const data = new Uint8ClampedArray(originalImageData.data);
-            const pixelCount = width * height;
-
-            const boostR = (settings.boostRed ?? 40) / 100;
-            const boostG = (settings.boostGreen ?? 30) / 100;
-            const boostB = (settings.boostBlue ?? 20) / 100;
-
-            // Calculate mean
-            let sumR = 0, sumG = 0, sumB = 0;
-            for (let i = 0; i < data.length; i += 4) {
-                sumR += data[i];
-                sumG += data[i + 1];
-                sumB += data[i + 2];
-            }
-            const meanR = sumR / pixelCount;
-            const meanG = sumG / pixelCount;
-            const meanB = sumB / pixelCount;
-
-            // Calculate std
-            let varR = 0, varG = 0, varB = 0;
-            for (let i = 0; i < data.length; i += 4) {
-                varR += Math.pow(data[i] - meanR, 2);
-                varG += Math.pow(data[i + 1] - meanG, 2);
-                varB += Math.pow(data[i + 2] - meanB, 2);
-            }
-            const stdR = Math.sqrt(varR / pixelCount) || 1;
-            const stdG = Math.sqrt(varG / pixelCount) || 1;
-            const stdB = Math.sqrt(varB / pixelCount) || 1;
-
-            // Apply boost
-            for (let i = 0; i < data.length; i += 4) {
-                const r = (data[i] - meanR) / stdR * boostR;
-                const g = (data[i + 1] - meanG) / stdG * boostG;
-                const b = (data[i + 2] - meanB) / stdB * boostB;
-
-                data[i] = Math.round((Math.tanh(r * 4) + 1) / 2 * 255);
-                data[i + 1] = Math.round((Math.tanh(g * 4) + 1) / 2 * 255);
-                data[i + 2] = Math.round((Math.tanh(b * 4) + 1) / 2 * 255);
-
-                if (i % 40000 === 0) {
-                    updateProgress((i / data.length) * 100);
-                    await new Promise(r => setTimeout(r, 0));
-                }
-            }
-
-            return new ImageData(data, width, height);
-        }
-
-        async function gaussianBlur() {
-            const radius = settings.radius || 10;
-            const width = originalImageData.width;
-            const height = originalImageData.height;
-            const src = originalImageData.data;
-            const dst = new Uint8ClampedArray(src.length);
-
-            // Create 1D Gaussian kernel
-            const kernel = [];
-            const sigma = radius / 3;
-            let sum = 0;
-            for (let i = -radius; i <= radius; i++) {
-                const val = Math.exp(-(i * i) / (2 * sigma * sigma));
-                kernel.push(val);
-                sum += val;
-            }
-            for (let i = 0; i < kernel.length; i++) kernel[i] /= sum;
+        blur(imageData, radius) {
+            const gl = this.gl;
+            // Two-pass separable blur
+            let texture = this.createTexture(imageData);
 
             // Horizontal pass
-            const temp = new Uint8ClampedArray(src.length);
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    let r = 0, g = 0, b = 0, a = 0;
-                    for (let k = -radius; k <= radius; k++) {
-                        const px = Math.min(width - 1, Math.max(0, x + k));
-                        const idx = (y * width + px) * 4;
-                        const w = kernel[k + radius];
-                        r += src[idx] * w;
-                        g += src[idx + 1] * w;
-                        b += src[idx + 2] * w;
-                        a += src[idx + 3] * w;
-                    }
-                    const idx = (y * width + x) * 4;
-                    temp[idx] = r;
-                    temp[idx + 1] = g;
-                    temp[idx + 2] = b;
-                    temp[idx + 3] = a;
-                }
-                if (y % 50 === 0) {
-                    updateProgress((y / height) * 50);
-                    await new Promise(r => setTimeout(r, 0));
-                }
-            }
+            this.render(this.programs.blur, imageData.width, imageData.height, (gl, prog) => {
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(gl.getUniformLocation(prog, 'u_image'), 0);
+                gl.uniform2f(gl.getUniformLocation(prog, 'u_resolution'), imageData.width, imageData.height);
+                gl.uniform1f(gl.getUniformLocation(prog, 'u_radius'), radius);
+                gl.uniform2f(gl.getUniformLocation(prog, 'u_direction'), 1, 0);
+            });
+
+            const intermediate = this.getImageData();
+            gl.deleteTexture(texture);
+            texture = this.createTexture(intermediate);
 
             // Vertical pass
-            for (let y = 0; y < height; y++) {
-                for (let x = 0; x < width; x++) {
-                    let r = 0, g = 0, b = 0, a = 0;
-                    for (let k = -radius; k <= radius; k++) {
-                        const py = Math.min(height - 1, Math.max(0, y + k));
-                        const idx = (py * width + x) * 4;
-                        const w = kernel[k + radius];
-                        r += temp[idx] * w;
-                        g += temp[idx + 1] * w;
-                        b += temp[idx + 2] * w;
-                        a += temp[idx + 3] * w;
-                    }
-                    const idx = (y * width + x) * 4;
-                    dst[idx] = r;
-                    dst[idx + 1] = g;
-                    dst[idx + 2] = b;
-                    dst[idx + 3] = a;
-                }
-                if (y % 50 === 0) {
-                    updateProgress(50 + (y / height) * 50);
-                    await new Promise(r => setTimeout(r, 0));
-                }
-            }
+            this.render(this.programs.blur, imageData.width, imageData.height, (gl, prog) => {
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(gl.getUniformLocation(prog, 'u_image'), 0);
+                gl.uniform2f(gl.getUniformLocation(prog, 'u_resolution'), imageData.width, imageData.height);
+                gl.uniform1f(gl.getUniformLocation(prog, 'u_radius'), radius);
+                gl.uniform2f(gl.getUniformLocation(prog, 'u_direction'), 0, 1);
+            });
 
-            return new ImageData(dst, width, height);
+            gl.deleteTexture(texture);
+            return this.getImageData();
         }
 
-        async function createGradient() {
-            const size = settings.outputSize || 512;
-            const data = new Uint8ClampedArray(size * size * 4);
+        localShuffle(imageData, spread) {
+            const texture = this.createTexture(imageData);
+            this.render(this.programs.localShuffle, imageData.width, imageData.height, (gl, prog) => {
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.uniform1i(gl.getUniformLocation(prog, 'u_image'), 0);
+                gl.uniform2f(gl.getUniformLocation(prog, 'u_resolution'), imageData.width, imageData.height);
+                gl.uniform1f(gl.getUniformLocation(prog, 'u_spread'), spread);
+                gl.uniform1f(gl.getUniformLocation(prog, 'u_seed'), Math.random() * 1000);
+            });
+            this.gl.deleteTexture(texture);
+            return this.getImageData();
+        }
 
-            // Random corner colors
-            const tl = { r: Math.random(), g: Math.random(), b: Math.random() };
-            const tr = { r: Math.random(), g: Math.random(), b: Math.random() };
-            const bl = { r: Math.random(), g: Math.random(), b: Math.random() };
-            const br = { r: Math.random(), g: Math.random(), b: Math.random() };
+        gradient(width, height) {
+            this.render(this.programs.gradient, width, height, (gl, prog) => {
+                gl.uniform4f(gl.getUniformLocation(prog, 'u_tl'), Math.random(), Math.random(), Math.random(), 1);
+                gl.uniform4f(gl.getUniformLocation(prog, 'u_tr'), Math.random(), Math.random(), Math.random(), 1);
+                gl.uniform4f(gl.getUniformLocation(prog, 'u_bl'), Math.random(), Math.random(), Math.random(), 1);
+                gl.uniform4f(gl.getUniformLocation(prog, 'u_br'), Math.random(), Math.random(), Math.random(), 1);
+            });
+            return this.getImageData();
+        }
+    }
 
-            for (let y = 0; y < size; y++) {
-                const fy = y / (size - 1);
-                for (let x = 0; x < size; x++) {
-                    const fx = x / (size - 1);
+    // ============================================
+    // App State & Config
+    // ============================================
+    const effects = {
+        shuffles: [
+            { id: 'globalShuffle', name: 'Global Shuffle', gpu: false },
+            { id: 'binedShuffle', name: 'Bined Shuffle', gpu: false },
+            { id: 'localShuffle', name: 'Local Shuffle', gpu: true },
+            { id: 'binedColorShuffle', name: 'Color Shuffle', gpu: false }
+        ],
+        transforms: [
+            { id: 'invert', name: 'Invert', gpu: true },
+            { id: 'boost', name: 'Boost', gpu: true },
+            { id: 'gaussianBlur', name: 'Blur', gpu: true }
+        ],
+        creations: [
+            { id: 'gradient', name: 'Gradient', gpu: true }
+        ]
+    };
 
-                    // Bilinear interpolation
-                    const top = {
-                        r: tl.r * (1 - fx) + tr.r * fx,
-                        g: tl.g * (1 - fx) + tr.g * fx,
-                        b: tl.b * (1 - fx) + tr.b * fx
-                    };
-                    const bottom = {
-                        r: bl.r * (1 - fx) + br.r * fx,
-                        g: bl.g * (1 - fx) + br.g * fx,
-                        b: bl.b * (1 - fx) + br.b * fx
-                    };
+    const settingsConfig = {
+        globalShuffle: [{ id: 'outputSize', name: 'Size', min: 128, max: 1024, default: 512, step: 64 }],
+        binedShuffle: [
+            { id: 'outputSize', name: 'Size', min: 128, max: 1024, default: 512, step: 64 },
+            { id: 'blockSize', name: 'Block', min: 4, max: 64, default: 16, step: 4 }
+        ],
+        localShuffle: [{ id: 'spread', name: 'Spread', min: 0, max: 100, default: 25, step: 1 }],
+        binedColorShuffle: [
+            { id: 'outputSize', name: 'Size', min: 128, max: 1024, default: 512, step: 64 },
+            { id: 'blockSize', name: 'Block', min: 8, max: 64, default: 32, step: 8 }
+        ],
+        boost: [
+            { id: 'boostRed', name: 'Red', min: 0, max: 100, default: 40, step: 5 },
+            { id: 'boostGreen', name: 'Green', min: 0, max: 100, default: 30, step: 5 },
+            { id: 'boostBlue', name: 'Blue', min: 0, max: 100, default: 20, step: 5 }
+        ],
+        gaussianBlur: [{ id: 'radius', name: 'Radius', min: 1, max: 30, default: 8, step: 1 }],
+        gradient: [{ id: 'outputSize', name: 'Size', min: 128, max: 1024, default: 512, step: 64 }],
+        invert: []
+    };
 
-                    const idx = (y * size + x) * 4;
-                    data[idx] = Math.round((top.r * (1 - fy) + bottom.r * fy) * 255);
-                    data[idx + 1] = Math.round((top.g * (1 - fy) + bottom.g * fy) * 255);
-                    data[idx + 2] = Math.round((top.b * (1 - fy) + bottom.b * fy) * 255);
-                    data[idx + 3] = 255;
-                }
-                if (y % 50 === 0) {
-                    updateProgress((y / size) * 100);
-                    await new Promise(r => setTimeout(r, 0));
-                }
-            }
+    let state = {
+        category: 'shuffles',
+        effect: 'globalShuffle',
+        settings: {},
+        originalImageData: null,
+        processedImageData: null,
+        isProcessing: false
+    };
 
-            // For gradient, we don't need an original image
-            if (!originalImageData) {
-                originalImageData = new ImageData(new Uint8ClampedArray(data), size, size);
+    // DOM
+    const $ = id => document.getElementById(id);
+    const canvas = $('canvas');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    const fileInput = $('fileInput');
+    const placeholder = $('placeholder');
+    const progressContainer = $('progressContainer');
+    const progressFill = $('progressFill');
+    const progressText = $('progressText');
+    const perfStats = $('perfStats');
+    const applyBtn = $('applyBtn');
+    const downloadBtn = $('downloadBtn');
+    const compareToggle = $('compareToggle');
+    const compareSwitch = $('compareSwitch');
+
+    // GPU Processor
+    const gpu = new WebGLProcessor();
+
+    // ============================================
+    // UI Rendering
+    // ============================================
+    function renderCategories() {
+        const container = $('categories');
+        container.innerHTML = Object.keys(effects).map(cat =>
+            `<button class="category-btn ${cat === state.category ? 'active' : ''}" data-cat="${cat}">
+                ${cat.charAt(0).toUpperCase() + cat.slice(1)}
+            </button>`
+        ).join('');
+
+        container.querySelectorAll('.category-btn').forEach(btn => {
+            btn.onclick = () => {
+                state.category = btn.dataset.cat;
+                state.effect = effects[state.category][0].id;
+                renderCategories();
+                renderEffects();
+                renderSettings();
+            };
+        });
+    }
+
+    function renderEffects() {
+        const container = $('effectsContainer');
+        container.innerHTML = effects[state.category].map(e =>
+            `<button class="effect-btn ${e.id === state.effect ? 'active' : ''}" data-effect="${e.id}">
+                ${e.name}${e.gpu && gpu.available ? ' ⚡' : ''}
+            </button>`
+        ).join('');
+
+        container.querySelectorAll('.effect-btn').forEach(btn => {
+            btn.onclick = () => {
+                state.effect = btn.dataset.effect;
+                renderEffects();
+                renderSettings();
+            };
+        });
+    }
+
+    function renderSettings() {
+        const config = settingsConfig[state.effect] || [];
+        const container = $('settingsContainer');
+
+        if (!config.length) {
+            container.innerHTML = '<p style="font-size:0.75rem;color:var(--text-secondary)">No settings</p>';
+            return;
+        }
+
+        container.innerHTML = config.map(s => {
+            const val = state.settings[s.id] ?? s.default;
+            return `<div class="setting-row">
+                <label>${s.name}</label>
+                <input type="range" id="s-${s.id}" min="${s.min}" max="${s.max}" value="${val}" step="${s.step}">
+                <span id="v-${s.id}">${val}</span>
+            </div>`;
+        }).join('');
+
+        config.forEach(s => {
+            const input = $(`s-${s.id}`);
+            const span = $(`v-${s.id}`);
+            state.settings[s.id] = state.settings[s.id] ?? s.default;
+
+            input.oninput = () => {
+                state.settings[s.id] = +input.value;
+                span.textContent = input.value;
+            };
+        });
+    }
+
+    // ============================================
+    // Image Handling
+    // ============================================
+    function loadImage(file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                state.originalImageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                state.processedImageData = null;
                 placeholder.style.display = 'none';
                 canvas.style.display = 'block';
-            }
-
-            return new ImageData(data, size, size);
-        }
-
-        // Utility functions
-        function resizeImageData(imageData, newWidth, newHeight) {
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = imageData.width;
-            tempCanvas.height = imageData.height;
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCtx.putImageData(imageData, 0, 0);
-
-            const resizedCanvas = document.createElement('canvas');
-            resizedCanvas.width = newWidth;
-            resizedCanvas.height = newHeight;
-            const resizedCtx = resizedCanvas.getContext('2d');
-            resizedCtx.drawImage(tempCanvas, 0, 0, newWidth, newHeight);
-
-            return resizedCtx.getImageData(0, 0, newWidth, newHeight);
-        }
-
-        function rgbToHsl(r, g, b) {
-            const max = Math.max(r, g, b);
-            const min = Math.min(r, g, b);
-            const l = (max + min) / 2;
-
-            if (max === min) {
-                return { h: 0, s: 0, l };
-            }
-
-            const d = max - min;
-            const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
-            let h;
-            switch (max) {
-                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-                case g: h = (b - r) / d + 2; break;
-                default: h = (r - g) / d + 4;
-            }
-            h /= 6;
-
-            return { h, s, l };
-        }
-
-        function hslToRgb(h, s, l) {
-            if (s === 0) {
-                return { r: l, g: l, b: l };
-            }
-
-            const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            const p = 2 * l - q;
-
-            const hueToRgb = (p, q, t) => {
-                if (t < 0) t += 1;
-                if (t > 1) t -= 1;
-                if (t < 1/6) return p + (q - p) * 6 * t;
-                if (t < 1/2) return q;
-                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
-                return p;
+                applyBtn.disabled = false;
+                downloadBtn.disabled = true;
+                compareToggle.style.display = 'none';
             };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
 
-            return {
-                r: hueToRgb(p, q, h + 1/3),
-                g: hueToRgb(p, q, h),
-                b: hueToRgb(p, q, h - 1/3)
-            };
+    function displayImage(imageData) {
+        if (!imageData) return;
+        canvas.width = imageData.width;
+        canvas.height = imageData.height;
+        ctx.putImageData(imageData, 0, 0);
+    }
+
+    function updateProgress(pct, text) {
+        progressFill.style.width = `${pct}%`;
+        progressText.textContent = text || `Processing... ${Math.round(pct)}%`;
+    }
+
+    // ============================================
+    // CPU Processing (chunked for 60fps)
+    // ============================================
+    function processChunked(total, chunkSize, processFn) {
+        return new Promise(resolve => {
+            let i = 0;
+            function chunk() {
+                const end = Math.min(i + chunkSize, total);
+                processFn(i, end);
+                i = end;
+                updateProgress((i / total) * 100);
+
+                if (i < total) {
+                    requestAnimationFrame(chunk);
+                } else {
+                    resolve();
+                }
+            }
+            requestAnimationFrame(chunk);
+        });
+    }
+
+    function resizeImageData(imageData, w, h) {
+        const temp = document.createElement('canvas');
+        temp.width = imageData.width;
+        temp.height = imageData.height;
+        temp.getContext('2d').putImageData(imageData, 0, 0);
+
+        const out = document.createElement('canvas');
+        out.width = w;
+        out.height = h;
+        out.getContext('2d').drawImage(temp, 0, 0, w, h);
+        return out.getContext('2d').getImageData(0, 0, w, h);
+    }
+
+    // ============================================
+    // Effect Implementations
+    // ============================================
+    async function globalShuffle() {
+        const size = state.settings.outputSize || 512;
+        const resized = resizeImageData(state.originalImageData, size, size);
+        const data = new Uint8ClampedArray(resized.data);
+        const total = size * size;
+
+        // Optimized Fisher-Yates with typed arrays
+        const indices = new Uint32Array(total);
+        for (let i = 0; i < total; i++) indices[i] = i;
+
+        await processChunked(total, 50000, (start, end) => {
+            for (let i = end - 1; i >= start && i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [indices[i], indices[j]] = [indices[j], indices[i]];
+            }
+        });
+
+        const output = new Uint8ClampedArray(total * 4);
+        for (let i = 0; i < total; i++) {
+            const src = indices[i] * 4;
+            const dst = i * 4;
+            output[dst] = data[src];
+            output[dst + 1] = data[src + 1];
+            output[dst + 2] = data[src + 2];
+            output[dst + 3] = data[src + 3];
         }
 
-        // Start
-        init();
+        return new ImageData(output, size, size);
+    }
+
+    async function binedShuffle() {
+        const size = state.settings.outputSize || 512;
+        const block = state.settings.blockSize || 16;
+        const resized = resizeImageData(state.originalImageData, size, size);
+        const data = new Uint8ClampedArray(resized.data);
+
+        const blocksX = Math.floor(size / block);
+        const blocksY = Math.floor(size / block);
+        const totalBlocks = blocksX * blocksY;
+
+        await processChunked(totalBlocks, 50, (start, end) => {
+            for (let b = start; b < end; b++) {
+                const bx = b % blocksX;
+                const by = Math.floor(b / blocksX);
+
+                const pixels = [];
+                for (let ly = 0; ly < block; ly++) {
+                    for (let lx = 0; lx < block; lx++) {
+                        const x = bx * block + lx;
+                        const y = by * block + ly;
+                        const i = (y * size + x) * 4;
+                        pixels.push([data[i], data[i+1], data[i+2], data[i+3]]);
+                    }
+                }
+
+                // Shuffle
+                for (let i = pixels.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pixels[i], pixels[j]] = [pixels[j], pixels[i]];
+                }
+
+                // Write back
+                let pi = 0;
+                for (let ly = 0; ly < block; ly++) {
+                    for (let lx = 0; lx < block; lx++) {
+                        const x = bx * block + lx;
+                        const y = by * block + ly;
+                        const i = (y * size + x) * 4;
+                        data[i] = pixels[pi][0];
+                        data[i+1] = pixels[pi][1];
+                        data[i+2] = pixels[pi][2];
+                        data[i+3] = pixels[pi][3];
+                        pi++;
+                    }
+                }
+            }
+        });
+
+        return new ImageData(data, size, size);
+    }
+
+    async function binedColorShuffle() {
+        const size = state.settings.outputSize || 512;
+        const block = state.settings.blockSize || 32;
+        const resized = resizeImageData(state.originalImageData, size, size);
+
+        // Sample colors
+        const colors = [];
+        for (let i = 0; i < 100; i++) {
+            const idx = Math.floor(Math.random() * size * size) * 4;
+            colors.push(rgbToHsl(resized.data[idx]/255, resized.data[idx+1]/255, resized.data[idx+2]/255));
+        }
+
+        const data = new Uint8ClampedArray(size * size * 4);
+        const blocksX = Math.floor(size / block);
+        const blocksY = Math.floor(size / block);
+
+        await processChunked(blocksX * blocksY, 20, (start, end) => {
+            for (let b = start; b < end; b++) {
+                const bx = b % blocksX;
+                const by = Math.floor(b / blocksX);
+                const base = colors[Math.floor(Math.random() * colors.length)];
+
+                for (let ly = 0; ly < block; ly++) {
+                    for (let lx = 0; lx < block; lx++) {
+                        const x = bx * block + lx;
+                        const y = by * block + ly;
+                        const i = (y * size + x) * 4;
+
+                        const s = Math.min(1, base.s * (1 + Math.random() * 0.5));
+                        const l = Math.min(1, Math.max(0, base.l * Math.random() * 1.5));
+                        const rgb = hslToRgb(base.h, s, l);
+
+                        data[i] = Math.round(rgb.r * 255);
+                        data[i+1] = Math.round(rgb.g * 255);
+                        data[i+2] = Math.round(rgb.b * 255);
+                        data[i+3] = 255;
+                    }
+                }
+            }
+        });
+
+        return new ImageData(data, size, size);
+    }
+
+    // Color conversion helpers
+    function rgbToHsl(r, g, b) {
+        const max = Math.max(r, g, b), min = Math.min(r, g, b);
+        const l = (max + min) / 2;
+        if (max === min) return { h: 0, s: 0, l };
+        const d = max - min;
+        const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        let h;
+        if (max === r) h = (g - b) / d + (g < b ? 6 : 0);
+        else if (max === g) h = (b - r) / d + 2;
+        else h = (r - g) / d + 4;
+        return { h: h / 6, s, l };
+    }
+
+    function hslToRgb(h, s, l) {
+        if (s === 0) return { r: l, g: l, b: l };
+        const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+        const p = 2 * l - q;
+        const hue2rgb = (p, q, t) => {
+            if (t < 0) t += 1;
+            if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        };
+        return { r: hue2rgb(p, q, h + 1/3), g: hue2rgb(p, q, h), b: hue2rgb(p, q, h - 1/3) };
+    }
+
+    // ============================================
+    // Apply Effect
+    // ============================================
+    async function applyEffect() {
+        if (state.isProcessing || (!state.originalImageData && state.effect !== 'gradient')) return;
+
+        state.isProcessing = true;
+        document.body.classList.add('processing');
+        applyBtn.disabled = true;
+        progressContainer.classList.add('visible');
+        updateProgress(0);
+
+        const startTime = performance.now();
+        let result;
+        let usedGPU = false;
+
+        try {
+            const effectConfig = effects[state.category].find(e => e.id === state.effect);
+
+            // Try GPU first if available
+            if (gpu.available && effectConfig?.gpu) {
+                usedGPU = true;
+                switch (state.effect) {
+                    case 'invert':
+                        result = gpu.invert(state.originalImageData);
+                        break;
+                    case 'boost':
+                        result = gpu.boost(state.originalImageData,
+                            (state.settings.boostRed ?? 40) / 100,
+                            (state.settings.boostGreen ?? 30) / 100,
+                            (state.settings.boostBlue ?? 20) / 100);
+                        break;
+                    case 'gaussianBlur':
+                        result = gpu.blur(state.originalImageData, state.settings.radius || 8);
+                        break;
+                    case 'localShuffle':
+                        result = gpu.localShuffle(state.originalImageData, (state.settings.spread || 25) / 100);
+                        break;
+                    case 'gradient':
+                        const size = state.settings.outputSize || 512;
+                        result = gpu.gradient(size, size);
+                        if (!state.originalImageData) {
+                            state.originalImageData = new ImageData(new Uint8ClampedArray(result.data), size, size);
+                            placeholder.style.display = 'none';
+                            canvas.style.display = 'block';
+                        }
+                        break;
+                }
+            }
+
+            // Fall back to CPU
+            if (!result) {
+                usedGPU = false;
+                switch (state.effect) {
+                    case 'globalShuffle': result = await globalShuffle(); break;
+                    case 'binedShuffle': result = await binedShuffle(); break;
+                    case 'localShuffle': result = await localShuffleCPU(); break;
+                    case 'binedColorShuffle': result = await binedColorShuffle(); break;
+                    case 'invert': result = await invertCPU(); break;
+                    case 'boost': result = await boostCPU(); break;
+                    case 'gaussianBlur': result = await blurCPU(); break;
+                    case 'gradient': result = await gradientCPU(); break;
+                }
+            }
+
+            const elapsed = performance.now() - startTime;
+            perfStats.textContent = `${usedGPU ? 'GPU' : 'CPU'} · ${elapsed.toFixed(1)}ms`;
+
+            state.processedImageData = result;
+            displayImage(result);
+            downloadBtn.disabled = false;
+            compareToggle.style.display = 'flex';
+            compareSwitch.checked = true;
+            $('originalLabel').classList.remove('active');
+            $('processedLabel').classList.add('active');
+
+        } catch (err) {
+            console.error(err);
+            perfStats.textContent = 'Error processing';
+        }
+
+        updateProgress(100);
+        setTimeout(() => {
+            progressContainer.classList.remove('visible');
+            state.isProcessing = false;
+            document.body.classList.remove('processing');
+            applyBtn.disabled = false;
+        }, 300);
+    }
+
+    // CPU fallbacks for non-GPU effects
+    async function localShuffleCPU() {
+        const spread = (state.settings.spread || 25) / 100;
+        const { width, height, data } = state.originalImageData;
+        const maxSpread = Math.max(width, height) * spread / 4;
+        const output = new Uint8ClampedArray(data);
+
+        await processChunked(width * height, 20000, (start, end) => {
+            for (let i = start; i < end; i++) {
+                const x = i % width, y = Math.floor(i / width);
+                const u1 = Math.random(), u2 = Math.random();
+                const n = Math.sqrt(-2 * Math.log(Math.max(0.0001, u1))) * Math.cos(2 * Math.PI * u2);
+                const ox = Math.round(n * maxSpread), oy = Math.round(n * maxSpread);
+                const nx = Math.max(0, Math.min(width - 1, x + ox));
+                const ny = Math.max(0, Math.min(height - 1, y + oy));
+                const ni = ny * width + nx;
+                for (let c = 0; c < 4; c++) {
+                    const t = output[i * 4 + c];
+                    output[i * 4 + c] = output[ni * 4 + c];
+                    output[ni * 4 + c] = t;
+                }
+            }
+        });
+        return new ImageData(output, width, height);
+    }
+
+    async function invertCPU() {
+        const { width, height, data } = state.originalImageData;
+        const output = new Uint8ClampedArray(data.length);
+        for (let i = 0; i < data.length; i += 4) {
+            output[i] = 255 - data[i];
+            output[i+1] = 255 - data[i+1];
+            output[i+2] = 255 - data[i+2];
+            output[i+3] = data[i+3];
+        }
+        return new ImageData(output, width, height);
+    }
+
+    async function boostCPU() {
+        const { width, height, data } = state.originalImageData;
+        const br = (state.settings.boostRed ?? 40) / 100;
+        const bg = (state.settings.boostGreen ?? 30) / 100;
+        const bb = (state.settings.boostBlue ?? 20) / 100;
+        const output = new Uint8ClampedArray(data.length);
+
+        let sr = 0, sg = 0, sb = 0;
+        const n = width * height;
+        for (let i = 0; i < data.length; i += 4) { sr += data[i]; sg += data[i+1]; sb += data[i+2]; }
+        const mr = sr / n, mg = sg / n, mb = sb / n;
+
+        let vr = 0, vg = 0, vb = 0;
+        for (let i = 0; i < data.length; i += 4) {
+            vr += (data[i] - mr) ** 2;
+            vg += (data[i+1] - mg) ** 2;
+            vb += (data[i+2] - mb) ** 2;
+        }
+        const dr = Math.sqrt(vr / n) || 1, dg = Math.sqrt(vg / n) || 1, db = Math.sqrt(vb / n) || 1;
+
+        for (let i = 0; i < data.length; i += 4) {
+            const r = (data[i] - mr) / dr * br;
+            const g = (data[i+1] - mg) / dg * bg;
+            const b = (data[i+2] - mb) / db * bb;
+            output[i] = Math.round((Math.tanh(r * 4) + 1) / 2 * 255);
+            output[i+1] = Math.round((Math.tanh(g * 4) + 1) / 2 * 255);
+            output[i+2] = Math.round((Math.tanh(b * 4) + 1) / 2 * 255);
+            output[i+3] = data[i+3];
+        }
+        return new ImageData(output, width, height);
+    }
+
+    async function blurCPU() {
+        const radius = state.settings.radius || 8;
+        const { width, height, data } = state.originalImageData;
+        const kernel = [];
+        const sigma = radius / 3;
+        let sum = 0;
+        for (let i = -radius; i <= radius; i++) {
+            const v = Math.exp(-i * i / (2 * sigma * sigma));
+            kernel.push(v);
+            sum += v;
+        }
+        for (let i = 0; i < kernel.length; i++) kernel[i] /= sum;
+
+        const temp = new Uint8ClampedArray(data.length);
+        const output = new Uint8ClampedArray(data.length);
+
+        // Horizontal
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r = 0, g = 0, b = 0, a = 0;
+                for (let k = -radius; k <= radius; k++) {
+                    const px = Math.min(width - 1, Math.max(0, x + k));
+                    const idx = (y * width + px) * 4;
+                    const w = kernel[k + radius];
+                    r += data[idx] * w; g += data[idx+1] * w; b += data[idx+2] * w; a += data[idx+3] * w;
+                }
+                const idx = (y * width + x) * 4;
+                temp[idx] = r; temp[idx+1] = g; temp[idx+2] = b; temp[idx+3] = a;
+            }
+            if (y % 20 === 0) { updateProgress(y / height * 50); await new Promise(r => setTimeout(r, 0)); }
+        }
+
+        // Vertical
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                let r = 0, g = 0, b = 0, a = 0;
+                for (let k = -radius; k <= radius; k++) {
+                    const py = Math.min(height - 1, Math.max(0, y + k));
+                    const idx = (py * width + x) * 4;
+                    const w = kernel[k + radius];
+                    r += temp[idx] * w; g += temp[idx+1] * w; b += temp[idx+2] * w; a += temp[idx+3] * w;
+                }
+                const idx = (y * width + x) * 4;
+                output[idx] = r; output[idx+1] = g; output[idx+2] = b; output[idx+3] = a;
+            }
+            if (y % 20 === 0) { updateProgress(50 + y / height * 50); await new Promise(r => setTimeout(r, 0)); }
+        }
+
+        return new ImageData(output, width, height);
+    }
+
+    async function gradientCPU() {
+        const size = state.settings.outputSize || 512;
+        const data = new Uint8ClampedArray(size * size * 4);
+        const tl = { r: Math.random(), g: Math.random(), b: Math.random() };
+        const tr = { r: Math.random(), g: Math.random(), b: Math.random() };
+        const bl = { r: Math.random(), g: Math.random(), b: Math.random() };
+        const br = { r: Math.random(), g: Math.random(), b: Math.random() };
+
+        for (let y = 0; y < size; y++) {
+            const fy = y / (size - 1);
+            for (let x = 0; x < size; x++) {
+                const fx = x / (size - 1);
+                const top = { r: tl.r * (1-fx) + tr.r * fx, g: tl.g * (1-fx) + tr.g * fx, b: tl.b * (1-fx) + tr.b * fx };
+                const bot = { r: bl.r * (1-fx) + br.r * fx, g: bl.g * (1-fx) + br.g * fx, b: bl.b * (1-fx) + br.b * fx };
+                const i = (y * size + x) * 4;
+                data[i] = Math.round((top.r * (1-fy) + bot.r * fy) * 255);
+                data[i+1] = Math.round((top.g * (1-fy) + bot.g * fy) * 255);
+                data[i+2] = Math.round((top.b * (1-fy) + bot.b * fy) * 255);
+                data[i+3] = 255;
+            }
+        }
+
+        if (!state.originalImageData) {
+            state.originalImageData = new ImageData(new Uint8ClampedArray(data), size, size);
+            placeholder.style.display = 'none';
+            canvas.style.display = 'block';
+        }
+
+        return new ImageData(data, size, size);
+    }
+
+    // ============================================
+    // Event Listeners
+    // ============================================
+    $('uploadBtn').onclick = () => fileInput.click();
+    fileInput.onchange = e => e.target.files[0] && loadImage(e.target.files[0]);
+
+    $('canvasContainer').ondragover = e => { e.preventDefault(); $('dropZone').classList.add('active'); };
+    $('canvasContainer').ondragleave = () => $('dropZone').classList.remove('active');
+    $('canvasContainer').ondrop = e => {
+        e.preventDefault();
+        $('dropZone').classList.remove('active');
+        const file = e.dataTransfer.files[0];
+        if (file?.type.startsWith('image/')) loadImage(file);
+    };
+
+    applyBtn.onclick = applyEffect;
+
+    downloadBtn.onclick = () => {
+        if (!state.processedImageData) return;
+        const link = document.createElement('a');
+        link.download = `madpixels-${state.effect}-${Date.now()}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
+
+    compareSwitch.onchange = () => {
+        const show = compareSwitch.checked;
+        $('originalLabel').classList.toggle('active', !show);
+        $('processedLabel').classList.toggle('active', show);
+        displayImage(show ? state.processedImageData : state.originalImageData);
+    };
+
+    // Init
+    renderCategories();
+    renderEffects();
+    renderSettings();
     </script>
 </body>
 </html>
