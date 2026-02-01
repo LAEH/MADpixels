@@ -23,7 +23,6 @@
             --accent-hover: #409cff;
             --green: #30d158;
             --radius: 12px;
-            --radius-sm: 8px;
             --radius-lg: 20px;
         }
 
@@ -37,7 +36,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Layout */
         .app {
             display: flex;
             flex-direction: column;
@@ -59,16 +57,9 @@
             -webkit-backdrop-filter: saturate(180%) blur(20px);
         }
 
-        .title {
-            font-size: 17px;
-            font-weight: 600;
-            letter-spacing: -0.4px;
-        }
+        .title { font-size: 17px; font-weight: 600; letter-spacing: -0.4px; }
 
-        .header-actions {
-            display: flex;
-            gap: 8px;
-        }
+        .header-actions { display: flex; gap: 8px; }
 
         .icon-btn {
             width: 36px;
@@ -89,7 +80,7 @@
         .icon-btn:disabled { opacity: 0.3; pointer-events: none; }
         .icon-btn svg { width: 18px; height: 18px; }
 
-        /* Main Content */
+        /* Main */
         main {
             flex: 1;
             display: flex;
@@ -101,7 +92,99 @@
             width: 100%;
         }
 
-        /* Canvas Area */
+        /* Gallery View (Initial) */
+        .gallery-view {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-top: 8px;
+        }
+
+        .gallery-header {
+            text-align: center;
+        }
+
+        .gallery-title {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+
+        .gallery-subtitle {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .gallery-item {
+            aspect-ratio: 1;
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .gallery-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+
+        .gallery-item:active { transform: scale(0.98); }
+
+        .gallery-item canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gallery-item-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 12px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .choose-photo-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            border: none;
+            border-radius: var(--radius);
+            background: var(--accent);
+            color: white;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .choose-photo-btn:hover { background: var(--accent-hover); }
+        .choose-photo-btn:active { transform: scale(0.98); }
+        .choose-photo-btn svg { width: 20px; height: 20px; }
+
+        /* Editor View */
+        .editor-view {
+            display: none;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .editor-view.active { display: flex; }
+        .gallery-view.hidden { display: none; }
+
         .canvas-area {
             aspect-ratio: 1;
             max-height: 50vh;
@@ -112,6 +195,7 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .canvas-area canvas {
@@ -120,25 +204,24 @@
             border-radius: var(--radius);
         }
 
-        .placeholder {
-            text-align: center;
-            padding: 40px 20px;
+        .canvas-hint {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 6px 12px;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 100px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .placeholder-icon {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 16px;
-            background: var(--card-elevated);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .placeholder-icon svg { width: 28px; height: 28px; color: var(--text-secondary); }
-        .placeholder-title { font-size: 17px; font-weight: 600; margin-bottom: 6px; }
-        .placeholder-subtitle { font-size: 13px; color: var(--text-secondary); }
+        .canvas-area:hover .canvas-hint { opacity: 1; }
 
         .drop-zone {
             position: absolute;
@@ -156,7 +239,7 @@
 
         .drop-zone.active { display: flex; }
 
-        /* Compare Bar */
+        /* Compare */
         .compare-bar {
             display: none;
             align-items: center;
@@ -195,7 +278,7 @@
 
         .toggle.on .toggle-knob { transform: translateX(20px); }
 
-        /* Controls Card */
+        /* Controls */
         .controls {
             background: var(--card);
             border-radius: var(--radius-lg);
@@ -218,7 +301,6 @@
             margin-bottom: 12px;
         }
 
-        /* Effect Pills */
         .effects-row {
             display: flex;
             gap: 8px;
@@ -241,7 +323,6 @@
         .effect-pill:active { transform: scale(0.96); }
         .effect-pill.active { background: var(--accent); color: white; }
 
-        /* Settings */
         .setting-item {
             display: flex;
             align-items: center;
@@ -249,10 +330,7 @@
             padding: 6px 0;
         }
 
-        .setting-label {
-            font-size: 15px;
-            color: var(--text);
-        }
+        .setting-label { font-size: 15px; color: var(--text); }
 
         .setting-control {
             display: flex;
@@ -287,7 +365,6 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.2);
         }
 
-        /* Apply Button */
         .apply-btn {
             width: 100%;
             padding: 16px;
@@ -305,7 +382,6 @@
         .apply-btn:active { transform: scale(0.98); }
         .apply-btn:disabled { background: var(--card-elevated); color: var(--text-tertiary); }
 
-        /* Progress */
         .progress-section {
             display: none;
             padding: 16px 20px;
@@ -330,10 +406,7 @@
             border-radius: 2px;
         }
 
-        .progress-text {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
+        .progress-text { font-size: 13px; color: var(--text-secondary); }
 
         .perf-badge {
             display: inline-flex;
@@ -349,18 +422,23 @@
 
         .perf-badge.gpu { color: var(--green); }
 
-        /* Hidden */
         .hidden { display: none !important; }
 
-        /* Desktop */
         @media (min-width: 768px) {
             main { max-width: 480px; padding-top: 20px; }
             .canvas-area { max-height: 400px; }
+            .gallery-grid { gap: 16px; }
         }
 
-        /* Animations */
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         .processing .apply-btn { animation: pulse 1.5s ease infinite; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .gallery-item { animation: fadeIn 0.4s ease backwards; }
+        .gallery-item:nth-child(1) { animation-delay: 0.05s; }
+        .gallery-item:nth-child(2) { animation-delay: 0.1s; }
+        .gallery-item:nth-child(3) { animation-delay: 0.15s; }
+        .gallery-item:nth-child(4) { animation-delay: 0.2s; }
     </style>
 </head>
 <body>
@@ -368,12 +446,7 @@
         <header>
             <span class="title">MADpixels</span>
             <div class="header-actions">
-                <button class="icon-btn" id="uploadBtn" title="Choose Photo">
-                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                    </svg>
-                </button>
-                <button class="icon-btn" id="downloadBtn" disabled title="Save Image">
+                <button class="icon-btn" id="downloadBtn" disabled title="Save">
                     <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                     </svg>
@@ -382,50 +455,64 @@
         </header>
 
         <main>
-            <div class="canvas-area" id="canvasArea">
-                <canvas id="canvas" class="hidden"></canvas>
-                <canvas id="glCanvas" class="hidden"></canvas>
-                <div class="placeholder" id="placeholder">
-                    <div class="placeholder-icon">
-                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                        </svg>
-                    </div>
-                    <div class="placeholder-title">No Photo Selected</div>
-                    <div class="placeholder-subtitle">Tap the photo icon to choose an image</div>
+            <!-- Gallery View (Initial) -->
+            <div class="gallery-view" id="galleryView">
+                <div class="gallery-header">
+                    <div class="gallery-title">MADpixels</div>
+                    <div class="gallery-subtitle">Tap a style or choose your own photo</div>
                 </div>
-                <div class="drop-zone" id="dropZone">Drop to upload</div>
+
+                <div class="gallery-grid" id="galleryGrid">
+                    <!-- Generated dynamically -->
+                </div>
+
+                <button class="choose-photo-btn" id="choosePhotoBtn">
+                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                    Choose Photo
+                </button>
             </div>
 
-            <div class="compare-bar" id="compareBar">
-                <span class="compare-label" id="labelOriginal">Original</span>
-                <div class="toggle on" id="toggle">
-                    <div class="toggle-knob"></div>
-                </div>
-                <span class="compare-label active" id="labelProcessed">Edited</span>
-            </div>
-
-            <div class="controls">
-                <div class="section">
-                    <div class="section-title">Effect</div>
-                    <div class="effects-row" id="effectsRow"></div>
+            <!-- Editor View -->
+            <div class="editor-view" id="editorView">
+                <div class="canvas-area" id="canvasArea">
+                    <canvas id="canvas"></canvas>
+                    <canvas id="glCanvas" class="hidden"></canvas>
+                    <div class="canvas-hint">Tap to change photo</div>
+                    <div class="drop-zone" id="dropZone">Drop to upload</div>
                 </div>
 
-                <div class="section" id="settingsSection">
-                    <div class="section-title">Adjust</div>
-                    <div id="settingsContainer"></div>
-                </div>
-
-                <div class="progress-section" id="progressSection">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progressFill"></div>
+                <div class="compare-bar" id="compareBar">
+                    <span class="compare-label" id="labelOriginal">Original</span>
+                    <div class="toggle on" id="toggle">
+                        <div class="toggle-knob"></div>
                     </div>
-                    <div class="progress-text" id="progressText">Processing...</div>
-                    <div class="perf-badge" id="perfBadge"></div>
+                    <span class="compare-label active" id="labelProcessed">Edited</span>
                 </div>
 
-                <div class="section">
-                    <button class="apply-btn" id="applyBtn" disabled>Apply</button>
+                <div class="controls">
+                    <div class="section">
+                        <div class="section-title">Effect</div>
+                        <div class="effects-row" id="effectsRow"></div>
+                    </div>
+
+                    <div class="section" id="settingsSection">
+                        <div class="section-title">Adjust</div>
+                        <div id="settingsContainer"></div>
+                    </div>
+
+                    <div class="progress-section" id="progressSection">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Processing...</div>
+                        <div class="perf-badge" id="perfBadge"></div>
+                    </div>
+
+                    <div class="section">
+                        <button class="apply-btn" id="applyBtn">Apply</button>
+                    </div>
                 </div>
             </div>
         </main>
@@ -500,26 +587,30 @@ class WebGLProcessor {
         return new ImageData(flip, w, h);
     }
 
+    gradient(w, h, colors) {
+        this.render(this.programs.gradient, w, h, (gl, p) => {
+            gl.uniform4f(gl.getUniformLocation(p, 'u_tl'), colors.tl[0], colors.tl[1], colors.tl[2], 1);
+            gl.uniform4f(gl.getUniformLocation(p, 'u_tr'), colors.tr[0], colors.tr[1], colors.tr[2], 1);
+            gl.uniform4f(gl.getUniformLocation(p, 'u_bl'), colors.bl[0], colors.bl[1], colors.bl[2], 1);
+            gl.uniform4f(gl.getUniformLocation(p, 'u_br'), colors.br[0], colors.br[1], colors.br[2], 1);
+        });
+        return this.getImageData();
+    }
+
     invert(img) { const t = this.createTexture(img); this.render(this.programs.invert, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); }); this.gl.deleteTexture(t); return this.getImageData(); }
-
     boost(img, r, g, b) { const t = this.createTexture(img); this.render(this.programs.boost, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); gl.uniform3f(gl.getUniformLocation(p, 'u_boost'), r, g, b); }); this.gl.deleteTexture(t); return this.getImageData(); }
-
     blur(img, rad) { const gl = this.gl; let t = this.createTexture(img); this.render(this.programs.blur, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); gl.uniform2f(gl.getUniformLocation(p, 'u_res'), img.width, img.height); gl.uniform1f(gl.getUniformLocation(p, 'u_rad'), rad); gl.uniform2f(gl.getUniformLocation(p, 'u_dir'), 1, 0); }); const mid = this.getImageData(); gl.deleteTexture(t); t = this.createTexture(mid); this.render(this.programs.blur, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); gl.uniform2f(gl.getUniformLocation(p, 'u_res'), img.width, img.height); gl.uniform1f(gl.getUniformLocation(p, 'u_rad'), rad); gl.uniform2f(gl.getUniformLocation(p, 'u_dir'), 0, 1); }); gl.deleteTexture(t); return this.getImageData(); }
-
     localShuffle(img, spread) { const t = this.createTexture(img); this.render(this.programs.localShuffle, img.width, img.height, (gl, p) => { gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, t); gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0); gl.uniform2f(gl.getUniformLocation(p, 'u_res'), img.width, img.height); gl.uniform1f(gl.getUniformLocation(p, 'u_spread'), spread); gl.uniform1f(gl.getUniformLocation(p, 'u_seed'), Math.random() * 1000); }); this.gl.deleteTexture(t); return this.getImageData(); }
-
-    gradient(w, h) { this.render(this.programs.gradient, w, h, (gl, p) => { gl.uniform4f(gl.getUniformLocation(p, 'u_tl'), Math.random(), Math.random(), Math.random(), 1); gl.uniform4f(gl.getUniformLocation(p, 'u_tr'), Math.random(), Math.random(), Math.random(), 1); gl.uniform4f(gl.getUniformLocation(p, 'u_bl'), Math.random(), Math.random(), Math.random(), 1); gl.uniform4f(gl.getUniformLocation(p, 'u_br'), Math.random(), Math.random(), Math.random(), 1); }); return this.getImageData(); }
 }
 
-// App
+// App State
 const effects = [
+    { id: 'localShuffle', name: 'Disperse', gpu: true },
     { id: 'globalShuffle', name: 'Shuffle', gpu: false },
     { id: 'binedShuffle', name: 'Blocks', gpu: false },
-    { id: 'localShuffle', name: 'Disperse', gpu: true },
     { id: 'invert', name: 'Invert', gpu: true },
     { id: 'boost', name: 'Boost', gpu: true },
-    { id: 'gaussianBlur', name: 'Blur', gpu: true },
-    { id: 'gradient', name: 'Gradient', gpu: true }
+    { id: 'gaussianBlur', name: 'Blur', gpu: true }
 ];
 
 const settingsConfig = {
@@ -528,15 +619,68 @@ const settingsConfig = {
     localShuffle: [{ id: 'spread', name: 'Intensity', min: 0, max: 100, default: 25, step: 5 }],
     boost: [{ id: 'red', name: 'Warmth', min: 0, max: 100, default: 40, step: 5 }, { id: 'green', name: 'Tint', min: 0, max: 100, default: 30, step: 5 }, { id: 'blue', name: 'Cool', min: 0, max: 100, default: 20, step: 5 }],
     gaussianBlur: [{ id: 'radius', name: 'Amount', min: 1, max: 30, default: 8, step: 1 }],
-    gradient: [{ id: 'size', name: 'Size', min: 256, max: 1024, default: 512, step: 128 }],
     invert: []
 };
+
+// Gallery presets - beautiful gradients
+const presets = [
+    { name: 'Sunset', colors: { tl: [1, 0.4, 0.2], tr: [1, 0.6, 0.3], bl: [0.6, 0.2, 0.4], br: [0.8, 0.3, 0.5] } },
+    { name: 'Ocean', colors: { tl: [0.1, 0.4, 0.6], tr: [0.2, 0.5, 0.7], bl: [0.05, 0.2, 0.4], br: [0.1, 0.3, 0.5] } },
+    { name: 'Aurora', colors: { tl: [0.2, 0.8, 0.6], tr: [0.4, 0.6, 0.9], bl: [0.1, 0.3, 0.4], br: [0.2, 0.4, 0.6] } },
+    { name: 'Dusk', colors: { tl: [0.3, 0.2, 0.5], tr: [0.5, 0.3, 0.6], bl: [0.1, 0.1, 0.2], br: [0.2, 0.15, 0.3] } }
+];
 
 let state = { effect: 'localShuffle', settings: {}, original: null, processed: null, processing: false };
 
 const $ = id => document.getElementById(id);
 const canvas = $('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
 const gpu = new WebGLProcessor();
+
+// Generate gallery previews
+function generateGallery() {
+    const grid = $('galleryGrid');
+    grid.innerHTML = '';
+
+    presets.forEach((preset, i) => {
+        const item = document.createElement('div');
+        item.className = 'gallery-item';
+
+        const c = document.createElement('canvas');
+        c.width = 200; c.height = 200;
+        const imgData = gpu.gradient(200, 200, preset.colors);
+        c.getContext('2d').putImageData(imgData, 0, 0);
+
+        const label = document.createElement('div');
+        label.className = 'gallery-item-label';
+        label.textContent = preset.name;
+
+        item.appendChild(c);
+        item.appendChild(label);
+
+        item.onclick = () => {
+            // Use this gradient as starting image
+            const fullImg = gpu.gradient(512, 512, preset.colors);
+            state.original = fullImg;
+            state.processed = null;
+            showEditor();
+        };
+
+        grid.appendChild(item);
+    });
+}
+
+function showEditor() {
+    $('galleryView').classList.add('hidden');
+    $('editorView').classList.add('active');
+    display(state.original);
+    $('compareBar').classList.remove('visible');
+    $('downloadBtn').disabled = true;
+}
+
+function showGallery() {
+    $('galleryView').classList.remove('hidden');
+    $('editorView').classList.remove('active');
+}
 
 function renderEffects() {
     $('effectsRow').innerHTML = effects.map(e =>
@@ -571,20 +715,23 @@ function loadImage(file) {
             ctx.drawImage(img, 0, 0);
             state.original = ctx.getImageData(0, 0, canvas.width, canvas.height);
             state.processed = null;
-            $('placeholder').classList.add('hidden');
-            canvas.classList.remove('hidden');
-            $('applyBtn').disabled = false;
-            $('downloadBtn').disabled = true;
-            $('compareBar').classList.remove('visible');
+            showEditor();
         };
         img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
 
-function display(data) { if (!data) return; canvas.width = data.width; canvas.height = data.height; ctx.putImageData(data, 0, 0); }
+function display(data) {
+    if (!data) return;
+    canvas.width = data.width; canvas.height = data.height;
+    ctx.putImageData(data, 0, 0);
+}
 
-function updateProgress(pct) { $('progressFill').style.width = pct + '%'; $('progressText').textContent = pct < 100 ? 'Processing...' : 'Done'; }
+function updateProgress(pct) {
+    $('progressFill').style.width = pct + '%';
+    $('progressText').textContent = pct < 100 ? 'Processing...' : 'Done';
+}
 
 function resize(img, w, h) {
     const c1 = document.createElement('canvas'); c1.width = img.width; c1.height = img.height; c1.getContext('2d').putImageData(img, 0, 0);
@@ -604,7 +751,6 @@ async function chunk(total, size, fn) {
     });
 }
 
-// CPU Effects
 async function globalShuffle() {
     const s = state.settings.size || 512, img = resize(state.original, s, s), d = new Uint8ClampedArray(img.data), n = s * s;
     const idx = new Uint32Array(n); for (let i = 0; i < n; i++) idx[i] = i;
@@ -631,7 +777,7 @@ async function binedShuffle() {
 }
 
 async function applyEffect() {
-    if (state.processing || (!state.original && state.effect !== 'gradient')) return;
+    if (state.processing || !state.original) return;
     state.processing = true;
     document.body.classList.add('processing');
     $('applyBtn').disabled = true;
@@ -649,11 +795,6 @@ async function applyEffect() {
             else if (state.effect === 'boost') result = gpu.boost(state.original, (state.settings.red ?? 40) / 100, (state.settings.green ?? 30) / 100, (state.settings.blue ?? 20) / 100);
             else if (state.effect === 'gaussianBlur') result = gpu.blur(state.original, state.settings.radius || 8);
             else if (state.effect === 'localShuffle') result = gpu.localShuffle(state.original, (state.settings.spread || 25) / 100);
-            else if (state.effect === 'gradient') {
-                const sz = state.settings.size || 512;
-                result = gpu.gradient(sz, sz);
-                if (!state.original) { state.original = new ImageData(new Uint8ClampedArray(result.data), sz, sz); $('placeholder').classList.add('hidden'); canvas.classList.remove('hidden'); }
-            }
         }
         if (!result) {
             usedGPU = false;
@@ -684,7 +825,8 @@ async function applyEffect() {
 }
 
 // Events
-$('uploadBtn').onclick = () => $('fileInput').click();
+$('choosePhotoBtn').onclick = () => $('fileInput').click();
+$('canvasArea').onclick = () => $('fileInput').click();
 $('fileInput').onchange = e => e.target.files[0] && loadImage(e.target.files[0]);
 
 $('canvasArea').ondragover = e => { e.preventDefault(); $('dropZone').classList.add('active'); };
@@ -701,6 +843,8 @@ $('toggle').onclick = () => {
     display(on ? state.processed : state.original);
 };
 
+// Init
+generateGallery();
 renderEffects();
 renderSettings();
 </script>
