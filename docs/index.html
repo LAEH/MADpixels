@@ -9,10 +9,15 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Archivo+Black&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { height: 100%; overflow: hidden; }
+        html, body {
+            height: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            overscroll-behavior: none;
+        }
 
         body {
             font-family: 'Space Grotesk', -apple-system, sans-serif;
@@ -36,10 +41,23 @@
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: 700;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 18px;
             letter-spacing: -1px;
-            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .logo-box {
+            border: 3px solid #000;
+            padding: 4px 6px;
+            line-height: 1;
+        }
+
+        .logo-emoji {
+            font-size: 22px;
+            margin-left: 6px;
         }
 
         .mode-toggle {
@@ -150,12 +168,20 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 8px 32px rgba(0,0,0,0.12);
+            max-width: calc(100% - 32px);
+            max-height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .canvas-container canvas {
             display: block;
             max-width: 100%;
             max-height: 100%;
+            width: auto;
+            height: auto;
+            object-fit: contain;
         }
 
         .controls {
@@ -288,6 +314,28 @@
             border: 2px solid #000;
         }
 
+        .effect-select {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 4px;
+        }
+
+        .effect-btn {
+            flex: 1;
+            padding: 12px 8px;
+            border: 3px solid #e0e0e0;
+            background: #fff;
+            font-size: 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .effect-btn.active {
+            border-color: #000;
+            background: #000;
+            transform: scale(1.05);
+        }
+
         .hidden { display: none !important; }
 
         .welcome {
@@ -304,10 +352,22 @@
         }
 
         .welcome-title {
-            font-size: 48px;
-            font-weight: 700;
-            letter-spacing: -2px;
-            text-transform: uppercase;
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 28px;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .welcome-title .logo-box {
+            border: 4px solid #000;
+            padding: 8px 12px;
+        }
+
+        .welcome-title .logo-emoji {
+            font-size: 36px;
+            margin-left: 8px;
         }
 
         .welcome-sub {
@@ -348,10 +408,10 @@
 <body>
     <div class="app">
         <header>
-            <span class="logo">MADpixels</span>
+            <span class="logo"><span class="logo-box">MAD</span><span class="logo-box">pixels</span><span class="logo-emoji">🧩</span></span>
             <div class="mode-toggle">
-                <button class="mode-btn active" id="gameModeBtn">Game</button>
-                <button class="mode-btn" id="editModeBtn">Edit</button>
+                <button class="mode-btn active" id="gameModeBtn">🎮 Game</button>
+                <button class="mode-btn" id="editModeBtn">✨ Edit</button>
             </div>
             <div class="header-right">
                 <div>
@@ -381,6 +441,12 @@
         </div>
 
         <div class="controls edit-controls hidden" id="editControls">
+            <div class="effect-select">
+                <button class="effect-btn" data-effect="none">📷</button>
+                <button class="effect-btn" data-effect="disperse">💥</button>
+                <button class="effect-btn" data-effect="shuffle">🔀</button>
+                <button class="effect-btn active" data-effect="both">🌀</button>
+            </div>
             <div class="slider-row">
                 <div class="slider-header">
                     <span class="slider-label">Block Size</span>
@@ -390,14 +456,14 @@
             </div>
             <div class="slider-row">
                 <div class="slider-header">
-                    <span class="slider-label">Dispersion</span>
+                    <span class="slider-label">Intensity</span>
                     <span class="slider-value" id="disperseValue">50</span>
                 </div>
                 <input type="range" id="disperseSlider" min="0" max="100" value="50" step="5">
             </div>
             <div class="btn-row">
-                <button class="action-btn outline" id="shuffleBtn">Shuffle</button>
-                <button class="action-btn" id="downloadBtn">Save</button>
+                <button class="action-btn outline" id="shuffleBtn">🎲 Randomize</button>
+                <button class="action-btn" id="downloadBtn">💾 Save</button>
             </div>
         </div>
     </div>
@@ -406,9 +472,9 @@
     <canvas id="glCanvas" class="gl"></canvas>
 
     <div class="welcome" id="welcome">
-        <div class="welcome-title">MADpixels</div>
-        <div class="welcome-sub">Select your photos. Find the missing pieces. Beat your streak.</div>
-        <button class="choose-btn" id="chooseBtn">Select Photos</button>
+        <div class="welcome-title"><span class="logo-box">MAD</span><span class="logo-box">pixels</span><span class="logo-emoji">🧩</span></div>
+        <div class="welcome-sub">Select your photos 📸<br>Find the missing pieces 🔍<br>Beat your streak 🔥</div>
+        <button class="choose-btn" id="chooseBtn">📱 Select Photos</button>
     </div>
 
 <script>
@@ -491,8 +557,8 @@ let currentImageIdx = 0;
 let puzzlesOnCurrentImage = 0;
 let originalImage = null;
 let originalImageData = null;
-let blocks = [];
-let shuffleOrder = [];
+let blocks = []; // dispersed blocks for grid
+let cleanBlocks = []; // original blocks for choices
 let missingGridPos = -1;
 let correctBlockIdx = -1;
 let correctChoiceIdx = -1;
@@ -505,6 +571,7 @@ let answered = false;
 let blockSize = 32;
 let dispersion = 50;
 let seed = Math.random() * 1000;
+let currentEffect = 'both'; // none, disperse, shuffle, both
 
 const GRID_SIZE = 5;
 const TOTAL_BLOCKS = GRID_SIZE * GRID_SIZE;
@@ -579,20 +646,29 @@ function nextImage() {
 
 function extractBlocks() {
     blocks = [];
+    cleanBlocks = [];
     const blkSize = originalImage.width / GRID_SIZE;
-    const dispersionAmount = 0.15; // pixel dispersion within blocks
+    const dispersionAmount = 0.2; // pixel dispersion within blocks
 
     for (let i = 0; i < TOTAL_BLOCKS; i++) {
         const x = (i % GRID_SIZE) * blkSize;
         const y = Math.floor(i / GRID_SIZE) * blkSize;
 
+        // Clean block for choices
+        const cleanCanvas = document.createElement('canvas');
+        cleanCanvas.width = blkSize;
+        cleanCanvas.height = blkSize;
+        const cleanCtx = cleanCanvas.getContext('2d');
+        cleanCtx.drawImage(originalImage, x, y, blkSize, blkSize, 0, 0, blkSize, blkSize);
+        cleanBlocks.push(cleanCanvas);
+
+        // Dispersed block for grid
         const blockCanvas = document.createElement('canvas');
         blockCanvas.width = blkSize;
         blockCanvas.height = blkSize;
         const blockCtx = blockCanvas.getContext('2d');
         blockCtx.drawImage(originalImage, x, y, blkSize, blkSize, 0, 0, blkSize, blkSize);
 
-        // Apply dispersion effect within each block
         if (gpu.available && dispersionAmount > 0) {
             const imgData = blockCtx.getImageData(0, 0, blkSize, blkSize);
             const dispersed = gpu.localShuffle(imgData, dispersionAmount, seed + i);
@@ -669,10 +745,11 @@ function renderChoices() {
     const container = $('choices');
     container.innerHTML = '';
 
+    // Show clean (non-dispersed) blocks as choices
     choices.forEach((blockIdx, i) => {
         const choice = document.createElement('div');
         choice.className = 'choice';
-        choice.style.backgroundImage = `url(${blocks[blockIdx].toDataURL()})`;
+        choice.style.backgroundImage = `url(${cleanBlocks[blockIdx].toDataURL()})`;
         choice.onclick = () => selectChoice(i);
         container.appendChild(choice);
     });
@@ -792,9 +869,19 @@ function binShuffle(imgData, blkSize, seedVal) {
 function applyEditEffect() {
     if (!originalImageData) return;
 
-    let result = binShuffle(originalImageData, blockSize, seed);
+    let result = new ImageData(
+        new Uint8ClampedArray(originalImageData.data),
+        originalImageData.width,
+        originalImageData.height
+    );
 
-    if (dispersion > 0 && gpu.available) {
+    // Apply shuffle effect (block rearrangement)
+    if (currentEffect === 'shuffle' || currentEffect === 'both') {
+        result = binShuffle(result, blockSize, seed);
+    }
+
+    // Apply disperse effect (pixel dispersion)
+    if ((currentEffect === 'disperse' || currentEffect === 'both') && dispersion > 0 && gpu.available) {
         result = gpu.localShuffle(result, dispersion / 100, seed);
     }
 
@@ -861,6 +948,16 @@ $('downloadBtn').onclick = () => {
     a.href = canvas.toDataURL('image/png');
     a.click();
 };
+
+// Effect selection buttons
+document.querySelectorAll('.effect-btn').forEach(btn => {
+    btn.onclick = () => {
+        document.querySelectorAll('.effect-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentEffect = btn.dataset.effect;
+        applyEditEffect();
+    };
+});
 
 window.addEventListener('resize', () => {
     if (originalImage && mode === 'game') renderGrid();
