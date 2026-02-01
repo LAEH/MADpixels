@@ -40,148 +40,135 @@
             letter-spacing: -0.5px;
         }
 
+        .score {
+            font-size: 16px;
+            font-weight: 700;
+            color: #666;
+        }
+
+        .header-btns {
+            display: flex;
+            gap: 8px;
+        }
+
         .icon-btn {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             border: 2px solid #000;
             background: #fff;
             color: #000;
-            border-radius: 24px;
+            border-radius: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
+            cursor: pointer;
         }
         .icon-btn:active { background: #000; color: #fff; }
-        .icon-btn:disabled { opacity: 0.2; }
-        .icon-btn svg { width: 22px; height: 22px; }
+        .icon-btn svg { width: 20px; height: 20px; }
 
-        .canvas-wrap {
+        .grid-wrap {
             flex: 1;
             min-height: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 16px;
-            position: relative;
-            cursor: pointer;
+            padding: 8px 16px;
         }
 
-        .canvas-wrap canvas {
-            max-width: 100%;
-            max-height: 100%;
-            display: block;
-            border-radius: 16px;
+        .grid-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
             box-shadow: 0 8px 32px rgba(0,0,0,0.12);
         }
 
-        .tap-hint {
-            position: absolute;
-            bottom: 24px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 8px 16px;
-            background: rgba(0,0,0,0.8);
-            color: #fff;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s;
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 1px;
+            background: #e0e0e0;
         }
-        .canvas-wrap:hover .tap-hint { opacity: 1; }
+
+        .grid-cell {
+            aspect-ratio: 1;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .grid-cell.missing {
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .grid-cell.missing::after {
+            content: '?';
+            font-size: 24px;
+            font-weight: 700;
+            color: #ccc;
+        }
+
+        .grid-cell.correct {
+            animation: flash-green 0.5s;
+        }
+
+        @keyframes flash-green {
+            0%, 100% { filter: none; }
+            50% { filter: brightness(1.5) saturate(0.5) sepia(1) hue-rotate(70deg); }
+        }
 
         .controls {
             flex-shrink: 0;
             padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
-        }
-
-        .slider-group {
-            display: flex;
-            flex-direction: column;
             gap: 16px;
         }
 
-        .slider-row {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .prompt {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            color: #666;
         }
 
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .choices {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
         }
 
-        .slider-label {
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #888;
+        .choice {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            border: 3px solid #e0e0e0;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+            transition: border-color 0.15s, transform 0.15s;
+        }
+        .choice:active { transform: scale(0.95); }
+        .choice.wrong {
+            border-color: #ff4444;
+            animation: shake 0.3s;
+        }
+        .choice.correct {
+            border-color: #44cc44;
         }
 
-        .slider-value {
-            font-size: 14px;
-            font-weight: 700;
-            color: #000;
-            min-width: 40px;
-            text-align: right;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
         }
 
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 48px;
-            background: transparent;
-            margin: 0;
-        }
-
-        input[type="range"]::-webkit-slider-runnable-track {
-            height: 8px;
-            background: #e0e0e0;
-            border-radius: 4px;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 32px;
-            height: 32px;
-            background: #000;
-            border-radius: 50%;
-            margin-top: -12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .btn-row {
+        .action-row {
             display: flex;
             gap: 12px;
         }
 
-        .reveal-btn {
-            flex: 1;
-            height: 56px;
-            border: 2px solid #000;
-            border-radius: 28px;
-            background: #fff;
-            color: #000;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 15px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .reveal-btn:active { background: #f0f0f0; }
-        .reveal-btn.active {
-            background: #000;
-            color: #fff;
-        }
-
-        .shuffle-btn {
+        .action-btn {
             flex: 1;
             height: 56px;
             border: none;
@@ -193,8 +180,14 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 1px;
+            cursor: pointer;
         }
-        .shuffle-btn:active { opacity: 0.85; }
+        .action-btn:active { opacity: 0.85; }
+        .action-btn.outline {
+            background: #fff;
+            color: #000;
+            border: 2px solid #000;
+        }
 
         .hidden { display: none !important; }
 
@@ -247,41 +240,27 @@
     <div class="app">
         <header>
             <span class="logo">MADpixels</span>
-            <button class="icon-btn" id="downloadBtn">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
-            </button>
+            <span class="score" id="score">0 / 0</span>
+            <div class="header-btns">
+                <button class="icon-btn" id="newPhotoBtn" title="New Photo">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    </svg>
+                </button>
+            </div>
         </header>
 
-        <div class="canvas-wrap" id="canvasArea">
-            <canvas id="canvas"></canvas>
-            <canvas id="glCanvas" class="hidden"></canvas>
-            <span class="tap-hint">Tap to change photo</span>
+        <div class="grid-wrap">
+            <div class="grid-container">
+                <div class="grid" id="grid"></div>
+            </div>
         </div>
 
         <div class="controls">
-            <div class="slider-group">
-                <div class="slider-row">
-                    <div class="slider-header">
-                        <span class="slider-label">Block Size</span>
-                        <span class="slider-value" id="blockValue">8</span>
-                    </div>
-                    <input type="range" id="blockSlider" min="2" max="64" value="8" step="2">
-                </div>
-
-                <div class="slider-row">
-                    <div class="slider-header">
-                        <span class="slider-label">Dispersion</span>
-                        <span class="slider-value" id="disperseValue">0</span>
-                    </div>
-                    <input type="range" id="disperseSlider" min="0" max="100" value="0" step="5">
-                </div>
-            </div>
-
-            <div class="btn-row">
-                <button class="reveal-btn" id="revealBtn">Reveal</button>
-                <button class="shuffle-btn" id="shuffleBtn">Shuffle</button>
+            <div class="prompt" id="prompt">Find the missing piece</div>
+            <div class="choices" id="choices"></div>
+            <div class="action-row">
+                <button class="action-btn" id="nextBtn">Next Puzzle</button>
             </div>
         </div>
     </div>
@@ -290,172 +269,32 @@
 
     <div class="welcome" id="welcome">
         <div class="welcome-title">MADpixels</div>
-        <div class="welcome-sub">Turn your photos into puzzles. Scramble, solve, share.</div>
+        <div class="welcome-sub">Find the missing piece. Test your eye for detail.</div>
         <button class="choose-btn" id="chooseBtn">Choose Photo</button>
     </div>
 
 <script>
-class WebGLProcessor {
-    constructor() {
-        this.canvas = document.getElementById('glCanvas');
-        this.gl = this.canvas.getContext('webgl2') || this.canvas.getContext('webgl');
-        this.programs = {};
-        this.available = !!this.gl;
-        if (this.available) this.init();
-    }
-
-    init() {
-        const gl = this.gl;
-        const vert = `attribute vec2 a_position;attribute vec2 a_texCoord;varying vec2 v_texCoord;void main(){gl_Position=vec4(a_position,0,1);v_texCoord=a_texCoord;}`;
-        const shaders = {
-            localShuffle: `precision highp float;varying vec2 v_texCoord;uniform sampler2D u_image;uniform vec2 u_res;uniform float u_spread;uniform float u_seed;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453+u_seed);}void main(){float m=max(u_res.x,u_res.y)*u_spread/4.0;float u1=max(0.0001,hash(v_texCoord*u_res));float u2=hash(v_texCoord*u_res+vec2(1.0,0.0));float r=sqrt(-2.0*log(u1));vec2 n=vec2(r*cos(6.28318*u2),r*sin(6.28318*u2))*m/u_res;gl_FragColor=texture2D(u_image,clamp(v_texCoord+n,0.0,1.0));}`
-        };
-        for (const [name, frag] of Object.entries(shaders)) {
-            const vs = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vs, vert); gl.compileShader(vs);
-            const fs = gl.createShader(gl.FRAGMENT_SHADER); gl.shaderSource(fs, frag); gl.compileShader(fs);
-            const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
-            this.programs[name] = prog;
-        }
-        this.posBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuf);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
-        this.texBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.texBuf);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0,1,1,1,0,0,0,0,1,1,1,0]), gl.STATIC_DRAW);
-    }
-
-    createTexture(img) {
-        const gl = this.gl, tex = gl.createTexture();
-        gl.bindTexture(gl.TEXTURE_2D, tex);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        return tex;
-    }
-
-    render(prog, w, h, setup) {
-        const gl = this.gl;
-        this.canvas.width = w; this.canvas.height = h;
-        gl.viewport(0, 0, w, h); gl.useProgram(prog);
-        const pLoc = gl.getAttribLocation(prog, 'a_position');
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuf); gl.enableVertexAttribArray(pLoc); gl.vertexAttribPointer(pLoc, 2, gl.FLOAT, false, 0, 0);
-        const tLoc = gl.getAttribLocation(prog, 'a_texCoord');
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.texBuf); gl.enableVertexAttribArray(tLoc); gl.vertexAttribPointer(tLoc, 2, gl.FLOAT, false, 0, 0);
-        setup(gl, prog); gl.drawArrays(gl.TRIANGLES, 0, 6);
-    }
-
-    getImageData() {
-        const gl = this.gl, w = this.canvas.width, h = this.canvas.height;
-        const px = new Uint8Array(w * h * 4);
-        gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
-        const flip = new Uint8ClampedArray(px.length);
-        for (let y = 0; y < h; y++) flip.set(px.subarray((h-1-y)*w*4, (h-y)*w*4), y*w*4);
-        return new ImageData(flip, w, h);
-    }
-
-    localShuffle(img, spread, seed) {
-        const t = this.createTexture(img);
-        this.render(this.programs.localShuffle, img.width, img.height, (gl, p) => {
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, t);
-            gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0);
-            gl.uniform2f(gl.getUniformLocation(p, 'u_res'), img.width, img.height);
-            gl.uniform1f(gl.getUniformLocation(p, 'u_spread'), spread);
-            gl.uniform1f(gl.getUniformLocation(p, 'u_seed'), seed);
-        });
-        this.gl.deleteTexture(t);
-        return this.getImageData();
-    }
-}
-
 // State
 let originalImage = null;
-let shuffledBlocks = null;
-let blockSize = 8;
-let dispersion = 0;
-let seed = Math.random() * 1000;
-let isRevealed = false;
+let blocks = []; // 64 block canvases
+let missingIndex = -1;
+let correctIndex = -1;
+let choices = []; // indices of blocks shown as choices
+let score = 0;
+let total = 0;
+let answered = false;
+
+const GRID_SIZE = 8;
+const TOTAL_BLOCKS = GRID_SIZE * GRID_SIZE;
 
 const $ = id => document.getElementById(id);
-const canvas = $('canvas');
-const ctx = canvas.getContext('2d', { willReadFrequently: true });
-const gpu = new WebGLProcessor();
-
-// Bin shuffle - scramble blocks
-function binShuffle(img, blockSize, seedVal) {
-    const w = img.width, h = img.height;
-    const data = new Uint8ClampedArray(img.data);
-    const out = new Uint8ClampedArray(data.length);
-
-    const bx = Math.floor(w / blockSize);
-    const by = Math.floor(h / blockSize);
-    const totalBlocks = bx * by;
-
-    // Create shuffled indices
-    const indices = [];
-    for (let i = 0; i < totalBlocks; i++) indices.push(i);
-
-    // Seeded shuffle
-    const rng = (s) => { s = Math.sin(s) * 10000; return s - Math.floor(s); };
-    let s = seedVal;
-    for (let i = indices.length - 1; i > 0; i--) {
-        s = rng(s + i);
-        const j = Math.floor(s * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-
-    // Copy blocks to shuffled positions
-    for (let i = 0; i < totalBlocks; i++) {
-        const srcIdx = indices[i];
-        const srcX = (srcIdx % bx) * blockSize;
-        const srcY = Math.floor(srcIdx / bx) * blockSize;
-        const dstX = (i % bx) * blockSize;
-        const dstY = Math.floor(i / bx) * blockSize;
-
-        for (let y = 0; y < blockSize; y++) {
-            for (let x = 0; x < blockSize; x++) {
-                const si = ((srcY + y) * w + srcX + x) * 4;
-                const di = ((dstY + y) * w + dstX + x) * 4;
-                out[di] = data[si];
-                out[di+1] = data[si+1];
-                out[di+2] = data[si+2];
-                out[di+3] = data[si+3];
-            }
-        }
-    }
-
-    return new ImageData(out, w, h);
-}
-
-// Apply current effect
-function applyEffect() {
-    if (!originalImage) return;
-
-    // First bin shuffle
-    let result = binShuffle(originalImage, blockSize, seed);
-
-    // Then apply dispersion if any
-    if (dispersion > 0 && gpu.available) {
-        result = gpu.localShuffle(result, dispersion / 100, seed);
-    }
-
-    shuffledBlocks = result;
-    display(result);
-}
-
-function display(data) {
-    if (!data) return;
-    canvas.width = data.width;
-    canvas.height = data.height;
-    ctx.putImageData(data, 0, 0);
-}
 
 function loadImage(file) {
     const reader = new FileReader();
     reader.onload = e => {
         const img = new Image();
         img.onload = () => {
-            // Resize to square for clean blocks
+            // Resize to 512x512 for clean 8x8 grid (64px per block)
             const size = 512;
             const c = document.createElement('canvas');
             c.width = size; c.height = size;
@@ -467,13 +306,13 @@ function loadImage(file) {
             const h = img.height * scale;
             cx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
 
-            originalImage = cx.getImageData(0, 0, size, size);
-            seed = Math.random() * 1000;
-            isRevealed = false;
-            $('revealBtn').classList.remove('active');
-            applyEffect();
+            originalImage = c;
+            extractBlocks();
+            score = 0;
+            total = 0;
+            updateScore();
+            newPuzzle();
 
-            // Hide welcome screen
             $('welcome').classList.add('hidden');
         };
         img.src = e.target.result;
@@ -481,47 +320,146 @@ function loadImage(file) {
     reader.readAsDataURL(file);
 }
 
-function newShuffle() {
-    seed = Math.random() * 1000;
-    isRevealed = false;
-    $('revealBtn').classList.remove('active');
-    applyEffect();
+function extractBlocks() {
+    blocks = [];
+    const blockSize = originalImage.width / GRID_SIZE;
+    const ctx = originalImage.getContext('2d');
+
+    for (let i = 0; i < TOTAL_BLOCKS; i++) {
+        const x = (i % GRID_SIZE) * blockSize;
+        const y = Math.floor(i / GRID_SIZE) * blockSize;
+
+        const blockCanvas = document.createElement('canvas');
+        blockCanvas.width = blockSize;
+        blockCanvas.height = blockSize;
+        const blockCtx = blockCanvas.getContext('2d');
+        blockCtx.drawImage(originalImage, x, y, blockSize, blockSize, 0, 0, blockSize, blockSize);
+
+        blocks.push(blockCanvas);
+    }
 }
 
-function toggleReveal() {
-    isRevealed = !isRevealed;
-    $('revealBtn').classList.toggle('active', isRevealed);
-    display(isRevealed ? originalImage : shuffledBlocks);
+function newPuzzle() {
+    answered = false;
+    $('prompt').textContent = 'Find the missing piece';
+    $('prompt').style.color = '#666';
+
+    // Pick random missing block
+    missingIndex = Math.floor(Math.random() * TOTAL_BLOCKS);
+
+    // Create choices: 1 correct + 3 wrong
+    const wrongChoices = [];
+    while (wrongChoices.length < 3) {
+        const idx = Math.floor(Math.random() * TOTAL_BLOCKS);
+        if (idx !== missingIndex && !wrongChoices.includes(idx)) {
+            wrongChoices.push(idx);
+        }
+    }
+
+    choices = [missingIndex, ...wrongChoices];
+    // Shuffle choices
+    for (let i = choices.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [choices[i], choices[j]] = [choices[j], choices[i]];
+    }
+    correctIndex = choices.indexOf(missingIndex);
+
+    renderGrid();
+    renderChoices();
+}
+
+function renderGrid() {
+    const grid = $('grid');
+    grid.innerHTML = '';
+
+    // Calculate cell size based on available space
+    const wrap = document.querySelector('.grid-wrap');
+    const maxSize = Math.min(wrap.clientWidth - 32, wrap.clientHeight - 16);
+    const cellSize = Math.floor(maxSize / GRID_SIZE);
+
+    grid.style.width = cellSize * GRID_SIZE + (GRID_SIZE - 1) + 'px';
+    grid.style.height = cellSize * GRID_SIZE + (GRID_SIZE - 1) + 'px';
+
+    for (let i = 0; i < TOTAL_BLOCKS; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'grid-cell';
+        cell.style.width = cellSize + 'px';
+        cell.style.height = cellSize + 'px';
+
+        if (i === missingIndex && !answered) {
+            cell.classList.add('missing');
+        } else {
+            cell.style.backgroundImage = `url(${blocks[i].toDataURL()})`;
+        }
+
+        grid.appendChild(cell);
+    }
+}
+
+function renderChoices() {
+    const container = $('choices');
+    container.innerHTML = '';
+
+    choices.forEach((blockIdx, i) => {
+        const choice = document.createElement('div');
+        choice.className = 'choice';
+        choice.style.backgroundImage = `url(${blocks[blockIdx].toDataURL()})`;
+
+        if (!answered) {
+            choice.onclick = () => selectChoice(i);
+        }
+
+        container.appendChild(choice);
+    });
+}
+
+function selectChoice(idx) {
+    if (answered) return;
+    answered = true;
+    total++;
+
+    const choiceEls = $('choices').children;
+    const gridCells = $('grid').children;
+
+    if (idx === correctIndex) {
+        // Correct!
+        score++;
+        choiceEls[idx].classList.add('correct');
+        gridCells[missingIndex].classList.remove('missing');
+        gridCells[missingIndex].style.backgroundImage = `url(${blocks[missingIndex].toDataURL()})`;
+        gridCells[missingIndex].classList.add('correct');
+        $('prompt').textContent = 'Correct!';
+        $('prompt').style.color = '#44cc44';
+    } else {
+        // Wrong
+        choiceEls[idx].classList.add('wrong');
+        choiceEls[correctIndex].classList.add('correct');
+        // Show the correct piece in grid
+        gridCells[missingIndex].classList.remove('missing');
+        gridCells[missingIndex].style.backgroundImage = `url(${blocks[missingIndex].toDataURL()})`;
+        $('prompt').textContent = 'Wrong! The correct piece is highlighted.';
+        $('prompt').style.color = '#ff4444';
+    }
+
+    updateScore();
+}
+
+function updateScore() {
+    $('score').textContent = `${score} / ${total}`;
 }
 
 // Events
 $('chooseBtn').onclick = () => $('fileInput').click();
-$('canvasArea').onclick = () => $('fileInput').click();
+$('newPhotoBtn').onclick = () => $('fileInput').click();
 $('fileInput').onchange = e => e.target.files[0] && loadImage(e.target.files[0]);
-
-$('blockSlider').oninput = e => {
-    blockSize = parseInt(e.target.value);
-    $('blockValue').textContent = blockSize;
-    if (!isRevealed) applyEffect();
+$('nextBtn').onclick = () => {
+    if (originalImage) newPuzzle();
 };
 
-$('disperseSlider').oninput = e => {
-    dispersion = parseInt(e.target.value);
-    $('disperseValue').textContent = dispersion;
-    if (!isRevealed) applyEffect();
-};
-
-$('revealBtn').onclick = toggleReveal;
-$('shuffleBtn').onclick = newShuffle;
-
-$('downloadBtn').onclick = () => {
-    const a = document.createElement('a');
-    a.download = `madpixels-${Date.now()}.png`;
-    a.href = canvas.toDataURL('image/png');
-    a.click();
-};
-
-// Welcome screen shows first - user picks their photo
+// Resize handler
+window.addEventListener('resize', () => {
+    if (originalImage) renderGrid();
+});
 </script>
 </body>
 </html>
