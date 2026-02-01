@@ -5,76 +5,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>MADpixels</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#ffffff">
+    <meta name="theme-color" content="#000000">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-        :root {
-            --bg: #ffffff;
-            --text: #000000;
-            --gray: #888888;
-            --border: #e0e0e0;
-        }
-
-        html, body {
-            height: 100%;
-            overflow: hidden;
-        }
+        html, body { height: 100%; overflow: hidden; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            font-size: 13px;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #000;
+            color: #fff;
         }
 
         .app {
             height: 100%;
             display: flex;
             flex-direction: column;
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 12px;
-            gap: 12px;
+            padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
         }
 
-        /* Header */
+        /* Header - minimal */
         header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            padding: 12px 16px;
             flex-shrink: 0;
         }
 
-        .logo {
-            font-size: 15px;
-            font-weight: 600;
-            letter-spacing: -0.3px;
-        }
+        .logo { font-size: 18px; font-weight: 700; }
 
         .icon-btn {
-            width: 32px;
-            height: 32px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            background: transparent;
-            color: var(--text);
+            width: 44px;
+            height: 44px;
+            border: none;
+            background: #1a1a1a;
+            color: #fff;
+            border-radius: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
         }
-        .icon-btn:active { background: var(--border); }
         .icon-btn:disabled { opacity: 0.3; }
-        .icon-btn svg { width: 16px; height: 16px; }
+        .icon-btn svg { width: 20px; height: 20px; }
 
-        /* Gallery View */
+        /* Gallery */
         .gallery-view {
             flex: 1;
             display: flex;
             flex-direction: column;
+            padding: 0 16px 16px;
             gap: 12px;
             min-height: 0;
         }
@@ -82,61 +64,51 @@
         .gallery-grid {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: 1fr 1fr;
             gap: 8px;
             min-height: 0;
         }
 
         .gallery-item {
-            aspect-ratio: 1;
-            border-radius: 8px;
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
             position: relative;
-            border: 1px solid var(--border);
         }
-        .gallery-item:active { opacity: 0.7; }
-
-        .gallery-item canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+        .gallery-item:active { transform: scale(0.98); }
+        .gallery-item canvas { width: 100%; height: 100%; display: block; }
 
         .gallery-item-label {
             position: absolute;
-            bottom: 6px;
-            left: 6px;
-            padding: 3px 6px;
-            background: rgba(255,255,255,0.9);
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
+            bottom: 8px;
+            left: 8px;
+            padding: 4px 8px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
         }
 
         .upload-btn {
             flex-shrink: 0;
-            padding: 14px;
-            border: 1px solid var(--text);
-            border-radius: 8px;
+            height: 56px;
+            border: 2px solid #333;
+            border-radius: 12px;
             background: transparent;
-            color: var(--text);
+            color: #fff;
             font-family: inherit;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
         }
-        .upload-btn:active { background: var(--text); color: var(--bg); }
+        .upload-btn:active { background: #1a1a1a; }
 
-        /* Editor View */
+        /* Editor */
         .editor-view {
             display: none;
             flex: 1;
             flex-direction: column;
-            gap: 10px;
             min-height: 0;
         }
-
         .editor-view.active { display: flex; }
         .gallery-view.hidden { display: none; }
 
@@ -146,11 +118,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            margin: 0 16px;
+            border-radius: 12px;
             overflow: hidden;
-            cursor: pointer;
-            position: relative;
+            background: #0a0a0a;
         }
 
         .canvas-wrap canvas {
@@ -162,164 +133,157 @@
         .drop-zone {
             position: absolute;
             inset: 0;
-            background: rgba(0,0,0,0.05);
-            border: 2px dashed var(--text);
+            background: rgba(255,255,255,0.1);
             display: none;
             align-items: center;
             justify-content: center;
-            font-weight: 500;
+            font-weight: 600;
         }
         .drop-zone.active { display: flex; }
 
-        /* Compare */
-        .compare-row {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            flex-shrink: 0;
-        }
-        .compare-row.visible { display: flex; }
-
-        .compare-label {
-            font-size: 11px;
-            color: var(--gray);
-        }
-        .compare-label.active { color: var(--text); font-weight: 500; }
-
-        .toggle {
-            width: 40px;
-            height: 22px;
-            background: var(--border);
-            border-radius: 11px;
-            position: relative;
-            cursor: pointer;
-        }
-        .toggle.on { background: var(--text); }
-
-        .toggle-knob {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            background: white;
-            border-radius: 50%;
-            top: 2px;
-            left: 2px;
-            transition: transform 0.15s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
-        .toggle.on .toggle-knob { transform: translateX(18px); }
-
-        /* Controls */
+        /* Controls panel */
         .controls {
             flex-shrink: 0;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 16px;
         }
 
-        .effects-row {
+        /* Effect buttons - large, scrollable row */
+        .effects-scroll {
             display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            -webkit-overflow-scrolling: touch;
         }
+        .effects-scroll::-webkit-scrollbar { display: none; }
 
         .effect-btn {
-            padding: 6px 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
+            flex-shrink: 0;
+            height: 44px;
+            padding: 0 20px;
+            border: 2px solid #333;
+            border-radius: 22px;
             background: transparent;
-            color: var(--gray);
+            color: #888;
             font-family: inherit;
-            font-size: 12px;
-            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            white-space: nowrap;
         }
-        .effect-btn:active { background: var(--border); }
+        .effect-btn:active { background: #1a1a1a; }
         .effect-btn.active {
-            border-color: var(--text);
-            color: var(--text);
-            font-weight: 500;
+            border-color: #fff;
+            color: #fff;
+            background: #1a1a1a;
         }
 
+        /* Sliders - full width, large touch */
         .param-row {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .param-label {
-            font-size: 12px;
-            color: var(--gray);
-        }
-
-        .param-control {
-            display: flex;
-            align-items: center;
+            flex-direction: column;
             gap: 8px;
         }
 
-        .param-value {
-            font-size: 12px;
-            min-width: 28px;
-            text-align: right;
+        .param-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
         }
+
+        .param-label { color: #888; }
+        .param-value { color: #fff; font-weight: 600; }
 
         input[type="range"] {
             -webkit-appearance: none;
-            width: 80px;
-            height: 4px;
-            background: var(--border);
-            border-radius: 2px;
+            width: 100%;
+            height: 44px;
+            background: transparent;
+            margin: 0;
+        }
+
+        input[type="range"]::-webkit-slider-runnable-track {
+            height: 8px;
+            background: #333;
+            border-radius: 4px;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--text);
+            width: 28px;
+            height: 28px;
+            background: #fff;
             border-radius: 50%;
-            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4);
         }
 
+        /* Compare toggle */
+        .compare-row {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .compare-row.visible { display: flex; }
+
+        .compare-label { font-size: 14px; color: #666; }
+        .compare-label.active { color: #fff; }
+
+        .toggle {
+            width: 52px;
+            height: 32px;
+            background: #333;
+            border-radius: 16px;
+            position: relative;
+        }
+        .toggle.on { background: #fff; }
+
+        .toggle-knob {
+            position: absolute;
+            width: 28px;
+            height: 28px;
+            background: #888;
+            border-radius: 50%;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.15s;
+        }
+        .toggle.on .toggle-knob {
+            transform: translateX(20px);
+            background: #000;
+        }
+
+        /* Apply button - big and bold */
         .apply-btn {
-            padding: 14px;
+            height: 56px;
             border: none;
-            border-radius: 8px;
-            background: var(--text);
-            color: var(--bg);
+            border-radius: 12px;
+            background: #fff;
+            color: #000;
             font-family: inherit;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
+            font-size: 17px;
+            font-weight: 700;
         }
         .apply-btn:active { opacity: 0.8; }
-        .apply-btn:disabled { background: var(--border); color: var(--gray); }
+        .apply-btn:disabled { background: #333; color: #666; }
 
         .progress-row {
             display: none;
-            flex-direction: column;
-            gap: 6px;
-        }
-        .progress-row.visible { display: flex; }
-
-        .progress-bar {
-            height: 3px;
-            background: var(--border);
+            height: 4px;
+            background: #333;
             border-radius: 2px;
             overflow: hidden;
         }
+        .progress-row.visible { display: block; }
 
         .progress-fill {
             height: 100%;
-            background: var(--text);
+            background: #fff;
             width: 0%;
             transition: width 0.1s;
-        }
-
-        .progress-text {
-            font-size: 11px;
-            color: var(--gray);
-            text-align: center;
         }
 
         .hidden { display: none !important; }
@@ -331,7 +295,7 @@
         <header>
             <span class="logo">MADpixels</span>
             <button class="icon-btn" id="downloadBtn" disabled>
-                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
                 </svg>
             </button>
@@ -349,21 +313,23 @@
                 <div class="drop-zone" id="dropZone">Drop</div>
             </div>
 
-            <div class="compare-row" id="compareBar">
-                <span class="compare-label" id="labelOriginal">Before</span>
-                <div class="toggle on" id="toggle"><div class="toggle-knob"></div></div>
-                <span class="compare-label active" id="labelProcessed">After</span>
-            </div>
-
             <div class="controls">
-                <div class="effects-row" id="effectsRow"></div>
+                <div class="compare-row" id="compareBar">
+                    <span class="compare-label" id="labelOriginal">Before</span>
+                    <div class="toggle on" id="toggle"><div class="toggle-knob"></div></div>
+                    <span class="compare-label active" id="labelProcessed">After</span>
+                </div>
+
+                <div class="effects-scroll" id="effectsRow"></div>
+
                 <div class="params-section" id="settingsSection">
                     <div id="settingsContainer"></div>
                 </div>
+
                 <div class="progress-row" id="progressSection">
-                    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-                    <div class="progress-text" id="progressText">Processing...</div>
+                    <div class="progress-fill" id="progressFill"></div>
                 </div>
+
                 <button class="apply-btn" id="applyBtn">Apply</button>
             </div>
         </div>
@@ -469,10 +435,10 @@ const settingsConfig = {
 };
 
 const presets = [
-    { name: 'Warm', colors: { tl: [1, 0.6, 0.4], tr: [1, 0.8, 0.5], bl: [0.8, 0.4, 0.3], br: [0.9, 0.5, 0.4] } },
-    { name: 'Cool', colors: { tl: [0.3, 0.5, 0.7], tr: [0.4, 0.6, 0.8], bl: [0.2, 0.3, 0.5], br: [0.3, 0.4, 0.6] } },
-    { name: 'Mono', colors: { tl: [0.9, 0.9, 0.9], tr: [0.7, 0.7, 0.7], bl: [0.5, 0.5, 0.5], br: [0.3, 0.3, 0.3] } },
-    { name: 'Vivid', colors: { tl: [1, 0.3, 0.5], tr: [0.3, 0.8, 1], bl: [0.5, 0.2, 0.7], br: [0.2, 0.6, 0.5] } }
+    { name: 'Neon', colors: { tl: [1, 0.2, 0.5], tr: [0.2, 0.8, 1], bl: [0.5, 0.1, 0.8], br: [0.1, 0.6, 0.6] } },
+    { name: 'Ember', colors: { tl: [1, 0.4, 0.1], tr: [1, 0.7, 0.2], bl: [0.6, 0.1, 0.1], br: [0.8, 0.3, 0.1] } },
+    { name: 'Void', colors: { tl: [0.15, 0.1, 0.2], tr: [0.1, 0.15, 0.25], bl: [0.05, 0.05, 0.1], br: [0.1, 0.08, 0.15] } },
+    { name: 'Acid', colors: { tl: [0.6, 1, 0.2], tr: [0.2, 1, 0.6], bl: [0.3, 0.5, 0.1], br: [0.1, 0.6, 0.3] } }
 ];
 
 let state = { effect: 'localShuffle', settings: {}, original: null, processed: null, processing: false };
@@ -488,8 +454,8 @@ function generateGallery() {
         const item = document.createElement('div');
         item.className = 'gallery-item';
         const c = document.createElement('canvas');
-        c.width = 150; c.height = 150;
-        c.getContext('2d').putImageData(gpu.gradient(150, 150, preset.colors), 0, 0);
+        c.width = 200; c.height = 200;
+        c.getContext('2d').putImageData(gpu.gradient(200, 200, preset.colors), 0, 0);
         const label = document.createElement('div');
         label.className = 'gallery-item-label';
         label.textContent = preset.name;
@@ -527,7 +493,7 @@ function renderSettings() {
     $('settingsSection').classList.remove('hidden');
     $('settingsContainer').innerHTML = cfg.map(s => {
         const val = state.settings[s.id] ?? s.default;
-        return `<div class="param-row"><span class="param-label">${s.name}</span><div class="param-control"><input type="range" id="r-${s.id}" min="${s.min}" max="${s.max}" value="${val}" step="${s.step}"><span class="param-value" id="v-${s.id}">${val}</span></div></div>`;
+        return `<div class="param-row"><div class="param-header"><span class="param-label">${s.name}</span><span class="param-value" id="v-${s.id}">${val}</span></div><input type="range" id="r-${s.id}" min="${s.min}" max="${s.max}" value="${val}" step="${s.step}"></div>`;
     }).join('');
     cfg.forEach(s => {
         state.settings[s.id] = state.settings[s.id] ?? s.default;
@@ -560,7 +526,6 @@ function display(data) {
 
 function updateProgress(pct) {
     $('progressFill').style.width = pct + '%';
-    $('progressText').textContent = pct < 100 ? 'Processing...' : 'Done';
 }
 
 function resize(img, w, h) {
@@ -612,12 +577,11 @@ async function applyEffect() {
     $('progressSection').classList.add('visible');
     updateProgress(0);
 
-    let result, usedGPU = false;
+    let result;
     const eff = effects.find(e => e.id === state.effect);
 
     try {
         if (gpu.available && eff?.gpu) {
-            usedGPU = true;
             if (state.effect === 'invert') result = gpu.invert(state.original);
             else if (state.effect === 'boost') result = gpu.boost(state.original, (state.settings.red ?? 40) / 100, (state.settings.green ?? 30) / 100, (state.settings.blue ?? 20) / 100);
             else if (state.effect === 'gaussianBlur') result = gpu.blur(state.original, state.settings.radius || 8);
@@ -642,7 +606,7 @@ async function applyEffect() {
         $('progressSection').classList.remove('visible');
         state.processing = false;
         $('applyBtn').disabled = false;
-    }, 300);
+    }, 200);
 }
 
 $('choosePhotoBtn').onclick = () => $('fileInput').click();
