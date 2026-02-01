@@ -12,415 +12,105 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&family=Archivo+Black&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body {
-            height: 100%;
-            height: 100dvh;
-            overflow: hidden;
-            overscroll-behavior: none;
-        }
+        html, body { height: 100%; height: 100dvh; overflow: hidden; overscroll-behavior: none; }
+        body { font-family: 'Space Grotesk', -apple-system, sans-serif; background: #fff; color: #000; }
 
-        body {
-            font-family: 'Space Grotesk', -apple-system, sans-serif;
-            background: #fff;
-            color: #000;
-        }
+        .app { height: 100%; display: flex; flex-direction: column; padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0; }
 
-        .app {
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom) 0;
-        }
+        header { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; flex-shrink: 0; }
 
-        header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 16px;
-            flex-shrink: 0;
-        }
+        .logo { font-family: 'Archivo Black', sans-serif; font-size: 16px; letter-spacing: -1px; display: flex; align-items: center; gap: 2px; }
+        .logo-box { border: 3px solid #000; padding: 3px 5px; line-height: 1; transition: transform 0.2s; }
+        .logo-box:hover { transform: rotate(-2deg); }
+        .logo-emoji { font-size: 20px; margin-left: 4px; animation: wiggle 2s infinite; }
 
-        .logo {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 18px;
-            letter-spacing: -1px;
-            display: flex;
-            align-items: center;
-            gap: 2px;
-        }
+        @keyframes wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-5deg); } 75% { transform: rotate(5deg); } }
 
-        .logo-box {
-            border: 3px solid #000;
-            padding: 4px 6px;
-            line-height: 1;
-        }
+        .mode-toggle { display: flex; background: #000; border-radius: 24px; padding: 3px; gap: 2px; }
+        .mode-btn { padding: 8px 14px; border: none; background: transparent; font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 700; color: #666; border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+        .mode-btn.active { background: #fff; color: #000; }
 
-        .logo-emoji {
-            font-size: 22px;
-            margin-left: 6px;
-        }
+        .header-right { display: flex; align-items: center; gap: 10px; }
+        .score-wrap { text-align: center; min-width: 44px; }
+        .score { font-family: 'Archivo Black', sans-serif; font-size: 24px; color: #000; transition: transform 0.2s; }
+        .score.pop { animation: scorePop 0.3s; }
+        @keyframes scorePop { 50% { transform: scale(1.3); } }
+        .streak { font-size: 10px; color: #888; white-space: nowrap; }
+        .streak.hot { color: #ff3366; font-weight: 700; animation: pulse 0.5s infinite; }
 
-        .mode-toggle {
-            display: flex;
-            background: #f0f0f0;
-            border-radius: 20px;
-            padding: 3px;
-        }
+        .icon-btn { width: 38px; height: 38px; border: 3px solid #000; background: #fff; color: #000; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; box-shadow: 3px 3px 0 #000; }
+        .icon-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+        .icon-btn svg { width: 16px; height: 16px; }
 
-        .mode-btn {
-            padding: 8px 16px;
-            border: none;
-            background: transparent;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 13px;
-            font-weight: 700;
-            color: #888;
-            border-radius: 17px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .mode-btn.active {
-            background: #000;
-            color: #fff;
-        }
+        .main-area { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 8px 12px; }
 
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .grid-container { position: relative; border-radius: 16px; overflow: hidden; box-shadow: 6px 6px 0 #000; border: 4px solid #000; transition: transform 0.3s; }
+        .grid-container.shake { animation: gridShake 0.4s; }
+        @keyframes gridShake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-6px); } 40%,80% { transform: translateX(6px); } }
 
-        .score {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 22px;
-            color: #000;
-        }
+        .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2px; background: #000; }
 
-        .icon-btn {
-            width: 40px;
-            height: 40px;
-            border: 2px solid #000;
-            background: #fff;
-            color: #000;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-        .icon-btn:active { background: #000; color: #fff; }
-        .icon-btn svg { width: 18px; height: 18px; }
+        .grid-cell { aspect-ratio: 1; background-size: cover; background-position: center; transition: transform 0.2s, opacity 0.2s; }
+        .grid-cell.missing { background: linear-gradient(135deg, #ff3366, #ff6b3d, #ffc107, #ff3366); background-size: 300% 300%; animation: gradientMove 2s ease infinite; display: flex; align-items: center; justify-content: center; }
+        .grid-cell.missing::after { content: '?'; font-family: 'Archivo Black', sans-serif; font-size: 28px; color: #fff; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); animation: bounce 1s infinite; }
+        @keyframes gradientMove { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
 
-        .main-area {
-            flex: 1;
-            min-height: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-        }
+        .grid-cell.correct { animation: cellPop 0.4s; }
+        @keyframes cellPop { 0% { transform: scale(0.8); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
 
-        .grid-container {
-            position: relative;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 8px 8px 0 #000;
-            border: 4px solid #000;
-        }
+        .canvas-container { border-radius: 16px; overflow: hidden; box-shadow: 6px 6px 0 #000; border: 4px solid #000; max-width: calc(100% - 24px); max-height: 100%; }
+        .canvas-container canvas { display: block; max-width: 100%; max-height: 100%; }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 3px;
-            background: #000;
-        }
+        .controls { flex-shrink: 0; padding: 8px 12px 12px; display: flex; flex-direction: column; gap: 10px; }
 
-        .grid-cell {
-            aspect-ratio: 1;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .grid-cell.missing {
-            background: linear-gradient(135deg, #ff3366 0%, #ff6b3d 50%, #ffc107 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: pulse 1.5s infinite;
-        }
-
-        .grid-cell.missing::after {
-            content: '?';
-            font-size: 32px;
-            font-weight: 900;
-            color: #fff;
-            text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        .grid-cell.correct {
-            animation: pop 0.3s;
-        }
-
-        @keyframes pop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-
-        .canvas-container {
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-            max-width: calc(100% - 32px);
-            max-height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .canvas-container canvas {
-            display: block;
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-        }
-
-        .controls {
-            flex-shrink: 0;
-            padding: 12px 16px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .game-controls .prompt {
-            text-align: center;
-            font-size: 28px;
-            min-height: 36px;
-            line-height: 36px;
-        }
-        .game-controls .prompt.correct { animation: bounce 0.4s; }
+        .game-controls .prompt { text-align: center; font-size: 32px; min-height: 40px; line-height: 40px; }
+        .game-controls .prompt.correct { animation: promptPop 0.4s; }
         .game-controls .prompt.wrong { animation: shake 0.3s; }
+        @keyframes promptPop { 0% { transform: scale(0); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-        @keyframes bounce {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.3); }
-        }
+        .choices { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+        .choice { aspect-ratio: 1; border-radius: 14px; border: 4px solid #000; background-size: cover; background-position: center; cursor: pointer; transition: all 0.12s; box-shadow: 4px 4px 0 #000; }
+        .choice:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
+        .choice.wrong { border-color: #ff3366; box-shadow: 4px 4px 0 #ff3366; animation: shake 0.3s; opacity: 0.3; transform: scale(0.95); }
+        .choice.correct { border-color: #00cc66; box-shadow: 0 0 0 4px #00cc66, 0 0 20px #00cc66; transform: scale(1.1); z-index: 10; }
+        .choice.disabled { pointer-events: none; opacity: 0.25; }
 
-        .choices {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-        }
+        @keyframes shake { 0%,100% { transform: translateX(0); } 20%,60% { transform: translateX(-4px); } 40%,80% { transform: translateX(4px); } }
 
-        .choice {
-            aspect-ratio: 1;
-            border-radius: 16px;
-            border: 4px solid #000;
-            background-size: cover;
-            background-position: center;
-            cursor: pointer;
-            transition: all 0.15s;
-            box-shadow: 4px 4px 0 #000;
-        }
-        .choice:active {
-            transform: translate(2px, 2px);
-            box-shadow: 2px 2px 0 #000;
-        }
-        .choice.wrong {
-            border-color: #ff3366;
-            box-shadow: 4px 4px 0 #ff3366;
-            animation: shake 0.3s;
-            opacity: 0.4;
-        }
-        .choice.correct {
-            border-color: #00cc66;
-            box-shadow: 0 0 20px #00cc66;
-            transform: scale(1.08);
-        }
-        .choice.disabled {
-            pointer-events: none;
-            opacity: 0.3;
-        }
+        .edit-controls .slider-row { display: flex; flex-direction: column; gap: 4px; }
+        .slider-header { display: flex; justify-content: space-between; align-items: center; }
+        .slider-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #888; }
+        .slider-value { font-size: 11px; font-weight: 700; color: #000; }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-4px); }
-            75% { transform: translateX(4px); }
-        }
+        input[type="range"] { -webkit-appearance: none; width: 100%; height: 40px; background: transparent; margin: 0; }
+        input[type="range"]::-webkit-slider-runnable-track { height: 8px; background: #e0e0e0; border-radius: 4px; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; background: #000; border-radius: 50%; margin-top: -8px; box-shadow: 2px 2px 0 rgba(0,0,0,0.2); }
 
-        .edit-controls .slider-row {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+        .btn-row { display: flex; gap: 8px; }
+        .action-btn { flex: 1; height: 48px; border: 3px solid #000; border-radius: 24px; background: #000; color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer; box-shadow: 3px 3px 0 rgba(0,0,0,0.3); transition: all 0.15s; }
+        .action-btn:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 rgba(0,0,0,0.3); }
+        .action-btn.outline { background: #fff; color: #000; }
 
-        .slider-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .slider-label {
-            font-size: 12px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #888;
-        }
-
-        .slider-value {
-            font-size: 12px;
-            font-weight: 700;
-            color: #000;
-        }
-
-        input[type="range"] {
-            -webkit-appearance: none;
-            width: 100%;
-            height: 44px;
-            background: transparent;
-            margin: 0;
-        }
-
-        input[type="range"]::-webkit-slider-runnable-track {
-            height: 6px;
-            background: #e0e0e0;
-            border-radius: 3px;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 28px;
-            height: 28px;
-            background: #000;
-            border-radius: 50%;
-            margin-top: -11px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .btn-row {
-            display: flex;
-            gap: 10px;
-        }
-
-        .action-btn {
-            flex: 1;
-            height: 52px;
-            border: none;
-            border-radius: 26px;
-            background: #000;
-            color: #fff;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 14px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-        }
-        .action-btn:active { opacity: 0.85; }
-        .action-btn.outline {
-            background: #fff;
-            color: #000;
-            border: 2px solid #000;
-        }
-
-        .effect-select {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 4px;
-        }
-
-        .effect-btn {
-            flex: 1;
-            padding: 12px 8px;
-            border: 3px solid #e0e0e0;
-            background: #fff;
-            font-size: 20px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.15s;
-        }
-        .effect-btn.active {
-            border-color: #000;
-            background: #000;
-            transform: scale(1.05);
-        }
+        .effect-select { display: flex; gap: 6px; }
+        .effect-btn { flex: 1; padding: 10px; border: 3px solid #e0e0e0; background: #fff; font-size: 18px; border-radius: 12px; cursor: pointer; transition: all 0.15s; }
+        .effect-btn.active { border-color: #000; background: #000; transform: scale(1.05); box-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
 
         .hidden { display: none !important; }
 
-        .welcome {
-            position: fixed;
-            inset: 0;
-            background: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            z-index: 100;
-            padding: 32px;
-        }
+        .welcome { position: fixed; inset: 0; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 32px; z-index: 100; padding: 24px; }
+        .welcome-title { font-family: 'Archivo Black', sans-serif; font-size: 24px; letter-spacing: -1px; display: flex; align-items: center; gap: 4px; animation: fadeInUp 0.6s; }
+        .welcome-title .logo-box { border: 4px solid #000; padding: 8px 10px; box-shadow: 4px 4px 0 #000; }
+        .welcome-title .logo-emoji { font-size: 32px; margin-left: 8px; }
+        .welcome-sub { font-size: 15px; color: #666; text-align: center; max-width: 260px; line-height: 1.6; animation: fadeInUp 0.6s 0.1s both; }
+        .choose-btn { width: 100%; max-width: 260px; height: 56px; border: 3px solid #000; border-radius: 28px; background: #000; color: #fff; font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; cursor: pointer; box-shadow: 4px 4px 0 rgba(0,0,0,0.3); transition: all 0.15s; animation: fadeInUp 0.6s 0.2s both; }
+        .choose-btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
 
-        .welcome-title {
-            font-family: 'Archivo Black', sans-serif;
-            font-size: 28px;
-            letter-spacing: -1px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .welcome-title .logo-box {
-            border: 4px solid #000;
-            padding: 8px 12px;
-        }
-
-        .welcome-title .logo-emoji {
-            font-size: 36px;
-            margin-left: 8px;
-        }
-
-        .welcome-sub {
-            font-size: 16px;
-            color: #666;
-            text-align: center;
-            max-width: 280px;
-            line-height: 1.5;
-        }
-
-        .choose-btn {
-            width: 100%;
-            max-width: 280px;
-            height: 60px;
-            border: none;
-            border-radius: 30px;
-            background: #000;
-            color: #fff;
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-        }
-        .choose-btn:active { opacity: 0.85; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         canvas.gl { display: none; }
 
-        .streak {
-            font-size: 11px;
-            color: #888;
-            margin-top: -4px;
-        }
-        .streak.hot { color: #ff6600; }
+        .confetti { position: fixed; pointer-events: none; z-index: 1000; }
     </style>
 </head>
 <body>
@@ -432,12 +122,12 @@
                 <button class="mode-btn" id="editModeBtn">✨ Edit</button>
             </div>
             <div class="header-right">
-                <div>
+                <div class="score-wrap">
                     <div class="score" id="score">0</div>
                     <div class="streak" id="streak"></div>
                 </div>
                 <button class="icon-btn" id="newPhotoBtn">
-                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <svg fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
                     </svg>
                 </button>
@@ -480,7 +170,7 @@
                 <input type="range" id="disperseSlider" min="0" max="100" value="50" step="5">
             </div>
             <div class="btn-row">
-                <button class="action-btn outline" id="shuffleBtn">🎲 Randomize</button>
+                <button class="action-btn outline" id="shuffleBtn">🎲 Random</button>
                 <button class="action-btn" id="downloadBtn">💾 Save</button>
             </div>
         </div>
@@ -491,496 +181,294 @@
 
     <div class="welcome" id="welcome">
         <div class="welcome-title"><span class="logo-box">MAD</span><span class="logo-box">pixels</span><span class="logo-emoji">🧩</span></div>
-        <div class="welcome-sub">Select your photos 📸<br>Find the missing pieces 🔍<br>Beat your streak 🔥</div>
-        <button class="choose-btn" id="chooseBtn">📱 Select Photos</button>
+        <div class="welcome-sub">📸 Pick your photos<br>🔍 Find the missing piece<br>🔥 Build your streak</div>
+        <button class="choose-btn" id="chooseBtn">📱 Choose Photos</button>
     </div>
 
 <script>
-class WebGLProcessor {
-    constructor() {
-        this.canvas = document.getElementById('glCanvas');
-        this.gl = this.canvas.getContext('webgl2') || this.canvas.getContext('webgl');
-        this.programs = {};
-        this.available = !!this.gl;
-        if (this.available) this.init();
-    }
+const $ = id => document.getElementById(id);
+const GRID = 5, TOTAL = 25, NEXT_DELAY = 400, PER_IMG = 3;
 
+class GPU {
+    constructor() {
+        this.c = $('glCanvas');
+        this.gl = this.c.getContext('webgl2') || this.c.getContext('webgl');
+        this.ok = !!this.gl;
+        if (this.ok) this.init();
+    }
     init() {
         const gl = this.gl;
-        const vert = `attribute vec2 a_position;attribute vec2 a_texCoord;varying vec2 v_texCoord;void main(){gl_Position=vec4(a_position,0,1);v_texCoord=a_texCoord;}`;
-        const shaders = {
-            localShuffle: `precision highp float;varying vec2 v_texCoord;uniform sampler2D u_image;uniform vec2 u_res;uniform float u_spread;uniform float u_seed;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453+u_seed);}void main(){float m=max(u_res.x,u_res.y)*u_spread/4.0;float u1=max(0.0001,hash(v_texCoord*u_res));float u2=hash(v_texCoord*u_res+vec2(1.0,0.0));float r=sqrt(-2.0*log(u1));vec2 n=vec2(r*cos(6.28318*u2),r*sin(6.28318*u2))*m/u_res;gl_FragColor=texture2D(u_image,clamp(v_texCoord+n,0.0,1.0));}`
-        };
-        for (const [name, frag] of Object.entries(shaders)) {
-            const vs = gl.createShader(gl.VERTEX_SHADER); gl.shaderSource(vs, vert); gl.compileShader(vs);
-            const fs = gl.createShader(gl.FRAGMENT_SHADER); gl.shaderSource(fs, frag); gl.compileShader(fs);
-            const prog = gl.createProgram(); gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
-            this.programs[name] = prog;
-        }
-        this.posBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuf);
+        const vs = gl.createShader(gl.VERTEX_SHADER);
+        gl.shaderSource(vs, 'attribute vec2 p,t;varying vec2 v;void main(){gl_Position=vec4(p,0,1);v=t;}');
+        gl.compileShader(vs);
+        const fs = gl.createShader(gl.FRAGMENT_SHADER);
+        gl.shaderSource(fs, 'precision highp float;varying vec2 v;uniform sampler2D i;uniform vec2 r;uniform float s,d;float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453+d);}void main(){float m=max(r.x,r.y)*s/4.;float u1=max(.0001,h(v*r)),u2=h(v*r+vec2(1,0));vec2 n=vec2(sqrt(-2.*log(u1))*cos(6.28318*u2),sqrt(-2.*log(u1))*sin(6.28318*u2))*m/r;gl_FragColor=texture2D(i,clamp(v+n,0.,1.));}');
+        gl.compileShader(fs);
+        this.p = gl.createProgram();
+        gl.attachShader(this.p, vs); gl.attachShader(this.p, fs); gl.linkProgram(this.p);
+        this.pb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.pb);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]), gl.STATIC_DRAW);
-        this.texBuf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.texBuf);
+        this.tb = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, this.tb);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([0,1,1,1,0,0,0,0,1,1,1,0]), gl.STATIC_DRAW);
     }
-
-    createTexture(img) {
-        const gl = this.gl, tex = gl.createTexture();
+    process(img, spread, seed) {
+        const gl = this.gl, w = img.width, h = img.height;
+        this.c.width = w; this.c.height = h;
+        gl.viewport(0, 0, w, h); gl.useProgram(this.p);
+        const tex = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, tex);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        return tex;
-    }
-
-    render(prog, w, h, setup) {
-        const gl = this.gl;
-        this.canvas.width = w; this.canvas.height = h;
-        gl.viewport(0, 0, w, h); gl.useProgram(prog);
-        const pLoc = gl.getAttribLocation(prog, 'a_position');
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.posBuf); gl.enableVertexAttribArray(pLoc); gl.vertexAttribPointer(pLoc, 2, gl.FLOAT, false, 0, 0);
-        const tLoc = gl.getAttribLocation(prog, 'a_texCoord');
-        gl.bindBuffer(gl.ARRAY_BUFFER, this.texBuf); gl.enableVertexAttribArray(tLoc); gl.vertexAttribPointer(tLoc, 2, gl.FLOAT, false, 0, 0);
-        setup(gl, prog); gl.drawArrays(gl.TRIANGLES, 0, 6);
-    }
-
-    getImageData() {
-        const gl = this.gl, w = this.canvas.width, h = this.canvas.height;
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.pb);
+        const pL = gl.getAttribLocation(this.p, 'p');
+        gl.enableVertexAttribArray(pL); gl.vertexAttribPointer(pL, 2, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.tb);
+        const tL = gl.getAttribLocation(this.p, 't');
+        gl.enableVertexAttribArray(tL); gl.vertexAttribPointer(tL, 2, gl.FLOAT, false, 0, 0);
+        gl.uniform1i(gl.getUniformLocation(this.p, 'i'), 0);
+        gl.uniform2f(gl.getUniformLocation(this.p, 'r'), w, h);
+        gl.uniform1f(gl.getUniformLocation(this.p, 's'), spread);
+        gl.uniform1f(gl.getUniformLocation(this.p, 'd'), seed);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
         const px = new Uint8Array(w * h * 4);
         gl.readPixels(0, 0, w, h, gl.RGBA, gl.UNSIGNED_BYTE, px);
         const flip = new Uint8ClampedArray(px.length);
         for (let y = 0; y < h; y++) flip.set(px.subarray((h-1-y)*w*4, (h-y)*w*4), y*w*4);
+        gl.deleteTexture(tex);
         return new ImageData(flip, w, h);
-    }
-
-    localShuffle(imgData, spread, seed) {
-        const t = this.createTexture(imgData);
-        this.render(this.programs.localShuffle, imgData.width, imgData.height, (gl, p) => {
-            gl.activeTexture(gl.TEXTURE0);
-            gl.bindTexture(gl.TEXTURE_2D, t);
-            gl.uniform1i(gl.getUniformLocation(p, 'u_image'), 0);
-            gl.uniform2f(gl.getUniformLocation(p, 'u_res'), imgData.width, imgData.height);
-            gl.uniform1f(gl.getUniformLocation(p, 'u_spread'), spread);
-            gl.uniform1f(gl.getUniformLocation(p, 'u_seed'), seed);
-        });
-        this.gl.deleteTexture(t);
-        return this.getImageData();
     }
 }
 
-let mode = 'game';
-let images = [];
-let currentImageIdx = 0;
-let puzzlesOnCurrentImage = 0;
-let originalImage = null;
-let originalImageData = null;
-let blocks = []; // dispersed blocks for grid
-let cleanBlocks = []; // original blocks for choices
-let missingGridPos = -1;
-let correctBlockIdx = -1;
-let correctChoiceIdx = -1;
-let choices = [];
-let score = 0;
-let streak = 0;
-let bestStreak = 0;
-let answered = false;
+const gpu = new GPU();
+const canvas = $('canvas'), ctx = canvas.getContext('2d', { willReadFrequently: true });
 
-let blockSize = 32;
-let dispersion = 50;
-let seed = Math.random() * 1000;
-let currentEffect = 'both'; // none, disperse, shuffle, both
-
-const GRID_SIZE = 5;
-const TOTAL_BLOCKS = GRID_SIZE * GRID_SIZE;
-const AUTO_NEXT_DELAY = 500;
-const PUZZLES_PER_IMAGE = 3;
-
-const $ = id => document.getElementById(id);
-const gpu = new WebGLProcessor();
-const canvas = $('canvas');
-const ctx = canvas.getContext('2d', { willReadFrequently: true });
+let mode = 'game', images = [], imgIdx = 0, puzzleCount = 0;
+let origImg = null, origData = null;
+let blocks = [], cleanBlocks = [], blockURLs = [], cleanURLs = [];
+let missing = -1, correct = -1, correctChoice = -1, choices = [];
+let score = 0, streak = 0, best = 0, answered = false;
+let blockSize = 32, dispersion = 50, seed = Math.random() * 1000, effect = 'both';
 
 function loadImages(files) {
-    images = [];
-    currentImageIdx = 0;
-    puzzlesOnCurrentImage = 0;
+    images = []; imgIdx = 0; puzzleCount = 0;
     let loaded = 0;
-
-    Array.from(files).forEach((file, idx) => {
-        const reader = new FileReader();
-        reader.onload = e => {
+    [...files].forEach((f, i) => {
+        const r = new FileReader();
+        r.onload = e => {
             const img = new Image();
             img.onload = () => {
-                const size = 500;
                 const c = document.createElement('canvas');
-                c.width = size; c.height = size;
+                c.width = c.height = 500;
                 const cx = c.getContext('2d');
-
-                const scale = Math.max(size / img.width, size / img.height);
-                const w = img.width * scale;
-                const h = img.height * scale;
-                cx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
-
-                images[idx] = { canvas: c, data: cx.getImageData(0, 0, size, size) };
-                loaded++;
-
-                if (loaded === files.length) {
-                    for (let i = images.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [images[i], images[j]] = [images[j], images[i]];
-                    }
-                    setCurrentImage(0);
+                const s = Math.max(500/img.width, 500/img.height);
+                cx.drawImage(img, (500-img.width*s)/2, (500-img.height*s)/2, img.width*s, img.height*s);
+                images[i] = { canvas: c, data: cx.getImageData(0,0,500,500) };
+                if (++loaded === files.length) {
+                    for (let j = images.length-1; j > 0; j--) { const k = ~~(Math.random()*(j+1)); [images[j],images[k]] = [images[k],images[j]]; }
+                    setImage(0);
                     $('welcome').classList.add('hidden');
                 }
             };
             img.src = e.target.result;
         };
-        reader.readAsDataURL(file);
+        r.readAsDataURL(f);
     });
 }
 
-function setCurrentImage(idx) {
-    if (images.length === 0) return;
-    currentImageIdx = idx % images.length;
-    puzzlesOnCurrentImage = 0;
-
-    originalImage = images[currentImageIdx].canvas;
-    originalImageData = images[currentImageIdx].data;
-
-    if (mode === 'game') {
-        extractBlocks();
-        newPuzzle();
-    } else {
-        applyEditEffect();
-    }
-}
-
-function nextImage() {
-    if (images.length > 1) {
-        setCurrentImage(currentImageIdx + 1);
-    }
+function setImage(i) {
+    if (!images.length) return;
+    imgIdx = i % images.length;
+    puzzleCount = 0;
+    origImg = images[imgIdx].canvas;
+    origData = images[imgIdx].data;
+    seed = Math.random() * 1000;
+    mode === 'game' ? (extractBlocks(), newPuzzle()) : applyEdit();
 }
 
 function extractBlocks() {
-    blocks = [];
-    cleanBlocks = [];
-    const blkSize = originalImage.width / GRID_SIZE;
-    const dispersionAmount = 0.2; // pixel dispersion within blocks
+    blocks = []; cleanBlocks = []; blockURLs = []; cleanURLs = [];
+    const sz = origImg.width / GRID;
+    for (let i = 0; i < TOTAL; i++) {
+        const x = (i % GRID) * sz, y = ~~(i / GRID) * sz;
+        const clean = document.createElement('canvas');
+        clean.width = clean.height = sz;
+        clean.getContext('2d').drawImage(origImg, x, y, sz, sz, 0, 0, sz, sz);
+        cleanBlocks.push(clean);
+        cleanURLs.push(clean.toDataURL());
 
-    for (let i = 0; i < TOTAL_BLOCKS; i++) {
-        const x = (i % GRID_SIZE) * blkSize;
-        const y = Math.floor(i / GRID_SIZE) * blkSize;
-
-        // Clean block for choices
-        const cleanCanvas = document.createElement('canvas');
-        cleanCanvas.width = blkSize;
-        cleanCanvas.height = blkSize;
-        const cleanCtx = cleanCanvas.getContext('2d');
-        cleanCtx.drawImage(originalImage, x, y, blkSize, blkSize, 0, 0, blkSize, blkSize);
-        cleanBlocks.push(cleanCanvas);
-
-        // Dispersed block for grid
-        const blockCanvas = document.createElement('canvas');
-        blockCanvas.width = blkSize;
-        blockCanvas.height = blkSize;
-        const blockCtx = blockCanvas.getContext('2d');
-        blockCtx.drawImage(originalImage, x, y, blkSize, blkSize, 0, 0, blkSize, blkSize);
-
-        if (gpu.available && dispersionAmount > 0) {
-            const imgData = blockCtx.getImageData(0, 0, blkSize, blkSize);
-            const uniqueSeed = seed * (i + 1) * 7.31 + Math.sin(i * 13.7) * 1000;
-            const dispersed = gpu.localShuffle(imgData, dispersionAmount, uniqueSeed);
-            blockCtx.putImageData(dispersed, 0, 0);
+        const block = document.createElement('canvas');
+        block.width = block.height = sz;
+        const bx = block.getContext('2d');
+        bx.drawImage(origImg, x, y, sz, sz, 0, 0, sz, sz);
+        if (gpu.ok) {
+            const dispersed = gpu.process(bx.getImageData(0,0,sz,sz), 0.2, seed*(i+1)*7.31+Math.sin(i*13.7)*1000);
+            bx.putImageData(dispersed, 0, 0);
         }
-
-        blocks.push(blockCanvas);
+        blocks.push(block);
+        blockURLs.push(block.toDataURL());
     }
 }
 
-function shuffleArray(arr) {
-    const result = [...arr];
-    for (let i = result.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
-}
+function shuffle(a) { const r=[...a]; for(let i=r.length-1;i>0;i--){const j=~~(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];} return r; }
 
 function newPuzzle() {
     answered = false;
     $('prompt').textContent = '';
     $('prompt').className = 'prompt';
-
-    // Pick random position to be missing (blocks NOT shuffled - stay in place)
-    missingGridPos = Math.floor(Math.random() * TOTAL_BLOCKS);
-    correctBlockIdx = missingGridPos; // block index = grid position
-
-    // Create 4 choices: 1 correct + 3 wrong
-    const wrongChoices = [];
-    while (wrongChoices.length < 3) {
-        const idx = Math.floor(Math.random() * TOTAL_BLOCKS);
-        if (idx !== correctBlockIdx && !wrongChoices.includes(idx)) {
-            wrongChoices.push(idx);
-        }
-    }
-
-    choices = shuffleArray([correctBlockIdx, ...wrongChoices]);
-    correctChoiceIdx = choices.indexOf(correctBlockIdx);
-
+    missing = ~~(Math.random() * TOTAL);
+    correct = missing;
+    const wrong = [];
+    while (wrong.length < 3) { const n = ~~(Math.random()*TOTAL); if (n !== correct && !wrong.includes(n)) wrong.push(n); }
+    choices = shuffle([correct, ...wrong]);
+    correctChoice = choices.indexOf(correct);
     renderGrid();
     renderChoices();
 }
 
 function renderGrid() {
-    const grid = $('grid');
+    const grid = $('grid'), wrap = document.querySelector('.main-area');
+    const maxSz = Math.min(wrap.clientWidth - 24, wrap.clientHeight - 16);
+    const cellSz = ~~(maxSz / GRID);
+    grid.style.width = grid.style.height = cellSz * GRID + (GRID-1) * 2 + 'px';
     grid.innerHTML = '';
-
-    const wrap = document.querySelector('.main-area');
-    const maxSize = Math.min(wrap.clientWidth - 32, wrap.clientHeight - 16);
-    const cellSize = Math.floor(maxSize / GRID_SIZE);
-
-    grid.style.width = cellSize * GRID_SIZE + (GRID_SIZE - 1) * 2 + 'px';
-    grid.style.height = cellSize * GRID_SIZE + (GRID_SIZE - 1) * 2 + 'px';
-
-    for (let i = 0; i < TOTAL_BLOCKS; i++) {
+    for (let i = 0; i < TOTAL; i++) {
         const cell = document.createElement('div');
         cell.className = 'grid-cell';
-        cell.style.width = cellSize + 'px';
-        cell.style.height = cellSize + 'px';
-
-        // Blocks stay in their original positions (not shuffled)
-        if (i === missingGridPos && !answered) {
-            cell.classList.add('missing');
-        } else {
-            cell.style.backgroundImage = `url(${blocks[i].toDataURL()})`;
-        }
-
+        cell.style.cssText = `width:${cellSz}px;height:${cellSz}px;`;
+        if (i === missing && !answered) cell.classList.add('missing');
+        else cell.style.backgroundImage = `url(${blockURLs[i]})`;
         grid.appendChild(cell);
     }
 }
 
 function renderChoices() {
-    const container = $('choices');
-    container.innerHTML = '';
-
-    // Show clean (non-dispersed) blocks as choices
-    choices.forEach((blockIdx, i) => {
-        const choice = document.createElement('div');
-        choice.className = 'choice';
-        choice.style.backgroundImage = `url(${cleanBlocks[blockIdx].toDataURL()})`;
-        choice.onclick = () => selectChoice(i);
-        container.appendChild(choice);
+    const c = $('choices');
+    c.innerHTML = '';
+    choices.forEach((idx, i) => {
+        const el = document.createElement('div');
+        el.className = 'choice';
+        el.style.backgroundImage = `url(${cleanURLs[idx]})`;
+        el.onclick = () => pick(i);
+        c.appendChild(el);
     });
 }
 
-function selectChoice(idx) {
+function pick(i) {
     if (answered) return;
     answered = true;
+    const els = $('choices').children, cells = $('grid').children;
+    [...els].forEach(e => e.classList.add('disabled'));
 
-    const choiceEls = $('choices').children;
-    const gridCells = $('grid').children;
-
-    Array.from(choiceEls).forEach(c => c.classList.add('disabled'));
-
-    if (idx === correctChoiceIdx) {
-        score++;
-        streak++;
-        if (streak > bestStreak) bestStreak = streak;
-
-        choiceEls[idx].classList.remove('disabled');
-        choiceEls[idx].classList.add('correct');
-        gridCells[missingGridPos].classList.remove('missing');
-        gridCells[missingGridPos].style.backgroundImage = `url(${blocks[correctBlockIdx].toDataURL()})`;
-        gridCells[missingGridPos].classList.add('correct');
-
-        $('prompt').textContent = streak > 2 ? `🔥🔥🔥 ${streak}` : '✨';
+    if (i === correctChoice) {
+        score++; streak++;
+        if (streak > best) best = streak;
+        els[i].classList.remove('disabled');
+        els[i].classList.add('correct');
+        cells[missing].classList.remove('missing');
+        cells[missing].style.backgroundImage = `url(${blockURLs[correct]})`;
+        cells[missing].classList.add('correct');
+        $('prompt').textContent = streak > 2 ? `🔥 ${streak}` : '✨';
         $('prompt').className = 'prompt correct';
-
-        puzzlesOnCurrentImage++;
-
-        setTimeout(() => {
-            if (images.length > 1 && puzzlesOnCurrentImage >= PUZZLES_PER_IMAGE) {
-                nextImage();
-            } else {
-                newPuzzle();
-            }
-        }, AUTO_NEXT_DELAY);
+        $('score').classList.add('pop');
+        setTimeout(() => $('score').classList.remove('pop'), 300);
+        if (streak >= 5 && streak % 5 === 0) confetti();
+        puzzleCount++;
+        setTimeout(() => images.length > 1 && puzzleCount >= PER_IMG ? setImage(imgIdx+1) : newPuzzle(), NEXT_DELAY);
     } else {
-        // Wrong - let user try again (don't advance)
         streak = 0;
-        answered = false; // allow retry
-        choiceEls[idx].classList.add('wrong');
-
-        $('prompt').textContent = '❌';
+        answered = false;
+        els[i].classList.add('wrong');
+        $('prompt').textContent = '✗';
         $('prompt').className = 'prompt wrong';
-
-        // Re-enable other choices after shake animation
+        $('gameArea').classList.add('shake');
+        setTimeout(() => $('gameArea').classList.remove('shake'), 400);
         setTimeout(() => {
-            choiceEls[idx].classList.add('disabled');
-            Array.from(choiceEls).forEach((c, i) => {
-                if (i !== idx && !c.classList.contains('wrong')) {
-                    c.classList.remove('disabled');
-                }
-            });
+            els[i].classList.add('disabled');
+            [...els].forEach((e, j) => { if (j !== i && !e.classList.contains('wrong')) e.classList.remove('disabled'); });
         }, 300);
     }
-
     updateScore();
 }
 
 function updateScore() {
     $('score').textContent = score;
-    const streakEl = $('streak');
-    if (streak > 2) {
-        streakEl.textContent = `${streak} streak`;
-        streakEl.className = 'streak hot';
-    } else if (bestStreak > 2) {
-        streakEl.textContent = `best: ${bestStreak}`;
-        streakEl.className = 'streak';
-    } else {
-        streakEl.textContent = '';
+    const s = $('streak');
+    if (streak > 2) { s.textContent = `🔥 ${streak}`; s.className = 'streak hot'; }
+    else if (best > 2) { s.textContent = `best ${best}`; s.className = 'streak'; }
+    else s.textContent = '';
+}
+
+function confetti() {
+    for (let i = 0; i < 30; i++) {
+        const c = document.createElement('div');
+        c.className = 'confetti';
+        c.textContent = ['🎉','✨','⭐','🔥'][~~(Math.random()*4)];
+        c.style.cssText = `left:${Math.random()*100}%;top:-20px;font-size:${16+Math.random()*16}px;`;
+        document.body.appendChild(c);
+        c.animate([
+            { transform: 'translateY(0) rotate(0)', opacity: 1 },
+            { transform: `translateY(${window.innerHeight+50}px) rotate(${Math.random()*720-360}deg)`, opacity: 0 }
+        ], { duration: 1500+Math.random()*1000, easing: 'ease-out' }).onfinish = () => c.remove();
     }
 }
 
-function binShuffle(imgData, blkSize, seedVal) {
-    const w = imgData.width, h = imgData.height;
-    const data = new Uint8ClampedArray(imgData.data);
-    const out = new Uint8ClampedArray(data.length);
-
-    const bx = Math.floor(w / blkSize);
-    const by = Math.floor(h / blkSize);
-    const totalBlocks = bx * by;
-
-    const indices = [];
-    for (let i = 0; i < totalBlocks; i++) indices.push(i);
-
-    const rng = (s) => { s = Math.sin(s) * 10000; return s - Math.floor(s); };
-    let s = seedVal;
-    for (let i = indices.length - 1; i > 0; i--) {
-        s = rng(s + i);
-        const j = Math.floor(s * (i + 1));
-        [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-
-    for (let i = 0; i < totalBlocks; i++) {
-        const srcIdx = indices[i];
-        const srcX = (srcIdx % bx) * blkSize;
-        const srcY = Math.floor(srcIdx / bx) * blkSize;
-        const dstX = (i % bx) * blkSize;
-        const dstY = Math.floor(i / bx) * blkSize;
-
-        for (let y = 0; y < blkSize; y++) {
-            for (let x = 0; x < blkSize; x++) {
-                const si = ((srcY + y) * w + srcX + x) * 4;
-                const di = ((dstY + y) * w + dstX + x) * 4;
-                out[di] = data[si];
-                out[di+1] = data[si+1];
-                out[di+2] = data[si+2];
-                out[di+3] = data[si+3];
-            }
+function binShuffle(data, sz, s) {
+    const w = data.width, d = new Uint8ClampedArray(data.data), o = new Uint8ClampedArray(d.length);
+    const bx = ~~(w/sz), by = ~~(w/sz), t = bx*by;
+    const idx = [...Array(t).keys()];
+    const rng = x => { x = Math.sin(x)*10000; return x - ~~x; };
+    for (let i = t-1; i > 0; i--) { s = rng(s+i); const j = ~~(s*(i+1)); [idx[i],idx[j]] = [idx[j],idx[i]]; }
+    for (let i = 0; i < t; i++) {
+        const sx = (idx[i]%bx)*sz, sy = ~~(idx[i]/bx)*sz, dx = (i%bx)*sz, dy = ~~(i/bx)*sz;
+        for (let y = 0; y < sz; y++) for (let x = 0; x < sz; x++) {
+            const si = ((sy+y)*w+sx+x)*4, di = ((dy+y)*w+dx+x)*4;
+            o[di]=d[si]; o[di+1]=d[si+1]; o[di+2]=d[si+2]; o[di+3]=d[si+3];
         }
     }
-
-    return new ImageData(out, w, h);
+    return new ImageData(o, w, w);
 }
 
-function applyEditEffect() {
-    if (!originalImageData) return;
-
-    let result = new ImageData(
-        new Uint8ClampedArray(originalImageData.data),
-        originalImageData.width,
-        originalImageData.height
-    );
-
-    // Apply shuffle effect (block rearrangement)
-    if (currentEffect === 'shuffle' || currentEffect === 'both') {
-        result = binShuffle(result, blockSize, seed);
-    }
-
-    // Apply disperse effect (pixel dispersion)
-    if ((currentEffect === 'disperse' || currentEffect === 'both') && dispersion > 0 && gpu.available) {
-        result = gpu.localShuffle(result, dispersion / 100, seed);
-    }
-
-    canvas.width = result.width;
-    canvas.height = result.height;
-    ctx.putImageData(result, 0, 0);
+function applyEdit() {
+    if (!origData) return;
+    let r = new ImageData(new Uint8ClampedArray(origData.data), origData.width, origData.height);
+    if (effect === 'shuffle' || effect === 'both') r = binShuffle(r, blockSize, seed);
+    if ((effect === 'disperse' || effect === 'both') && dispersion > 0 && gpu.ok) r = gpu.process(r, dispersion/100, seed);
+    canvas.width = canvas.height = r.width;
+    ctx.putImageData(r, 0, 0);
 }
 
-function setMode(newMode) {
-    mode = newMode;
-
-    $('gameModeBtn').classList.toggle('active', mode === 'game');
-    $('editModeBtn').classList.toggle('active', mode === 'edit');
-
-    $('gameArea').classList.toggle('hidden', mode !== 'game');
-    $('editArea').classList.toggle('hidden', mode !== 'edit');
-    $('gameControls').classList.toggle('hidden', mode !== 'game');
-    $('editControls').classList.toggle('hidden', mode !== 'edit');
-
-    if (originalImage) {
-        if (mode === 'game') {
-            extractBlocks();
-            newPuzzle();
-        } else {
-            applyEditEffect();
-        }
-    }
+function setMode(m) {
+    mode = m;
+    $('gameModeBtn').classList.toggle('active', m === 'game');
+    $('editModeBtn').classList.toggle('active', m === 'edit');
+    $('gameArea').classList.toggle('hidden', m !== 'game');
+    $('editArea').classList.toggle('hidden', m !== 'edit');
+    $('gameControls').classList.toggle('hidden', m !== 'game');
+    $('editControls').classList.toggle('hidden', m !== 'edit');
+    if (origImg) m === 'game' ? (extractBlocks(), newPuzzle()) : applyEdit();
 }
 
-$('chooseBtn').onclick = () => $('fileInput').click();
-$('newPhotoBtn').onclick = () => $('fileInput').click();
-$('fileInput').onchange = e => {
-    if (e.target.files.length > 0) {
-        loadImages(e.target.files);
-        score = 0;
-        streak = 0;
-        updateScore();
-    }
-};
-
+$('chooseBtn').onclick = $('newPhotoBtn').onclick = () => $('fileInput').click();
+$('fileInput').onchange = e => { if (e.target.files.length) { loadImages(e.target.files); score = streak = 0; updateScore(); } };
 $('gameModeBtn').onclick = () => setMode('game');
 $('editModeBtn').onclick = () => setMode('edit');
 
-$('blockSlider').oninput = e => {
-    blockSize = parseInt(e.target.value);
-    $('blockValue').textContent = blockSize;
-    applyEditEffect();
-};
+let editTimer;
+$('blockSlider').oninput = e => { blockSize = +e.target.value; $('blockValue').textContent = blockSize; clearTimeout(editTimer); editTimer = setTimeout(applyEdit, 50); };
+$('disperseSlider').oninput = e => { dispersion = +e.target.value; $('disperseValue').textContent = dispersion; clearTimeout(editTimer); editTimer = setTimeout(applyEdit, 50); };
+$('shuffleBtn').onclick = () => { seed = Math.random() * 1000; applyEdit(); };
+$('downloadBtn').onclick = () => { const a = document.createElement('a'); a.download = `madpixels-${Date.now()}.png`; a.href = canvas.toDataURL(); a.click(); };
 
-$('disperseSlider').oninput = e => {
-    dispersion = parseInt(e.target.value);
-    $('disperseValue').textContent = dispersion;
-    applyEditEffect();
-};
-
-$('shuffleBtn').onclick = () => {
-    seed = Math.random() * 1000;
-    applyEditEffect();
-};
-
-$('downloadBtn').onclick = () => {
-    const a = document.createElement('a');
-    a.download = `madpixels-${Date.now()}.png`;
-    a.href = canvas.toDataURL('image/png');
-    a.click();
-};
-
-// Effect selection buttons
-document.querySelectorAll('.effect-btn').forEach(btn => {
-    btn.onclick = () => {
-        document.querySelectorAll('.effect-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        currentEffect = btn.dataset.effect;
-        applyEditEffect();
-    };
+document.querySelectorAll('.effect-btn').forEach(b => b.onclick = () => {
+    document.querySelectorAll('.effect-btn').forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    effect = b.dataset.effect;
+    applyEdit();
 });
 
-window.addEventListener('resize', () => {
-    if (originalImage && mode === 'game') renderGrid();
-});
+window.onresize = () => { if (origImg && mode === 'game') renderGrid(); };
 </script>
 </body>
 </html>
