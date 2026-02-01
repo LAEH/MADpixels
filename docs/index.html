@@ -9,30 +9,29 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
+
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
             --bg: #000000;
-            --card: #1c1c1e;
-            --card-elevated: #2c2c2e;
-            --separator: rgba(255,255,255,0.08);
+            --surface: #0a0a0a;
+            --border: #1a1a1a;
             --text: #ffffff;
-            --text-secondary: rgba(255,255,255,0.55);
-            --text-tertiary: rgba(255,255,255,0.3);
-            --accent: #0a84ff;
-            --accent-hover: #409cff;
-            --green: #30d158;
-            --radius: 12px;
-            --radius-lg: 20px;
+            --text-dim: #666666;
+            --accent: #ff2d6a;
+            --accent-glow: rgba(255, 45, 106, 0.4);
+            --cyan: #00f0ff;
+            --cyan-glow: rgba(0, 240, 255, 0.4);
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            font-family: 'Space Mono', monospace;
             background: var(--bg);
             color: var(--text);
             min-height: 100vh;
             min-height: 100dvh;
-            line-height: 1.4;
+            line-height: 1.5;
             -webkit-font-smoothing: antialiased;
         }
 
@@ -45,39 +44,41 @@
 
         /* Header */
         header {
-            padding: 16px 20px;
+            padding: 20px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(0,0,0,0.72);
-            backdrop-filter: saturate(180%) blur(20px);
-            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid var(--border);
         }
 
-        .title { font-size: 17px; font-weight: 600; letter-spacing: -0.4px; }
-
-        .header-actions { display: flex; gap: 8px; }
+        .logo {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: var(--accent);
+        }
 
         .icon-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: none;
-            background: var(--card);
-            color: var(--text);
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-dim);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
-        .icon-btn:hover { background: var(--card-elevated); }
-        .icon-btn:active { transform: scale(0.94); }
-        .icon-btn:disabled { opacity: 0.3; pointer-events: none; }
+        .icon-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+        .icon-btn:active { transform: scale(0.95); }
+        .icon-btn:disabled { opacity: 0.2; pointer-events: none; }
         .icon-btn svg { width: 18px; height: 18px; }
 
         /* Main */
@@ -85,63 +86,79 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            padding: 0 20px 20px;
-            gap: 16px;
-            max-width: 600px;
+            padding: 20px;
+            gap: 20px;
+            max-width: 500px;
             margin: 0 auto;
             width: 100%;
         }
 
-        /* Gallery View (Initial) */
+        /* Gallery View */
         .gallery-view {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            padding-top: 8px;
+            gap: 32px;
         }
 
         .gallery-header {
             text-align: center;
+            padding-top: 20px;
         }
 
         .gallery-title {
-            font-size: 28px;
+            font-size: 32px;
             font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 8px;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .gallery-subtitle {
-            font-size: 15px;
-            color: var(--text-secondary);
+            font-size: 12px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 2px;
+            border: 1px solid var(--border);
         }
 
         .gallery-item {
             aspect-ratio: 1;
-            border-radius: var(--radius);
             overflow: hidden;
             cursor: pointer;
             position: relative;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: var(--surface);
         }
 
-        .gallery-item:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        .gallery-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 2px solid transparent;
+            transition: all 0.15s ease;
+            pointer-events: none;
         }
 
-        .gallery-item:active { transform: scale(0.98); }
+        .gallery-item:hover::after {
+            border-color: var(--accent);
+            box-shadow: inset 0 0 30px var(--accent-glow);
+        }
+
+        .gallery-item:active { opacity: 0.8; }
 
         .gallery-item canvas {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         .gallery-item-label {
@@ -149,37 +166,46 @@
             bottom: 0;
             left: 0;
             right: 0;
-            padding: 8px 12px;
-            background: linear-gradient(transparent, rgba(0,0,0,0.7));
-            font-size: 13px;
-            font-weight: 500;
+            padding: 8px;
+            background: rgba(0,0,0,0.8);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            border-top: 1px solid var(--border);
         }
 
         .choose-photo-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 12px;
             padding: 16px;
-            border: none;
-            border-radius: var(--radius);
-            background: var(--accent);
-            color: white;
-            font-size: 17px;
-            font-weight: 600;
+            border: 1px solid var(--accent);
+            background: transparent;
+            color: var(--accent);
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
-        .choose-photo-btn:hover { background: var(--accent-hover); }
+        .choose-photo-btn:hover {
+            background: var(--accent);
+            color: var(--bg);
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
         .choose-photo-btn:active { transform: scale(0.98); }
-        .choose-photo-btn svg { width: 20px; height: 20px; }
+        .choose-photo-btn svg { width: 18px; height: 18px; }
 
         /* Editor View */
         .editor-view {
             display: none;
             flex-direction: column;
-            gap: 16px;
+            gap: 20px;
         }
 
         .editor-view.active { display: flex; }
@@ -188,8 +214,8 @@
         .canvas-area {
             aspect-ratio: 1;
             max-height: 50vh;
-            background: var(--card);
-            border-radius: var(--radius-lg);
+            background: var(--surface);
+            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -198,42 +224,45 @@
             cursor: pointer;
         }
 
+        .canvas-area:hover {
+            border-color: var(--text-dim);
+        }
+
         .canvas-area canvas {
             max-width: 100%;
             max-height: 100%;
-            border-radius: var(--radius);
         }
 
         .canvas-hint {
             position: absolute;
-            bottom: 12px;
+            bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
             padding: 6px 12px;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 100px;
-            font-size: 12px;
-            color: var(--text-secondary);
+            background: var(--bg);
+            border: 1px solid var(--border);
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
             pointer-events: none;
             opacity: 0;
-            transition: opacity 0.3s;
+            transition: opacity 0.2s;
         }
 
         .canvas-area:hover .canvas-hint { opacity: 1; }
 
         .drop-zone {
             position: absolute;
-            inset: 8px;
-            background: rgba(10,132,255,0.1);
+            inset: 0;
+            background: rgba(255, 45, 106, 0.1);
             border: 2px dashed var(--accent);
-            border-radius: var(--radius);
             display: none;
             align-items: center;
             justify-content: center;
-            font-size: 15px;
-            font-weight: 500;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             color: var(--accent);
         }
 
@@ -244,60 +273,70 @@
             display: none;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 16px;
             padding: 8px 0;
         }
 
         .compare-bar.visible { display: flex; }
-        .compare-label { font-size: 13px; color: var(--text-tertiary); transition: all 0.2s; }
-        .compare-label.active { color: var(--text); font-weight: 500; }
+
+        .compare-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+            transition: all 0.15s;
+        }
+        .compare-label.active { color: var(--cyan); }
 
         .toggle {
-            width: 51px;
-            height: 31px;
-            background: var(--card-elevated);
-            border-radius: 16px;
+            width: 48px;
+            height: 24px;
+            background: var(--surface);
+            border: 1px solid var(--border);
             position: relative;
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.15s;
         }
 
-        .toggle.on { background: var(--green); }
+        .toggle.on {
+            border-color: var(--cyan);
+            box-shadow: 0 0 15px var(--cyan-glow);
+        }
 
         .toggle-knob {
             position: absolute;
-            width: 27px;
-            height: 27px;
-            background: white;
-            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            background: var(--text-dim);
             top: 2px;
             left: 2px;
-            transition: transform 0.2s ease;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 1px 1px rgba(0,0,0,0.16);
+            transition: all 0.15s ease;
         }
 
-        .toggle.on .toggle-knob { transform: translateX(20px); }
+        .toggle.on .toggle-knob {
+            transform: translateX(24px);
+            background: var(--cyan);
+        }
 
         /* Controls */
         .controls {
-            background: var(--card);
-            border-radius: var(--radius-lg);
-            overflow: hidden;
+            border: 1px solid var(--border);
+            background: var(--surface);
         }
 
         .section {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--separator);
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
         }
 
         .section:last-child { border-bottom: none; }
 
         .section-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--text-dim);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 3px;
             margin-bottom: 12px;
         }
 
@@ -308,29 +347,42 @@
         }
 
         .effect-pill {
-            padding: 8px 14px;
-            border-radius: 100px;
-            border: none;
-            background: var(--card-elevated);
-            color: var(--text-secondary);
-            font-size: 14px;
-            font-weight: 500;
+            padding: 8px 12px;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-dim);
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
-        .effect-pill:hover { background: #3a3a3c; color: var(--text); }
+        .effect-pill:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
         .effect-pill:active { transform: scale(0.96); }
-        .effect-pill.active { background: var(--accent); color: white; }
+        .effect-pill.active {
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
 
         .setting-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 6px 0;
+            padding: 8px 0;
         }
 
-        .setting-label { font-size: 15px; color: var(--text); }
+        .setting-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
 
         .setting-control {
             display: flex;
@@ -339,63 +391,69 @@
         }
 
         .setting-value {
-            font-size: 15px;
-            color: var(--text-secondary);
-            min-width: 36px;
+            font-size: 11px;
+            color: var(--cyan);
+            min-width: 32px;
             text-align: right;
             font-variant-numeric: tabular-nums;
         }
 
         input[type="range"] {
             -webkit-appearance: none;
-            width: 120px;
-            height: 4px;
-            background: var(--card-elevated);
-            border-radius: 2px;
+            width: 100px;
+            height: 2px;
+            background: var(--border);
             outline: none;
         }
 
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 20px;
-            height: 20px;
-            background: white;
-            border-radius: 50%;
+            width: 12px;
+            height: 12px;
+            background: var(--cyan);
             cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            box-shadow: 0 0 10px var(--cyan-glow);
         }
 
         .apply-btn {
             width: 100%;
             padding: 16px;
-            border: none;
-            border-radius: var(--radius);
+            border: 1px solid var(--accent);
             background: var(--accent);
-            color: white;
-            font-size: 17px;
-            font-weight: 600;
+            color: var(--bg);
+            font-family: 'Space Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
 
-        .apply-btn:hover { background: var(--accent-hover); }
+        .apply-btn:hover {
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
         .apply-btn:active { transform: scale(0.98); }
-        .apply-btn:disabled { background: var(--card-elevated); color: var(--text-tertiary); }
+        .apply-btn:disabled {
+            background: transparent;
+            color: var(--text-dim);
+            border-color: var(--border);
+            box-shadow: none;
+        }
 
         .progress-section {
             display: none;
-            padding: 16px 20px;
+            padding: 16px;
             text-align: center;
         }
 
         .progress-section.visible { display: block; }
 
         .progress-bar {
-            height: 4px;
-            background: var(--card-elevated);
-            border-radius: 2px;
+            height: 2px;
+            background: var(--border);
             overflow: hidden;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .progress-fill {
@@ -403,48 +461,77 @@
             background: var(--accent);
             width: 0%;
             transition: width 0.1s linear;
-            border-radius: 2px;
+            box-shadow: 0 0 10px var(--accent-glow);
         }
 
-        .progress-text { font-size: 13px; color: var(--text-secondary); }
+        .progress-text {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-dim);
+        }
 
         .perf-badge {
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             padding: 4px 10px;
-            background: var(--card-elevated);
-            border-radius: 100px;
-            font-size: 12px;
-            color: var(--text-secondary);
+            border: 1px solid var(--border);
+            font-size: 10px;
+            color: var(--text-dim);
             margin-top: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .perf-badge.gpu { color: var(--green); }
+        .perf-badge.gpu {
+            color: var(--cyan);
+            border-color: var(--cyan);
+        }
 
         .hidden { display: none !important; }
 
         @media (min-width: 768px) {
-            main { max-width: 480px; padding-top: 20px; }
+            main { padding-top: 40px; }
             .canvas-area { max-height: 400px; }
-            .gallery-grid { gap: 16px; }
+            .gallery-grid { gap: 4px; }
         }
 
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .processing .apply-btn { animation: pulse 1.5s ease infinite; }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .processing .apply-btn { animation: pulse 1s ease infinite; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .gallery-item { animation: fadeIn 0.4s ease backwards; }
-        .gallery-item:nth-child(1) { animation-delay: 0.05s; }
-        .gallery-item:nth-child(2) { animation-delay: 0.1s; }
-        .gallery-item:nth-child(3) { animation-delay: 0.15s; }
-        .gallery-item:nth-child(4) { animation-delay: 0.2s; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .gallery-item { animation: fadeIn 0.3s ease backwards; }
+        .gallery-item:nth-child(1) { animation-delay: 0s; }
+        .gallery-item:nth-child(2) { animation-delay: 0.05s; }
+        .gallery-item:nth-child(3) { animation-delay: 0.1s; }
+        .gallery-item:nth-child(4) { animation-delay: 0.15s; }
+
+        /* Glitch effect on title hover */
+        .gallery-title:hover {
+            animation: glitch 0.3s ease;
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
     </style>
 </head>
 <body>
     <div class="app">
         <header>
-            <span class="title">MADpixels</span>
+            <span class="logo">MADpixels</span>
             <div class="header-actions">
                 <button class="icon-btn" id="downloadBtn" disabled title="Save">
                     <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -455,22 +542,20 @@
         </header>
 
         <main>
-            <!-- Gallery View (Initial) -->
+            <!-- Gallery View -->
             <div class="gallery-view" id="galleryView">
                 <div class="gallery-header">
                     <div class="gallery-title">MADpixels</div>
-                    <div class="gallery-subtitle">Tap a style or choose your own photo</div>
+                    <div class="gallery-subtitle">Select a style or upload</div>
                 </div>
 
-                <div class="gallery-grid" id="galleryGrid">
-                    <!-- Generated dynamically -->
-                </div>
+                <div class="gallery-grid" id="galleryGrid"></div>
 
                 <button class="choose-photo-btn" id="choosePhotoBtn">
                     <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
-                    Choose Photo
+                    Upload
                 </button>
             </div>
 
@@ -479,16 +564,16 @@
                 <div class="canvas-area" id="canvasArea">
                     <canvas id="canvas"></canvas>
                     <canvas id="glCanvas" class="hidden"></canvas>
-                    <div class="canvas-hint">Tap to change photo</div>
-                    <div class="drop-zone" id="dropZone">Drop to upload</div>
+                    <div class="canvas-hint">tap to change</div>
+                    <div class="drop-zone" id="dropZone">Drop file</div>
                 </div>
 
                 <div class="compare-bar" id="compareBar">
-                    <span class="compare-label" id="labelOriginal">Original</span>
+                    <span class="compare-label" id="labelOriginal">src</span>
                     <div class="toggle on" id="toggle">
                         <div class="toggle-knob"></div>
                     </div>
-                    <span class="compare-label active" id="labelProcessed">Edited</span>
+                    <span class="compare-label active" id="labelProcessed">out</span>
                 </div>
 
                 <div class="controls">
@@ -498,7 +583,7 @@
                     </div>
 
                     <div class="section" id="settingsSection">
-                        <div class="section-title">Adjust</div>
+                        <div class="section-title">Params</div>
                         <div id="settingsContainer"></div>
                     </div>
 
@@ -511,7 +596,7 @@
                     </div>
 
                     <div class="section">
-                        <button class="apply-btn" id="applyBtn">Apply</button>
+                        <button class="apply-btn" id="applyBtn">Execute</button>
                     </div>
                 </div>
             </div>
@@ -615,19 +700,19 @@ const effects = [
 
 const settingsConfig = {
     globalShuffle: [{ id: 'size', name: 'Size', min: 256, max: 1024, default: 512, step: 128 }],
-    binedShuffle: [{ id: 'size', name: 'Size', min: 256, max: 1024, default: 512, step: 128 }, { id: 'block', name: 'Block Size', min: 8, max: 64, default: 16, step: 8 }],
+    binedShuffle: [{ id: 'size', name: 'Size', min: 256, max: 1024, default: 512, step: 128 }, { id: 'block', name: 'Block', min: 8, max: 64, default: 16, step: 8 }],
     localShuffle: [{ id: 'spread', name: 'Intensity', min: 0, max: 100, default: 25, step: 5 }],
-    boost: [{ id: 'red', name: 'Warmth', min: 0, max: 100, default: 40, step: 5 }, { id: 'green', name: 'Tint', min: 0, max: 100, default: 30, step: 5 }, { id: 'blue', name: 'Cool', min: 0, max: 100, default: 20, step: 5 }],
-    gaussianBlur: [{ id: 'radius', name: 'Amount', min: 1, max: 30, default: 8, step: 1 }],
+    boost: [{ id: 'red', name: 'Warm', min: 0, max: 100, default: 40, step: 5 }, { id: 'green', name: 'Tint', min: 0, max: 100, default: 30, step: 5 }, { id: 'blue', name: 'Cool', min: 0, max: 100, default: 20, step: 5 }],
+    gaussianBlur: [{ id: 'radius', name: 'Radius', min: 1, max: 30, default: 8, step: 1 }],
     invert: []
 };
 
-// Gallery presets - beautiful gradients
+// Gallery presets - punk color schemes
 const presets = [
-    { name: 'Sunset', colors: { tl: [1, 0.4, 0.2], tr: [1, 0.6, 0.3], bl: [0.6, 0.2, 0.4], br: [0.8, 0.3, 0.5] } },
-    { name: 'Ocean', colors: { tl: [0.1, 0.4, 0.6], tr: [0.2, 0.5, 0.7], bl: [0.05, 0.2, 0.4], br: [0.1, 0.3, 0.5] } },
-    { name: 'Aurora', colors: { tl: [0.2, 0.8, 0.6], tr: [0.4, 0.6, 0.9], bl: [0.1, 0.3, 0.4], br: [0.2, 0.4, 0.6] } },
-    { name: 'Dusk', colors: { tl: [0.3, 0.2, 0.5], tr: [0.5, 0.3, 0.6], bl: [0.1, 0.1, 0.2], br: [0.2, 0.15, 0.3] } }
+    { name: 'Neon', colors: { tl: [1, 0.1, 0.4], tr: [0, 0.9, 1], bl: [0.1, 0, 0.2], br: [0.2, 0, 0.4] } },
+    { name: 'Void', colors: { tl: [0.05, 0.05, 0.1], tr: [0.1, 0, 0.15], bl: [0, 0, 0], br: [0.05, 0.02, 0.08] } },
+    { name: 'Acid', colors: { tl: [0.7, 1, 0], tr: [0, 1, 0.5], bl: [0.2, 0.3, 0], br: [0, 0.4, 0.2] } },
+    { name: 'Burn', colors: { tl: [1, 0.3, 0], tr: [1, 0.6, 0], bl: [0.3, 0, 0], br: [0.5, 0.1, 0] } }
 ];
 
 let state = { effect: 'localShuffle', settings: {}, original: null, processed: null, processing: false };
@@ -658,7 +743,6 @@ function generateGallery() {
         item.appendChild(label);
 
         item.onclick = () => {
-            // Use this gradient as starting image
             const fullImg = gpu.gradient(512, 512, preset.colors);
             state.original = fullImg;
             state.processed = null;
@@ -730,7 +814,7 @@ function display(data) {
 
 function updateProgress(pct) {
     $('progressFill').style.width = pct + '%';
-    $('progressText').textContent = pct < 100 ? 'Processing...' : 'Done';
+    $('progressText').textContent = pct < 100 ? 'Processing...' : 'Complete';
 }
 
 function resize(img, w, h) {
