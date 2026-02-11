@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "laeh380to760"
+  },
+  "targets": {
+    "laeh380to760": {
+      "hosting": {
+        "laeh-madpixels": ["laeh-madpixels"]
+      }
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "hosting": {
+    "target": "laeh-madpixels",
+    "public": "apps/web",
+    "ignore": ["firebase.json", "**/.*"]
+  }
+}
